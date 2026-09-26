@@ -54,7 +54,7 @@ const event = (t0, len, gen, gain = 1, pan = 0, room = 0) => {
 
 // ---------------------------------------------------------------- the lake: a low wash and lapping
 {
-  const level = regions([[0, SH["04.1"].a, 1, 0.1, 1.2], [SH["04.4"].a, SH["04.4"].b, 1.8, 0.05, 0.25], [SH["04.4"].b, SH["04.5"].b, 0.35, 0.3, 0.8],
+  const level = regions([[0, SH["04.1"].a, 1, 0.1, 1.2], [SH["04.4"].a, SH["04.4"].b, 1.2, 0.05, 0.25], [SH["04.4"].b, SH["04.5"].b, 0.35, 0.3, 0.8],
     [SH["08.1"].a - 0.6, SH["08.3"].a, 0.8, 1.2, 0.8], [SH["08.3"].a, SH["09.1"].a, 0.45, 0.8, 0.6], [SH["09.9"].a, SH["09.9"].b, 0.9, 0.4, 0.5],
     [SH["13.1"].a, SH["13.1"].b, 0.3, 0.5, 0.5], [SH["13.7"].a, DUR, 0.75, 1.2, 1.2]]);
   const r = rng(11), nl = brown(r), nr = brown(r), lpL = new Biq("lp", 420), lpR = new Biq("lp", 420);
@@ -90,7 +90,7 @@ const event = (t0, len, gen, gain = 1, pan = 0, room = 0) => {
   const a = SH["04.4"].a, b = SH["04.4"].b, r = rng(31), hl = new Biq("hp", 3000), hr = new Biq("hp", 3000);
   bed(regions([[a, b, 0.5, 0.05, 0.12]]), () => [hl.tick(r() * 2 - 1) * 0.5, hr.tick(r() * 2 - 1) * 0.5]);
   const rb = rng(32), bn = brown(rb), lp = new Biq("lp", 160), crack = new Biq("hp", 1200);
-  event(a + 0.05, 3.2, (x) => { const e = Math.min(1, x / 0.04) * Math.exp(-x / 0.9) * (1 + 0.5 * Math.sin(TAU * 3.1 * x) * Math.exp(-x)); return lp.tick(bn()) * e * 3.2 + crack.tick(rb() * 2 - 1) * Math.exp(-x / 0.08) * 0.5; }, 1, -0.2);
+  event(a + 0.05, 3.2, (x) => { const e = Math.min(1, x / 0.04) * Math.exp(-x / 0.9) * (1 + 0.5 * Math.sin(TAU * 3.1 * x) * Math.exp(-x)); return lp.tick(bn()) * e * 1.6 + crack.tick(rb() * 2 - 1) * Math.exp(-x / 0.08) * 0.5; }, 1, -0.2);
 }
 
 // ---------------------------------------------------------------- fire: a low roar and crackles

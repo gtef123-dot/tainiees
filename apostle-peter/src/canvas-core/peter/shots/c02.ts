@@ -126,7 +126,7 @@ const s025 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   // the jump's path (root position): a push, the arc, the drop into the water
   const pos: V3 = [lerp(rail[0], LAND[0], j), keys([[0, rail[1]], [0.2, rail[1]], [0.55, rail[1] + 0.55], [1, LAND[1]]], j), lerp(rail[2], LAND[2], easeOut(j))];
   const pose: BodyPose = { bend: keys([[0, 0.5], [0.2, 0.62], [0.5, -0.05], [0.8, 0.1], [1, 0.25 * (1 - land) + 0.12]], j), neck: { pitch: keys([[0, 0.3], [0.5, 0], [1, 0.15]], j) },
-    armL: { raise: keys([[0, 0.3], [0.2, -0.4], [0.5, 1.5], [1, 0.7]], j), out: keys([[0, 0.3], [0.6, 0.7], [1, 0.9]], j), elbow: 0.35 }, armR: { raise: keys([[0, 0.3], [0.2, -0.4], [0.5, 1.4], [1, 0.6]], j), out: keys([[0, 0.3], [0.6, 0.7], [1, 0.9]], j), elbow: 0.4 },
+    armL: { raise: keys([[0, 0.3], [0.2, -0.4], [0.5, 1.5], [1, 0.7]], j), out: keys([[0, 0.3], [0.6, 0.5], [1, 0.4]], j), elbow: 0.35 }, armR: { raise: keys([[0, 0.3], [0.2, -0.4], [0.5, 1.4], [1, 0.6]], j), out: keys([[0, 0.3], [0.6, 0.5], [1, 0.4]], j), elbow: 0.4 },
     legL: { hip: keys([[0, 1.3], [0.2, 1.5], [0.5, 0.2], [0.8, 0.6], [1, 0.25]], j), knee: keys([[0, 2.0], [0.2, 2.2], [0.5, 0.3], [0.8, 1.0], [1, 0.3]], j) },
     legR: { hip: keys([[0, 1.2], [0.2, 1.5], [0.5, -0.1], [0.8, 0.3], [1, 0.1]], j), knee: keys([[0, 1.9], [0.2, 2.2], [0.5, 0.2], [0.8, 0.6], [1, 0.2]], j) },
     handL: HANDS.open, handR: HANDS.open };
@@ -134,7 +134,7 @@ const s025 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const boat = boatAt(ctx, env, cam, BOAT, 0, t, { light: DAY, roll: -0.06 * smooth(0.1, 0.3, n) * (1 - smooth(0.3, 0.8, n)) });
   const simon = fig(ctx, env, cam, PETER_FIG.A, body, pos, 0.35, t, { expr: blendFace(FACE.determined, FACE.joyful, smooth(0.6, 0.8, n)), light: DAY, live: 0.2 });
   renderParts(ctx, [boat], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0.6, fx: { waterY: waterAt(cam, env, [0, 0, -0.5]), reflect: t } });
-  renderParts(ctx, [simon], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0.6, fx: air ? {} : { waterY: waterAt(cam, env, pos), reflect: t } });
+  renderParts(ctx, [simon], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0.6, fx: { waterY: waterAt(cam, env, [pos[0], 0, pos[2]]), reflect: t } }); void air; // clipped at the waterline in every phase of the jump
   const P = (p: V3) => wproj(cam, env, p), sp = P([LAND[0], 0, LAND[2]]), hitT = t - (0.08 + 0.5) * (s.frames - 1) / 30;
   splash(ctx, sp[0], sp[1], 520, hitT, 51);
   // the water he displaces keeps rippling round his thighs

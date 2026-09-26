@@ -100,13 +100,13 @@ export const pebbleTex = (env: Env, px = 1024, wet = 0) => tex(env, `pebbles:${p
   const r = rng(301), k = w / 2; // px per metre
   c.fillStyle = css(mix(hex("#6f655a"), hex("#4a4540"), wet)); c.fillRect(0, 0, w, h);
   for (let i = 0; i < 9000; i++) { const x = r() * w, y = r() * h, s = 0.6 + r() * 1.6; c.fillStyle = css(scalec(hex("#7d7166"), 0.7 + r() * 0.6), 0.6); c.fillRect(x, y, s, s); }
-  const cols = ["#3d3a38", "#4a4643", "#56504a", "#5e5249", "#8a8175", "#a59a8a", "#3a3532"].map(hex);
+  const cols = ["#3d3a38", "#4a4643", "#56504a", "#5e5249", "#6e665c", "#766c62", "#3a3532"].map(hex);
   for (let i = 0; i < 2600; i++) {
     const x = r() * w, y = r() * h, s = (0.008 + Math.pow(r(), 2.2) * 0.05) * k, e = 0.6 + r() * 0.35, a = r() * Math.PI, col = cols[Math.floor(r() * cols.length)], dark = scalec(col, 0.45 - wet * 0.1);
     wrap(w, h, x, y, s * 1.4, (X, Y) => {
-      c.fillStyle = css(dark, 0.8); c.beginPath(); c.ellipse(X + s * 0.18, Y + s * 0.2, s * 1.05, s * e * 1.05, a, 0, Math.PI * 2); c.fill();
+      c.fillStyle = css(dark, 0.5); c.beginPath(); c.ellipse(X + s * 0.18, Y + s * 0.2, s * 1.05, s * e * 1.05, a, 0, Math.PI * 2); c.fill();
       c.fillStyle = css(scalec(col, 1 - wet * 0.25)); c.beginPath(); c.ellipse(X, Y, s, s * e, a, 0, Math.PI * 2); c.fill();
-      c.fillStyle = css(mix(col, [0.96, 0.93, 0.86], 0.3 + wet * 0.45), 0.55 + wet * 0.3); c.beginPath(); c.ellipse(X - s * 0.25, Y - s * 0.28, s * 0.45, s * e * 0.3, a, 0, Math.PI * 2); c.fill();
+      c.fillStyle = css(mix(col, [0.96, 0.93, 0.86], 0.14 + wet * 0.4), 0.28 + wet * 0.3); c.beginPath(); c.ellipse(X - s * 0.25, Y - s * 0.28, s * 0.45, s * e * 0.3, a, 0, Math.PI * 2); c.fill();
     });
   }
 }, { seed: 302, sizes: [10, 5, 2.5], keepBase: 0.6, alpha: 0.7 });

@@ -158,7 +158,7 @@ export const figureParts = (ctx: CanvasRenderingContext2D, fig: Figure, pose: Bo
   const beltY = J.pelvis[1] + 0.06, torsoRows: V3[][] = [];
   // the shoulder line: widest across the deltoids at the joints, round over the acromion, then the
   // long trapezius slope up to a neck that stands clear of the collar
-  const torsoProfile: [number, number, number][] = [[0, 0.152, 0.116], [0.07, 0.168, 0.126], [0.2, 0.16, 0.118], [0.42, 0.166, 0.124], [0.6, 0.174, 0.126], [0.7, D.shoulderW + 0.025, 0.122], [0.78, D.shoulderW + 0.02, 0.116], [0.84, D.shoulderW - 0.008, 0.106], [0.9, D.shoulderW * 0.78, 0.096], [0.95, D.shoulderW * 0.56, 0.084], [0.985, 0.085, 0.072], [1.0, 0.074, 0.066]];
+  const torsoProfile: [number, number, number][] = [[0, 0.152, 0.116], [0.07, 0.168, 0.126], [0.2, 0.16, 0.118], [0.42, 0.172, 0.125], [0.6, D.shoulderW + 0.012, 0.126], [0.7, D.shoulderW + 0.025, 0.122], [0.78, D.shoulderW + 0.02, 0.116], [0.84, D.shoulderW - 0.008, 0.106], [0.9, D.shoulderW * 0.78, 0.096], [0.95, D.shoulderW * 0.56, 0.084], [0.985, 0.085, 0.072], [1.0, 0.074, 0.066]];
   const torsoLen = D.chestUp + D.neckUp - 0.05;
   for (const [t, rx, rz] of torsoProfile) { const cpt = add3([J.pelvis[0], beltY, J.pelvis[2]], mul3(up, t * torsoLen)); torsoRows.push(ring(cpt, rx * (0.92 + 0.08 * fig.bulk), rz * (0.92 + 0.08 * fig.bulk), segs, pose.twist ?? 0, 0, Math.PI * 2, (a) => 0.004 * Math.sin(a * 7 + t * 5))); }
   surface(B, torsoRows, true, clothCol(tunicC, 11));
@@ -229,12 +229,12 @@ export const figureParts = (ctx: CanvasRenderingContext2D, fig: Figure, pose: Bo
     const nTop = 7, Lm = D.hipY + 0.06 - mLen, nLow = Lm > 0.05 ? 6 : 0;
     for (let i = 0; i <= nTop; i++) {
       const t = i / (nTop + nLow), y = lerp(J.neck[1] - 0.02, beltY, i / nTop);
-      const f = clamp((y - beltY) / torsoLen), sh = smooth(0.65, 0.88, f); let rx = lerp(0.2, D.shoulderW + 0.05, sh) - smooth(0.9, 1.0, f) * 0.12; const rz = lerp(0.15, 0.135, sh) - smooth(0.92, 1.0, f) * 0.05; const cp = add3([J.pelvis[0], beltY, J.pelvis[2]], mul3(up, f * torsoLen));
+      const f = clamp((y - beltY) / torsoLen), sh = smooth(0.65, 0.88, f); let rx = lerp(0.222, D.shoulderW + 0.068, sh) - smooth(0.9, 1.0, f) * 0.12; const rz = lerp(0.172, 0.152, sh) - smooth(0.92, 1.0, f) * 0.05; /* > 3 cm off the tunic everywhere: closer, the two cloths z-fight and the mantle tears into patches */ const cp = add3([J.pelvis[0], beltY, J.pelvis[2]], mul3(up, f * torsoLen));
       // arms push the mantle out where they are
       for (const e of [J.elbowL, J.elbowR]) if (Math.abs(e[1] - y) < 0.12) rx = Math.max(rx, Math.abs(e[0] - cp[0]) + 0.07 * (1 - Math.abs(e[1] - y) / 0.12));
       levels.push([y, rx, rz, 0]); const op = lerp(0.62, open, smooth(0, 0.35, t)); mRows.push(ring([cp[0], y, cp[2] - 0.012], rx, rz, arcN, pose.twist ?? 0, op, Math.PI * 2 - op, (ang) => (0.006 + 0.022 * t) * Math.sin(ang * 7 + 0.7 + t * 0.8) + 0.01 * t * Math.sin(ang * 3.3) + 0.004 * Math.sin(ang * 17)));
     }
-    for (let i = 1; i <= nLow; i++) { const t = (nTop + i) / (nTop + nLow), u = (Lm * i) / nLow; mRows.push(dRing(u, 0.12 + 0.05 * (i / nLow), 0.1 + 0.02 * (i / nLow), arcN, open, Math.PI * 2 - open, (ang) => (0.006 + 0.022 * t) * Math.sin(ang * 7 + 0.7 + t * 0.8) + 0.01 * t * Math.sin(ang * 3.3) + 0.004 * Math.sin(ang * 17))); }
+    for (let i = 1; i <= nLow; i++) { const t = (nTop + i) / (nTop + nLow), u = (Lm * i) / nLow; mRows.push(dRing(u, 0.135 + 0.05 * (i / nLow), 0.115 + 0.02 * (i / nLow), arcN, open, Math.PI * 2 - open, (ang) => (0.006 + 0.022 * t) * Math.sin(ang * 7 + 0.7 + t * 0.8) + 0.01 * t * Math.sin(ang * 3.3) + 0.004 * Math.sin(ang * 17))); }
     if (hood > 0) {
       // a mantle drawn up over the head: it follows the skull (in the head's own frame, so it turns
       // with the head), closes over the crown, frames the face and falls to the shoulders

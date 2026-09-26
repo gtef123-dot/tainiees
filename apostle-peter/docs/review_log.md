@@ -138,3 +138,22 @@ Recorded honestly rather than hidden, with the fix list ranked below. The fixes 
 ### Performance (fixed in this pass)
 
 The plate cache was bounded by count (24) and thrashed on the Via Appia, repainting about 40 plates every frame at 9 s per frame. It is now bounded by bytes, and those frames take 0.25 s. The whole 960×540 animatic now renders in 14.8 min instead of over an hour.
+
+## Review 2: fixes after the first public cut
+
+- **Sound:**
+  - *Problem:* the bed breathed with the words.
+  - *Fix:* per-word ducking is replaced by one steady level per narration clip (8–11.5 dB down). It glides between clips that are close together and only rises in the real silences. Inside a clip the bed now moves only with the music itself: std-dev 0.9–3.9 dB, from the storm, the Tabor swell and the tolls.
+  - *Also:* the thunder in 04.4 is 6 dB lower.
+- **02.5:** Peter no longer stands on the water. He is clipped at the waterline in every phase of the jump, and his arms no longer spread into a T-pose.
+- **Cloaks:**
+  - *Cause of the torn-paper patches:* the mantle was 1–2.5 cm off the tunic, inside the renderer's 3 cm depth tolerance, so the two cloths z-fought.
+  - *Fix:* it now hangs more than 3 cm out, and reads as one cloth in most shots.
+- **Roman helmets:** duller bronze, cheek guards and a narrow crest, instead of a golden bowl with a red plate.
+- **Pebble shore:** lower-contrast stones; no more popcorn.
+- **Still open:**
+  - the horizontal band across the chest in some close-ups: the torso profile was smoothed, but the band remains, and its cause is not yet found;
+  - boxy seated crowds;
+  - the confetti crowds from above;
+  - close faces;
+  - 05.5 (Christ's face in close-up).

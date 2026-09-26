@@ -26,19 +26,32 @@ const levelled = clipGain.map((g, k) => (g ? `${T.clips[k].clip ?? k + 1}: ${g >
 const env = new Float32Array(N); { let e = 0; const att = Math.exp(-1 / (0.01 * SR)), rel = Math.exp(-1 / (0.35 * SR)); for (let i = 0; i < N; i++) { const a = Math.abs(voice[i]); e = a > e ? att * e + (1 - att) * a : rel * e + (1 - rel) * a; env[i] = e; } }
 const wavOut = (file, l, r) => { const pcm = Buffer.alloc(N * 8); for (let i = 0; i < N; i++) { pcm.writeFloatLE(l[i], i * 8); pcm.writeFloatLE(r[i], i * 8 + 4); } const h = Buffer.alloc(44); h.write("RIFF", 0); h.writeUInt32LE(36 + pcm.length, 4); h.write("WAVEfmt ", 8); h.writeUInt32LE(16, 16); h.writeUInt16LE(3, 20); h.writeUInt16LE(2, 22); h.writeUInt32LE(SR, 24); h.writeUInt32LE(SR * 8, 28); h.writeUInt16LE(8, 32); h.writeUInt16LE(32, 34); h.write("data", 36); h.writeUInt32LE(pcm.length, 40); writeFileSync(file, Buffer.concat([h, pcm])); };
 const L = new Float32Array(N), R = new Float32Array(N), duckDb = Number(arg("duck", 9));
-const bed = (file, gain, duck = duckDb) => { if (!file || !existsSync(file)) return; const s = decode(file, 2); for (let i = 0; i < N && i * 2 + 1 < s.length; i++) { const speak = Math.min(1, env[i] * 14), g = gain * Math.pow(10, (-duck * speak) / 20); L[i] += s[i * 2] * g; R[i] += s[i * 2 + 1] * g; } };
+const bed = (file, gain, duck = duckDb) => { if (!file || !existsSync(file)) return; const s = decode(file, 2); for (let i = 0; i < N && i * 2 + 1 < s.length; i++) { const g = gain; void duck; /* no per-word ducking: see the steady duck below */ L[i] += s[i * 2] * g; R[i] += s[i * 2 + 1] * g; } };
 bed(arg("music", join(ROOT, ".tmp/music.wav")), Number(arg("musicGain", 0.6))); bed(arg("sfx", join(ROOT, ".tmp/sfx.wav")), Number(arg("sfxGain", 0.4)), Number(arg("sfxDuck", 5)));
-// intelligibility guard: wherever he speaks, the bed stays at least --margin dB (default 10) under the
-// voice, measured in 300 ms windows; the extra cut is smoothed (60 ms in, 400 ms out) so it breathes
+// STEADY DUCK. The bed never breathes with the words. Each narration clip gets ONE level for its whole
+// length: at least --duck dB, more if the bed's loud moments (95th percentile, 400 ms windows) would
+// come within --margin dB of his voice. It is reached by a slow 0.8 s ramp before he speaks; between
+// clips closer than 1.5 s the bed glides from one clip's level to the next instead of popping up, and
+// it only rises again in the real silences (the head, the long holds, the tail).
 {
-  const margin = Number(arg("margin", 10)), win = Math.round(0.3 * SR), hop = Math.round(0.01 * SR), nH = Math.ceil(N / hop), need = new Float32Array(nH).fill(1);
-  const cv = new Float64Array(N + 1), cb = new Float64Array(N + 1); for (let i = 0; i < N; i++) { cv[i + 1] = cv[i] + voice[i] ** 2; cb[i + 1] = cb[i] + (L[i] ** 2 + R[i] ** 2) / 2; }
-  for (let h = 0; h < nH; h++) { const a = Math.max(0, h * hop - (win >> 1)), b = Math.min(N, a + win), v = 10 * Math.log10((cv[b] - cv[a]) / (b - a) + 1e-12), bd = 10 * Math.log10((cb[b] - cb[a]) / (b - a) + 1e-12); if (v > -45) { const over = bd - (v - margin); if (over > 0) need[h] = Math.pow(10, -over / 20); } }
-  let g = 1; const at = Math.exp(-1 / (0.06 * SR / hop)), rl = Math.exp(-1 / (0.4 * SR / hop)), gh = new Float32Array(nH);
-  for (let h = nH - 1, m = 1; h >= 0; h--) { m = Math.min(need[h], 1 - (1 - m) * at); gh[h] = m; } // look ahead: start the cut before the word
-  for (let h = 0; h < nH; h++) { g = gh[h] < g ? gh[h] : 1 - (1 - g) * rl; gh[h] = g; }
-  let cut = 0; for (let i = 0; i < N; i++) { const x = gh[Math.min(nH - 1, Math.floor(i / hop))]; L[i] *= x; R[i] *= x; if (x < 0.9) cut++; }
-  console.log(`intelligibility guard: bed pulled further down for ${(cut / SR).toFixed(1)} s (margin ${margin} dB)`);
+  const margin = Number(arg("margin", 11)), minDuck = Number(arg("duck", 8)), ramp = Math.round(0.8 * SR), win = Math.round(0.4 * SR);
+  const reg = T.clips.map((c) => ({ a: Math.round((c.start.frame / T.fps) * SR), b: Math.min(N, Math.round(((c.end.frame + 1) / T.fps) * SR)) }));
+  const rms = (x, y, a, b) => { let e = 0; for (let i = a; i < b; i++) e += x[i] ** 2 + (y ? y[i] ** 2 : x[i] ** 2); return 10 * Math.log10(e / (2 * (b - a)) + 1e-12); };
+  const lv = reg.map(({ a, b }) => {
+    const vs = [], bs = []; for (let i = a; i + win <= b; i += win >> 1) { const v = rms(voice, null, i, i + win); if (v > -45) { vs.push(v); bs.push(rms(L, R, i, i + win)); } }
+    vs.sort((p, q) => p - q); bs.sort((p, q) => p - q);
+    return Math.max(minDuck, Math.min(24, (bs[Math.floor(bs.length * 0.95)] ?? -90) - ((vs[vs.length >> 1] ?? -30) - margin)));
+  });
+  const D = new Float32Array(N), cs = (u) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(1, u)));
+  reg.forEach(({ a, b }, k) => {
+    const d = lv[k], nx = reg[k + 1], glide = nx && nx.a - b < 1.5 * SR;
+    for (let i = Math.max(0, a - ramp); i < a; i++) D[i] = Math.max(D[i], d * cs((i - (a - ramp)) / ramp));
+    for (let i = a; i < b; i++) D[i] = Math.max(D[i], d);
+    if (glide) for (let i = b; i < nx.a; i++) D[i] = Math.max(D[i], d + (lv[k + 1] - d) * cs((i - b) / (nx.a - b)));
+    else for (let i = b; i < Math.min(N, b + 1.2 * SR); i++) D[i] = Math.max(D[i], d * (1 - cs((i - b) / (1.2 * SR))));
+  });
+  for (let i = 0; i < N; i++) { const x = Math.pow(10, -D[i] / 20); L[i] *= x; R[i] *= x; }
+  console.log(`steady duck per clip (dB): ${lv.map((x) => x.toFixed(1)).join(" ")}`);
 }
 if (process.argv.includes("--stems")) { wavOut(join(ROOT, ".tmp/mix-bed.wav"), L, R); wavOut(join(ROOT, ".tmp/mix-voice.wav"), voice, voice); }
 for (let i = 0; i < N; i++) { L[i] += voice[i]; R[i] += voice[i]; }
