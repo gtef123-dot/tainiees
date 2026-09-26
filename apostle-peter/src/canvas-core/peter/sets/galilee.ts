@@ -17,8 +17,10 @@ const P = (env: Env, key: string, w: number, h: number, draw: (c: CanvasRenderin
   plate(env, `${key}@${env.scale}`, w * env.scale, h * env.scale, (s) => { s.ctx.save(); s.ctx.scale(env.scale, env.scale); draw(s.ctx); s.ctx.restore(); if (paint) paintOver(env, s, { ...paint, sizes: (paint.sizes ?? [22, 11, 5]).map((v) => Math.max(1.5, v * env.scale)) }); });
 
 // the far country: sky, four ridges receding, the lake far below. Horizon (the lake's far shore) at y=560.
-export const hillsBackdrop = (env: Env, time: HillTime, w = 2800, h = 900) => P(env, `gal:back:${time}:${w}`, w, h, (c) => {
+export const hillsBackdrop = (env: Env, time: HillTime, w = 2800, h = 1300) => P(env, `gal:back2:${time}:${w}`, w, h, (c) => {
   const S = T[time], cx = (w - 1920) / 2;
+  c.translate(0, 400);   // 400 px of extra sky above the old layout (the horizon is now at 960)
+  sky(c, w, h, [[0, S.sky[0][1]], [1, S.sky[0][1]]]); c.save(); c.translate(0, -400); sky(c, w, 400, [[0, S.sky[0][1]], [1, S.sky[0][1]]]); c.restore();
   sky(c, w, h, S.sky.map(([t, col]) => [t * 0.7, col] as [number, string]).concat([[1, S.sky[S.sky.length - 1][1]]]), { ...S.sun, x: S.sun.x + cx });
   clouds(c, 61, 14, [0, 30, w, 330], { lit: S.cloud[0], shade: S.cloud[1], alpha: 0.45, flat: 0.34, size: 120, sunX: S.sun.x + cx });
   streaks(c, 62, 22, [0, 330, w, 520], S.cloud[0], 0.3);
@@ -71,8 +73,8 @@ export const wheat = (env: Env, time: HillTime, w = 2800, h = 700, t = 0) => P(e
 export const hillsWorld = (ctx: CanvasRenderingContext2D, env: Env, cam: WCam, time: HillTime, focal = 2000, blur = 0) => {
   const hy = (cam.cy ?? env.H / 2) - Math.tan(cam.tilt) * (cam.focal ?? focal), px = panOf(cam), back = hillsBackdrop(env, time);
   ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.fillStyle = T[time].sky[0][1]; ctx.fillRect(0, 0, env.W, env.H); ctx.restore();
-  const src: Surface = blur > 0.05 ? plate(env, `gal:back:${time}:soft@${env.scale}`, back.w, back.h, (s) => { const b = blurInto(env, back, 24 * env.scale); s.ctx.drawImage(b.canvas as CanvasImageSource, 0, 0); }) : back;
-  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.drawImage(src.canvas as CanvasImageSource, (env.W - 2800) / 2 + px, hy - 560, 2800, 900); ctx.restore();
+  const src: Surface = blur > 0.05 ? plate(env, `gal:back2:${time}:soft@${env.scale}`, back.w, back.h, (s) => { const b = blurInto(env, back, 24 * env.scale); s.ctx.drawImage(b.canvas as CanvasImageSource, 0, 0); }) : back;
+  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.drawImage(src.canvas as CanvasImageSource, (env.W - 2800) / 2 + px, hy - 960, 2800, 1300); ctx.restore();
   return hy;
 };
 export { lerp, tree };

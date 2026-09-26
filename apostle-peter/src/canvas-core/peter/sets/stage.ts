@@ -76,9 +76,9 @@ export const card = (ctx: C, env: Env, cam: WCam, tex: Surface, o: { at: V3; w: 
   const U0 = o.u0 ?? 0, U1 = o.u1 ?? 1;
   ctx.save(); ctx.globalAlpha = o.alpha ?? 1;
   for (let i = 0; i < cols; i++) {
-    const ua = i / cols, ub = (i + 1) / cols, tl = P(ua, 1), tr = P(ub, 1), bl = P(ua, 0);
-    if (behind(cam, tl[2])) continue;
-    mapTo(ctx, env, tex, lerp(U0, U1, ua) * tex.w, 0, (ub - ua) * (U1 - U0) * tex.w, tex.h, [tl[0], tl[1]], [tr[0], tr[1]], [bl[0], bl[1]], 0.004);
+    const ua = i / cols, ub = (i + 1) / cols, tl = P(ua, 1), tr = P(ub, 1), bl = P(ua, 0), br = P(ub, 0);
+    if (behind(cam, tl[2]) || behind(cam, tr[2]) || behind(cam, bl[2]) || behind(cam, br[2])) continue;
+    quadTo(ctx, env, tex, lerp(U0, U1, ua) * tex.w, 0, (ub - ua) * (U1 - U0) * tex.w, tex.h, [tl[0], tl[1]], [tr[0], tr[1]], [bl[0], bl[1]], [br[0], br[1]]);
   }
   ctx.restore();
 };
@@ -205,3 +205,41 @@ export const streetTex = (env: Env, key: string, o: { sun: -1 | 1; lit?: number 
   const g = c.createLinearGradient(0, h - 0.5 * k, 0, h); g.addColorStop(0, "rgba(150,130,100,0)"); g.addColorStop(1, "rgba(150,130,100,0.45)"); c.fillStyle = g; c.fillRect(0, h - 0.5 * k, w, 0.5 * k);
   paintOver(env, s, { seed: 362, sizes: [10, 5, 2.5], keepBase: 0.6, alpha: 0.7 });
 });
+// the cliff at Caesarea Philippi (Banias): a wall of pale limestone streaked red-brown, fissured
+// in tall blocks, the dark mouth of the grotto low down, carved niches, figs and ivy in the cracks.
+// One card: 36 m wide x 28 m tall. glow: how much the late sun grazes it.
+export const cliffTex = (env: Env, glowAmt = 1) => plate(env, `tex:cliff:${glowAmt}`, 1800, 1400, (s) => {
+  const c = s.ctx, w = 1800, h = 1400, r = rng(371), k = w / 36, base = hex("#b8a488"), warm = hex("#e8b27a"), dark = hex("#5a4a3e");
+  // the silhouette against the sky: a ragged top edge
+  c.beginPath(); c.moveTo(0, h); for (let x = 0; x <= w; x += 12) c.lineTo(x, 120 + 60 * Math.sin(x * 0.004 + 1) + 35 * Math.sin(x * 0.017) + 14 * Math.sin(x * 0.07)); c.lineTo(w, h); c.closePath();
+  const g = c.createLinearGradient(0, 0, w, 0); g.addColorStop(0, css(mix(base, warm, 0.45 * glowAmt))); g.addColorStop(0.6, css(mix(base, warm, 0.25 * glowAmt))); g.addColorStop(1, css(scalec(base, 0.82))); c.fillStyle = g; c.fill();
+  c.save(); c.clip();
+  // tall blocks: vertical fissures with shaded faces, and horizontal bedding
+  for (let x = 0; x < w; ) { const bw = (1.2 + r() * 3.5) * k; c.fillStyle = css(scalec(dark, 0.7), 0.55); c.fillRect(x, 0, 2 + r() * 4, h); const sg = c.createLinearGradient(x, 0, x + bw, 0); sg.addColorStop(0, css(scalec(base, 0.6), 0.35)); sg.addColorStop(0.3, css(base, 0)); sg.addColorStop(0.85, css(warm, 0.18 * glowAmt)); sg.addColorStop(1, css(scalec(base, 0.7), 0.3)); c.fillStyle = sg; c.fillRect(x, 0, bw, h); x += bw; }
+  for (let y = 200; y < h; y += (0.6 + r() * 1.4) * k) { c.strokeStyle = css(scalec(dark, 0.9), 0.3 + r() * 0.25); c.lineWidth = 1.5 + r() * 2; c.beginPath(); c.moveTo(0, y); for (let x = 0; x <= w; x += 40) c.lineTo(x, y + Math.sin(x * 0.01 + y) * 6 + (r() - 0.5) * 4); c.stroke(); }
+  // iron-red streaks running down from the ledges, pale weathering
+  for (let i = 0; i < 70; i++) { const x = r() * w, y0 = 150 + r() * h * 0.6, l = (2 + r() * 8) * k; const sg = c.createLinearGradient(0, y0, 0, y0 + l); sg.addColorStop(0, css(hex("#8a5a3a"), 0.35)); sg.addColorStop(1, css(hex("#8a5a3a"), 0)); c.fillStyle = sg; c.fillRect(x, y0, 4 + r() * 16, l); }
+  // the grotto: a great dark arched mouth low on the left, deep shadow inside
+  const gx = w * 0.3, gy = h - 1.5 * k, gw = 9 * k, gh = 8 * k; c.fillStyle = "#15100c"; c.beginPath(); c.moveTo(gx - gw / 2, gy); c.bezierCurveTo(gx - gw * 0.55, gy - gh * 0.8, gx - gw * 0.2, gy - gh * 1.05, gx + gw * 0.05, gy - gh); c.bezierCurveTo(gx + gw * 0.4, gy - gh * 0.95, gx + gw * 0.55, gy - gh * 0.6, gx + gw / 2, gy); c.closePath(); c.fill();
+  const ig = c.createRadialGradient(gx, gy - gh * 0.3, 0, gx, gy - gh * 0.3, gw * 0.6); ig.addColorStop(0, "rgba(60,40,28,0.5)"); ig.addColorStop(1, "rgba(0,0,0,0)"); c.fillStyle = ig; c.fillRect(gx - gw, gy - gh * 1.2, gw * 2, gh * 1.3);
+  // carved niches to the right of it, each a small shadowed arch with a ledge
+  for (let i = 0; i < 5; i++) { const nx = w * (0.5 + i * 0.07), ny = h - (4 + (i % 2) * 3) * k, nw = 1.4 * k, nh = 2.2 * k; c.fillStyle = css(scalec(dark, 0.6)); c.beginPath(); c.moveTo(nx, ny); c.lineTo(nx, ny - nh + nw / 2); c.arc(nx + nw / 2, ny - nh + nw / 2, nw / 2, Math.PI, 0); c.lineTo(nx + nw, ny); c.closePath(); c.fill(); c.fillStyle = css(mix(base, warm, 0.4 * glowAmt)); c.fillRect(nx - 0.15 * k, ny, nw + 0.3 * k, 0.18 * k); }
+  // green in the cracks: figs, ivy, tufts
+  for (let i = 0; i < 120; i++) { const x = r() * w, y = 250 + r() * (h - 300), sz = (0.2 + r() * 0.9) * k; c.fillStyle = css(mix(hex("#4c5a30"), hex("#7a8448"), r())); c.beginPath(); for (let q = 0; q < 6; q++) { const a = r() * Math.PI * 2; c.ellipse(x + Math.cos(a) * sz * 0.4, y + Math.sin(a) * sz * 0.3, sz * 0.35, sz * 0.22, a, 0, Math.PI * 2); } c.fill(); }
+  // scree and fallen blocks at the foot
+  for (let i = 0; i < 60; i++) { const x = r() * w, y = h - r() * 1.2 * k, sz = (0.3 + r() * 1.2) * k; c.fillStyle = css(scalec(mix(base, warm, 0.2 * glowAmt), 0.7 + r() * 0.4)); c.beginPath(); c.ellipse(x, y, sz, sz * 0.55, 0, Math.PI, 0); c.fill(); }
+  c.restore();
+  paintOver(env, s, { seed: 372, sizes: [16, 8, 4], keepBase: 0.55, alpha: 0.75 });
+});
+
+// a tree seen side-on, on a transparent card (oak, fig, poplar, olive, cypress, pine), 600 x 700 px
+import { paintTree, type TreeKind } from "../paint/nature";
+export const treeTex = (env: Env, kind: TreeKind, seed: number, light: -1 | 1 = -1) => plate(env, `tex:tree2:${kind}:${seed}:${light}`, 600, 700, (s) => {
+  paintTree(s.ctx, 300, 690, 670, seed, kind, light);
+  paintOver(env, s, { seed: seed + 1, sizes: [6, 3], keepBase: 0.75, alpha: 0.55 });
+});
+// stand a scatter of tree cards around the scene (each faces the camera), far to near
+export const trees = (ctx: C, env: Env, cam: WCam, items: { at: V3; kind: TreeKind; h: number; seed: number }[], light: -1 | 1 = -1, alpha = 1) => {
+  const order = items.map((it) => ({ it, d: wproj(cam, env, it.at)[2] })).sort((a, b) => a.d - b.d);
+  for (const { it } of order) { const tx = treeTex(env, it.kind, it.seed, light); card(ctx, env, cam, tx, { at: it.at, w: it.h * (600 / 700), h: it.h, yaw: cam.yaw, cols: 2, alpha }); }
+};

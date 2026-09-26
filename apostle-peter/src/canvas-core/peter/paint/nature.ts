@@ -152,3 +152,48 @@ export const road = (ctx: C, pts: [number, number, number][], color: string, see
   for (const s of [-0.22, 0.22]) { ctx.strokeStyle = css(scalec(c, 0.8), 0.45); ctx.lineWidth = 2; ctx.beginPath(); pts.forEach(([x, y, w], i) => (i ? ctx.lineTo(x + s * w, y) : ctx.moveTo(x + s * w, y))); ctx.stroke(); }
 };
 export { col, smooth };
+
+// ---------------------------------------------------------------- painted trees
+// A tree the way a painter builds it: a skeleton of tapering limbs, then foliage as masses of small
+// leaf-dabs clustered at the limb ends, each mass dark underneath and away from the light, light on
+// top and on the lit side, with sky holes through the thinner species. Back masses first, then the
+// limbs, then the front masses.
+export type TreeKind = "oak" | "fig" | "poplar" | "olive" | "cypress" | "pine";
+const SPECIES: Record<TreeKind, { leaf: string; lit: string; trunk: string; crown: [number, number]; top: number; limbs: number; spread: number; dab: number; holes: number; clusters: number }> = {
+  oak: { leaf: "#38432a", lit: "#7e8a52", trunk: "#463c32", crown: [0.62, 0.5], top: 0.42, limbs: 4, spread: 0.9, dab: 7, holes: 0.08, clusters: 11 },
+  fig: { leaf: "#3e5028", lit: "#849652", trunk: "#6a6258", crown: [0.66, 0.46], top: 0.36, limbs: 5, spread: 1.0, dab: 9, holes: 0.12, clusters: 10 },
+  poplar: { leaf: "#46552e", lit: "#9aa46a", trunk: "#7a7466", crown: [0.2, 0.86], top: 0.12, limbs: 3, spread: 0.25, dab: 5, holes: 0.1, clusters: 9 },
+  olive: { leaf: "#5a6448", lit: "#b8bea0", trunk: "#5d554a", crown: [0.64, 0.42], top: 0.4, limbs: 4, spread: 1.0, dab: 5, holes: 0.3, clusters: 12 },
+  cypress: { leaf: "#26301f", lit: "#5e6a42", trunk: "#4a3f35", crown: [0.14, 0.92], top: 0.06, limbs: 1, spread: 0.1, dab: 5, holes: 0.02, clusters: 8 },
+  pine: { leaf: "#34402a", lit: "#7c8a52", trunk: "#5a4636", crown: [0.8, 0.2], top: 0.72, limbs: 5, spread: 1.1, dab: 6, holes: 0.1, clusters: 12 },
+};
+export const paintTree = (c: C, x: number, y: number, h: number, seed: number, kind: TreeKind, light: -1 | 1 = -1) => {
+  const S = SPECIES[kind], r = rng(seed), leaf = hex(S.leaf), lit = hex(S.lit), bark = hex(S.trunk), L = light;
+  const crownY = y - h * (1 - S.crown[1] / 2), cw = h * S.crown[0] / 2, chh = h * S.crown[1] / 2;
+  // clusters: points inside the crown ellipse, bigger in the middle
+  const cl: { x: number; y: number; r: number; front: boolean }[] = [];
+  for (let i = 0; i < S.clusters; i++) { const a = r() * Math.PI * 2, d = Math.sqrt(r()) * 0.78; cl.push({ x: x + Math.cos(a) * d * cw + (kind === "pine" ? (r() - 0.5) * cw * 0.3 : 0), y: crownY + Math.sin(a) * d * chh, r: (0.28 + r() * 0.22) * Math.min(cw, chh * 1.6) * (kind === "poplar" || kind === "cypress" ? 1.6 : 1), front: r() < 0.7 }); }
+  if (kind === "poplar" || kind === "cypress") for (const q of cl) q.x = x + (q.x - x) * 0.6;
+  const mass = (q: { x: number; y: number; r: number }, dark: number) => {
+    const n = Math.round(q.r * q.r * 0.035 + 30);
+    for (let i = 0; i < n; i++) {
+      const a = r() * Math.PI * 2, d = Math.sqrt(r()), px = q.x + Math.cos(a) * d * q.r, py = q.y + Math.sin(a) * d * q.r * 0.85;
+      if (r() < S.holes * d) continue;
+      const side = clamp(0.5 + L * -1 * (px - q.x) / q.r * 0.45 + (q.y - py) / q.r * 0.4 + (r() - 0.5) * 0.25), col = mix(scalec(leaf, 0.7 - dark * 0.25), lit, side * side * (1 - dark * 0.5));
+      c.fillStyle = css(col, 0.9); c.beginPath(); c.ellipse(px, py, S.dab * (0.6 + r() * 0.8), S.dab * (0.35 + r() * 0.4), r() * Math.PI, 0, Math.PI * 2); c.fill();
+    }
+  };
+  // back masses (darker)
+  for (const q of cl) if (!q.front) mass(q, 0.6);
+  // limbs: the trunk splits toward the clusters
+  const trunkTop = y - h * S.top, tw = h * (kind === "poplar" || kind === "cypress" ? 0.02 : 0.034);
+  const stroke = (x0: number, y0: number, x1: number, y1: number, w0: number, w1: number, bend: number) => { const mx = (x0 + x1) / 2 + bend, my = (y0 + y1) / 2; c.fillStyle = css(bark); c.beginPath(); const nx = -(y1 - y0), ny = x1 - x0, nl = Math.hypot(nx, ny) || 1; c.moveTo(x0 + (nx / nl) * w0, y0 + (ny / nl) * w0); c.quadraticCurveTo(mx + (nx / nl) * (w0 + w1) / 2, my + (ny / nl) * (w0 + w1) / 2, x1 + (nx / nl) * w1, y1 + (ny / nl) * w1); c.lineTo(x1 - (nx / nl) * w1, y1 - (ny / nl) * w1); c.quadraticCurveTo(mx - (nx / nl) * (w0 + w1) / 2, my - (ny / nl) * (w0 + w1) / 2, x0 - (nx / nl) * w0, y0 - (ny / nl) * w0); c.closePath(); c.fill();
+    c.fillStyle = css(mix(bark, [0.9, 0.86, 0.78], 0.3), 0.6); c.beginPath(); c.moveTo(x0 + L * -w0 * 0.5, y0); c.quadraticCurveTo(mx + L * -w0 * 0.4, my, x1 + L * -w1 * 0.5, y1); c.lineTo(x1, y1); c.quadraticCurveTo(mx, my, x0, y0); c.closePath(); c.fill(); };
+  const lean = (r() - 0.5) * h * (kind === "olive" ? 0.18 : kind === "pine" ? 0.14 : 0.06);
+  stroke(x, y, x + lean, trunkTop, tw, tw * 0.7, (r() - 0.5) * tw * 3);
+  if (kind === "olive") { stroke(x - tw * 0.6, y, x + lean * 0.6 - tw, trunkTop + h * 0.05, tw * 0.6, tw * 0.35, tw * 2); }
+  const tips = [...cl].sort((a, b) => a.y - b.y).slice(0, S.limbs + 2);
+  for (const q of tips) stroke(x + lean, trunkTop, lerp(x + lean, q.x, 0.7), lerp(trunkTop, q.y, 0.7), tw * 0.5, tw * 0.14, (r() - 0.5) * tw * 4);
+  // front masses
+  for (const q of cl) if (q.front) mass(q, 0.1);
+};
