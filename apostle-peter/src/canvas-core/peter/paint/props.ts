@@ -1,0 +1,106 @@
+// PROPS. The Galilee boat in 3D (after the 1st-century boat found at Ginosar: ~8.2 m, cedar
+// planks on oak frames, one mast), nets as a grid of cord and knots, fire, torches and lamps.
+import { fractal, rng } from "../../core";
+import { type V3, type RGB, type M3, clamp, lerp, smooth, hex, mix, scalec, css, rotation, apply, add3, mul3 } from "../lib/math";
+import { newB, surface, tube, toParts } from "../figure/build";
+import type { Parts, Light } from "../figure/head";
+
+export type Place3 = { R?: M3; x: number; y: number; scale: number; yaw: number; pitch?: number; roll?: number; z?: number; light: Light; paint?: number; alpha?: number };
+
+// ---------------------------------------------------------------- the boat
+export const boatParts = (o: Place3 & { sail?: "furled" | "none"; seed?: number; wet?: number }): Parts => {
+  const B = newB(), Lh = 4.1, cedar = hex("#7a4e32"), pitch = hex("#2a211c"), inner = hex("#8b6446"), rail = hex("#4e3424");
+  const beam = (x: number) => 1.12 * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(x) / Lh, x > 0 ? 2.0 : 2.6)), 0.55);
+  const sheer = (x: number) => 0.55 + 0.32 * Math.pow(Math.abs(x) / Lh, 3), keel = (x: number) => -0.58 + 0.25 * Math.pow(Math.abs(x) / Lh, 2);
+  const NX = 26, NP = 18, rowsOut: V3[][] = [];
+  for (let i = 0; i <= NX; i++) {
+    const x = lerp(-Lh, Lh, i / NX), b = Math.max(0.02, beam(x)), s = sheer(x), k = keel(x);
+    rowsOut.push(Array.from({ length: NP + 1 }, (_, j) => { const f = j / NP, ph = f * Math.PI, depth = Math.pow(Math.sin(ph), 0.55); return [x, lerp(s, k, depth), b * Math.cos(ph) * (0.35 + 0.65 * Math.pow(Math.sin(ph) * 0.5 + 0.5, 0.2))] as V3; }));
+  }
+  const r = rng(o.seed ?? 3);
+  const plankCol = (base: RGB, below: boolean) => (_r: number, k: number, p: V3): RGB => {
+    const band = Math.floor((1 - Math.abs(k * 2 - 1)) * 7), seam = Math.abs(((1 - Math.abs(k * 2 - 1)) * 7) % 1 - 0.5) > 0.46 ? 0.72 : 1;
+    let c = scalec(base, (0.9 + (band % 2) * 0.08) * seam * (0.92 + fractal(71, p[0] * 3, p[1] * 3 + p[2] * 3, 1, 1, 2) * 0.16));
+    if (below && p[1] < 0.05) c = mix(c, pitch, smooth(0.05, -0.1, p[1]));
+    if (o.wet && p[1] < 0.2) c = scalec(c, 0.85);
+    return c;
+  };
+  surface(B, rowsOut, false, plankCol(cedar, true), { noCull: true, flowVertical: false });
+  // the inside: a slightly smaller shell in the lighter, worn wood (the insides of the planks)
+  const rowsIn = rowsOut.map((row) => row.map((p) => [p[0], p[1] + 0.02, p[2] * 0.93] as V3));
+  const baseIn = B.V.length; surface(B, rowsIn, false, plankCol(inner, false), { noCull: true, flowVertical: false });
+  for (let i = baseIn; i < B.V.length; i++) B.N[i] = mul3(B.N[i], -1);
+  // gunwale rails, thwarts, stem and stern posts, mast and furled sail
+  for (const side of [-1, 1]) tube(B, Array.from({ length: NX + 1 }, (_, i) => { const x = lerp(-Lh * 0.99, Lh * 0.99, i / NX); return [x, sheer(x) + 0.02, side * beam(x) * 1.01] as V3; }), Array.from({ length: NX + 1 }, () => 0.045), 6, () => rail);
+  for (const tx of [-1.6, 0.35, 2.1]) { const b = beam(tx) * 0.9, y = sheer(tx) - 0.28; surface(B, [[[tx - 0.13, y, -b], [tx - 0.13, y, b]], [[tx + 0.13, y, -b], [tx + 0.13, y, b]]], false, () => scalec(inner, 0.95), { noCull: true, flowVertical: false }); }
+  tube(B, [[Lh - 0.05, sheer(Lh) - 0.2, 0], [Lh + 0.12, sheer(Lh) + 0.28, 0]], [0.07, 0.06], 6, () => rail);
+  tube(B, [[-Lh + 0.05, sheer(-Lh) - 0.2, 0], [-Lh - 0.1, sheer(-Lh) + 0.2, 0]], [0.07, 0.06], 6, () => rail);
+  if (o.sail !== "none") {
+    tube(B, [[0.6, -0.4, 0], [0.6, 5.2, 0]], [0.075, 0.05], 8, () => hex("#5e4a36"));
+    const yard: V3[] = Array.from({ length: 9 }, (_, i) => [0.6 + 0.1, 4.95 - Math.abs(i - 4) * 0.02, lerp(-2.6, 2.6, i / 8)] as V3);
+    tube(B, yard, yard.map((_, i) => 0.09 + 0.07 * Math.sin((i / 8) * Math.PI) + 0.02 * r()), 9, (t) => mix(hex("#b9a27c"), hex("#8f7a58"), Math.abs(t - 0.5)));
+  }
+  const R = o.R ?? rotation(o.yaw, o.pitch ?? 0, o.roll ?? 0);
+  return { ...toParts(B, { x: o.x, y: o.y, scale: o.scale, R, z: o.z, light: o.light, alpha: o.alpha, paint: o.paint ?? 1, seed: o.seed ?? 3 }), overlays: [] };
+};
+// the height of the boat's gunwale at a point along its length (for placing hands, nets, people)
+export const boatGunwale = (x: number) => 0.55 + 0.32 * Math.pow(Math.abs(x) / 4.1, 3) + 0.04;
+export const boatBeam = (x: number) => 1.12 * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(x) / 4.1, x > 0 ? 2.0 : 2.6)), 0.55);
+
+// ---------------------------------------------------------------- nets
+// a net is a grid of knots; it is drawn as cord, lit, with water beading on it if wet
+export type NetGrid = V3[][];
+export const drawNet = (ctx: CanvasRenderingContext2D, grid: NetGrid, o: { x: number; y: number; scale: number; R: M3; color?: string; lw?: number; alpha?: number; wet?: number; light?: Light }) => {
+  const c = hex(o.color ?? "#7a6a52"), P = (p: V3) => { const w = apply(o.R, p); return [o.x + w[0] * o.scale, o.y - w[1] * o.scale] as [number, number]; };
+  const S = grid.map((row) => row.map(P)), lw = o.lw ?? Math.max(0.5, o.scale * 0.0035), lit = o.light ? clamp(0.55 + 0.45 * o.light.keyAmt * 0.6) : 1;
+  ctx.save(); ctx.globalAlpha = o.alpha ?? 1; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.strokeStyle = css(scalec(c, 0.55 * lit)); ctx.lineWidth = lw * 1.5;
+  const lines = () => { ctx.beginPath(); for (const row of S) { row.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); } for (let j = 0; j < S[0].length; j++) S.forEach((row, i) => (i ? ctx.lineTo(row[j][0], row[j][1]) : ctx.moveTo(row[j][0], row[j][1]))); ctx.stroke(); };
+  lines(); ctx.strokeStyle = css(scalec(c, 1.05 * lit)); ctx.lineWidth = lw * 0.7; ctx.translate(-lw * 0.3, -lw * 0.3); lines(); ctx.translate(lw * 0.3, lw * 0.3);
+  if (o.scale > 150) { ctx.fillStyle = css(scalec(c, 0.7 * lit)); for (const row of S) for (const p of row) { ctx.beginPath(); ctx.arc(p[0], p[1], lw * 1.1, 0, Math.PI * 2); ctx.fill(); } }
+  if (o.wet) { const r = rng(5); ctx.fillStyle = `rgba(235,242,250,${0.7 * o.wet})`; for (const row of S) for (const p of row) if (r() < 0.25) { ctx.beginPath(); ctx.arc(p[0] + lw, p[1] + lw * 1.5, lw * 0.9, 0, Math.PI * 2); ctx.fill(); } }
+  ctx.restore();
+};
+// a heap of net: a lumpy mound with the mesh drawn over it
+export const netPileParts = (o: Place3 & { w: number; d: number; h: number; seed: number; color?: string }): Parts => {
+  const B = newB(), c = hex(o.color ?? "#6f5f48"), rows: V3[][] = [];
+  for (let i = 0; i <= 10; i++) { const f = i / 10; rows.push(Array.from({ length: 20 }, (_, k) => { const a = (k / 20) * Math.PI * 2, n = fractal(o.seed, Math.cos(a) * 2 + 3, f * 3, 1, 1, 3), rr = Math.sin(f * Math.PI * 0.5) * (0.75 + 0.5 * n); return [Math.cos(a) * o.w * 0.5 * rr, o.h * Math.cos(f * Math.PI * 0.5) * (0.7 + 0.5 * n), Math.sin(a) * o.d * 0.5 * rr] as V3; })); }
+  surface(B, rows.reverse(), true, (_r, _k, p) => scalec(c, 0.75 + fractal(o.seed + 4, p[0] * 9, p[2] * 9, 1, 1, 2) * 0.5));
+  return { ...toParts(B, { x: o.x, y: o.y, scale: o.scale, R: o.R ?? rotation(o.yaw, o.pitch ?? 0, o.roll ?? 0), z: o.z, light: o.light, paint: o.paint ?? 1, seed: o.seed }), overlays: [] };
+};
+
+// ---------------------------------------------------------------- fire and light
+// a flame: tongues that lick upward, pure in t; `size` is the flame height in px
+export const flame = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, t: number, seed: number, o: { core?: string; edge?: string; n?: number; alpha?: number } = {}) => {
+  const n = o.n ?? 5, core = hex(o.core ?? "#fff0b8"), edge = hex(o.edge ?? "#e0661f"), a = o.alpha ?? 1;
+  ctx.save(); ctx.globalCompositeOperation = "screen";
+  for (let i = 0; i < n; i++) {
+    const ph = seed * 1.7 + i * 2.1, sway = (fractal(seed + i, t * 2.2 + i, 0.5, 1, 1, 2) - 0.5) * size * 0.5, h = size * (0.55 + 0.45 * fractal(seed + 30 + i, t * 3.1, i, 1, 1, 2)) * (i === 0 ? 1 : 0.75), w = size * (0.22 - i * 0.02);
+    const bx = x + (i - (n - 1) / 2) * w * 0.35;
+    const g = ctx.createLinearGradient(bx, y, bx + sway, y - h); g.addColorStop(0, css(core, 0.95 * a)); g.addColorStop(0.35, css(mix(core, edge, 0.4), 0.85 * a)); g.addColorStop(0.8, css(edge, 0.4 * a)); g.addColorStop(1, css(edge, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(bx - w, y); ctx.bezierCurveTo(bx - w * 0.9, y - h * 0.4, bx + sway * 0.6 - w * 0.2, y - h * 0.7, bx + sway, y - h); ctx.bezierCurveTo(bx + sway * 0.6 + w * 0.3, y - h * 0.6, bx + w * 0.9, y - h * 0.35, bx + w, y); ctx.closePath(); ctx.fill();
+    void ph;
+  }
+  ctx.restore();
+};
+// a brazier of charcoal: an iron bowl on legs, the coals glowing, low flames, sparks
+export const brazier = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, t: number, seed: number, o: { flames?: number; glowColor?: RGB } = {}) => {
+  ctx.save();
+  ctx.strokeStyle = "#1c1612"; ctx.lineWidth = s * 0.05; for (const k of [-1, 1]) { ctx.beginPath(); ctx.moveTo(x + k * s * 0.35, y); ctx.lineTo(x + k * s * 0.25, y - s * 0.55); ctx.stroke(); }
+  ctx.fillStyle = "#2a211b"; ctx.beginPath(); ctx.ellipse(x, y - s * 0.6, s * 0.55, s * 0.16, 0, 0, Math.PI); ctx.lineTo(x - s * 0.55, y - s * 0.6); ctx.fill();
+  const r = rng(seed);
+  for (let i = 0; i < 40; i++) { const cx = x + (r() - 0.5) * s * 0.95, cy = y - s * 0.62 - r() * s * 0.08, cr = s * (0.035 + r() * 0.045), heat = 0.5 + 0.5 * Math.sin(t * (1 + r() * 2) + r() * 6); ctx.fillStyle = css(mix([0.35, 0.08, 0.03], [1, 0.62, 0.2], heat * (0.4 + r() * 0.6))); ctx.beginPath(); ctx.ellipse(cx, cy, cr * 1.2, cr * 0.8, r() * 3, 0, Math.PI * 2); ctx.fill(); }
+  ctx.restore();
+  flame(ctx, x, y - s * 0.65, s * 0.7 * (o.flames ?? 1), t, seed, { n: 5 });
+};
+export const torch = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, t: number, seed: number, angle = 0) => {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(angle); ctx.strokeStyle = "#3b2a1c"; ctx.lineWidth = s * 0.07; ctx.beginPath(); ctx.moveTo(0, s * 0.9); ctx.lineTo(0, 0); ctx.stroke(); ctx.fillStyle = "#2a1c14"; ctx.fillRect(-s * 0.06, -s * 0.12, s * 0.12, s * 0.16); ctx.restore();
+  flame(ctx, x + Math.sin(angle) * s * 0.1, y - s * 0.1, s * 0.9, t, seed, { n: 6 });
+};
+// a terracotta oil lamp (the Herodian and Roman kind): a closed body, a nozzle, a small flame
+export const oilLamp = (ctx: CanvasRenderingContext2D, x: number, y: number, s: number, t: number, seed: number, flick = 1) => {
+  ctx.save(); ctx.fillStyle = "#8a5a3a"; ctx.beginPath(); ctx.ellipse(x, y, s * 0.5, s * 0.22, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#a36c46"; ctx.beginPath(); ctx.ellipse(x - s * 0.05, y - s * 0.06, s * 0.36, s * 0.13, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#7a4e32"; ctx.beginPath(); ctx.moveTo(x + s * 0.3, y - s * 0.08); ctx.lineTo(x + s * 0.72, y - s * 0.05); ctx.lineTo(x + s * 0.72, y + s * 0.06); ctx.lineTo(x + s * 0.3, y + s * 0.1); ctx.fill(); ctx.restore();
+  flame(ctx, x + s * 0.7, y - s * 0.05, s * 0.55 * flick, t, seed, { n: 2 });
+};
+export { lerp, add3 };
