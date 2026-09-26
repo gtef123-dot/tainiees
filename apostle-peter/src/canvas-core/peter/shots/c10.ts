@@ -91,9 +91,9 @@ const s103 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
 // ---------------------------------------------------------------- the hidden room
 // a low room under an insula, plastered, a wooden stair up to the street door; lamps on the floor
 // and in niches; a few dozen people sitting close
-const RLAMPS: V3[] = [[-2.2, 0.6, -1.8], [2.0, 0.6, -1.9], [0.3, 0.15, 0.6], [-3.1, 1.3, 0.8]];
+export const RLAMPS: V3[] = [[-2.2, 0.6, -1.8], [2.0, 0.6, -1.9], [0.3, 0.15, 0.6], [-3.1, 1.3, 0.8]];
 const ROOMERS = crowd(1160, 20, { man: 0.45, woman: 0.4, elder: 0.1, child: 0.05 });
-const lowRoom = (ctx: Ctx2, env: Env, cam: WCam, t: number, tremble = 0) => {
+export const lowRoom = (ctx: Ctx2, env: Env, cam: WCam, t: number, tremble = 0) => {
   begin(ctx, env, "#0a0806");
   ground(ctx, env, cam, boardTex(env, "#4a3626"), { x0: -5, x1: 5, z0: -4, z1: 5, tile: [3, 3] });
   const pl = plasterTex(env, "#a89070");
@@ -104,9 +104,9 @@ const lowRoom = (ctx: Ctx2, env: Env, cam: WCam, t: number, tremble = 0) => {
   ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = "rgb(120,90,66)"; ctx.fillRect(0, 0, env.W, env.H); ctx.restore();
   for (const [i, p] of RLAMPS.entries()) { const q = wproj(cam, env, p), sc = wplace(cam, env, p, 0).scale; if (cam.focal && cam.focal / cam.scale - q[2] / cam.scale < 0.25) continue; glow(ctx, q[0], q[1], 1.6 * sc, [1, 0.6, 0.28], 0.4); oilLamp(ctx, q[0], q[1], 0.14 * sc, t, 1170 + i); ctx.save(); ctx.translate(q[0] + 0.1 * sc, q[1] - 0.03 * sc); ctx.rotate(tremble * Math.sin(t * 23 + i) * 0.4); flame(ctx, 0, 0, 0.11 * sc, t, 1171 + i, { n: 3 }); ctx.restore(); }
 };
-const lampKey = (cam: WCam, p: V3): Light => ({ ...LIGHTS.lamp, key: keyFrom(cam, [p[0], 1.1, p[2]], RLAMPS[2]), keyAmt: 1.0, fillAmt: 0.35 });
-const PSEAT: V3 = [0, 0, -2.4], seated = (f: Figure, p: BodyPose = {}) => grounded(f, { bend: 0.2, legL: { hip: 1.9, knee: 2.55, out: 0.25 }, legR: { hip: 1.85, knee: 2.6, out: 0.25 }, armL: { raise: 0.55, elbow: 1.1 }, armR: { raise: 0.5, elbow: 1.1 }, neck: { pitch: 0.05 }, ...p });
-const listeners = (ctx: Ctx2, env: Env, cam: WCam, t: number, freeze = 0): Parts[] => ROOMERS.map((fg, i) => { const r = rng(1180 + i), row = Math.floor(i / 6), p: V3 = [((i % 6) - 2.5) * 1.1 + (row % 2) * 0.4 + (r() - 0.5) * 0.3, 0, -0.9 + row * 1.0 + (r() - 0.5) * 0.3]; return fig(ctx, env, cam, fg, seated(fg, { neck: { pitch: 0.08, yaw: lerp((r() - 0.5) * 0.4, 0.9, freeze * (r() < 0.7 ? 1 : 0)) } }), p, faceYaw(p, PSEAT), t, { light: lampKey(cam, p), live: 0.3 * (1 - freeze), paint: 0.35 }); });
+export const lampKey = (cam: WCam, p: V3): Light => ({ ...LIGHTS.lamp, key: keyFrom(cam, [p[0], 1.1, p[2]], RLAMPS[2]), keyAmt: 1.0, fillAmt: 0.35 });
+export const PSEAT: V3 = [0, 0, -2.4], seated = (f: Figure, p: BodyPose = {}) => grounded(f, { bend: 0.2, legL: { hip: 1.9, knee: 2.55, out: 0.25 }, legR: { hip: 1.85, knee: 2.6, out: 0.25 }, armL: { raise: 0.55, elbow: 1.1 }, armR: { raise: 0.5, elbow: 1.1 }, neck: { pitch: 0.05 }, ...p });
+export const listeners = (ctx: Ctx2, env: Env, cam: WCam, t: number, freeze = 0): Parts[] => ROOMERS.map((fg, i) => { const r = rng(1180 + i), row = Math.floor(i / 6), p: V3 = [((i % 6) - 2.5) * 1.1 + (row % 2) * 0.4 + (r() - 0.5) * 0.3, 0, -0.9 + row * 1.0 + (r() - 0.5) * 0.3]; return fig(ctx, env, cam, fg, seated(fg, { neck: { pitch: 0.08, yaw: lerp((r() - 0.5) * 0.4, 0.9, freeze * (r() < 0.7 ? 1 : 0)) } }), p, faceYaw(p, PSEAT), t, { light: lampKey(cam, p), live: 0.3 * (1 - freeze), paint: 0.35 }); });
 const teach = (t: number): BodyPose => seated(PE, { bend: 0.1, armR: { raise: 0.7 + 0.1 * Math.sin(t * 1.2), out: 0.35, elbow: 0.8 }, armL: { raise: 0.6 + 0.1 * Math.sin(t * 1.4 + 1), out: 0.3, elbow: 0.9 }, handR: HANDS.open, handL: HANDS.open, neck: { pitch: 0.05, yaw: 0.2 * Math.sin(t * 0.5) } });
 
 // ---------------------------------------------------------------- 10.4 the hidden gathering

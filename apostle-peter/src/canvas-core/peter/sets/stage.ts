@@ -351,3 +351,11 @@ export const crowdTopTex = (env: Env, seed: number) => tex(env, `crowdtop2:${see
     wrap(w, h, x, y, 0.35 * k, (X, Y) => { c.fillStyle = "rgba(60,48,36,0.35)"; c.beginPath(); c.ellipse(X + 0.1 * k, Y + 0.12 * k, 0.26 * k, 0.17 * k, a, 0, Math.PI * 2); c.fill(); c.fillStyle = css(scalec(col, 0.8 + r() * 0.3)); c.beginPath(); c.ellipse(X, Y, 0.24 * k, 0.15 * k, a, 0, Math.PI * 2); c.fill(); c.fillStyle = css(mix(col, [1, 0.97, 0.9], 0.25), 0.6); c.beginPath(); c.ellipse(X - 0.05 * k, Y - 0.04 * k, 0.14 * k, 0.07 * k, a, 0, Math.PI * 2); c.fill();
       c.fillStyle = fem ? css(scalec(col, 0.95)) : css(hex(r() < 0.2 ? "#6a6058" : "#2a1d15")); c.beginPath(); c.ellipse(X + 0.01 * k, Y - 0.02 * k, 0.085 * k, 0.095 * k, 0, 0, Math.PI * 2); c.fill(); }); }
 }, { seed: seed + 1, sizes: [6, 3], keepBase: 0.7, alpha: 0.55 });
+// two rough beams lying crossed on the ground, seen from above, on a transparent texture: 5 x 3 m
+export const beamsTex = (env: Env) => plate(env, "tex:beams", 1000, 600, (s) => {
+  const c = s.ctx, r = rng(421), k = 200, wood = hex("#6a5238");
+  const beam = (x0: number, y0: number, x1: number, y1: number, w: number) => { const a = Math.atan2(y1 - y0, x1 - x0), l = Math.hypot(x1 - x0, y1 - y0); c.save(); c.translate(x0, y0); c.rotate(a); c.fillStyle = "rgba(30,24,18,0.45)"; c.fillRect(8, -w / 2 + 10, l, w); c.fillStyle = css(wood); c.fillRect(0, -w / 2, l, w); for (let i = 0; i < 26; i++) { c.strokeStyle = css(scalec(wood, 0.7 + r() * 0.5), 0.6); c.lineWidth = 1.5; const y = (r() - 0.5) * w * 0.9; c.beginPath(); c.moveTo(0, y); c.bezierCurveTo(l * 0.3, y + (r() - 0.5) * 6, l * 0.6, y + (r() - 0.5) * 6, l, y + (r() - 0.5) * 4); c.stroke(); } c.fillStyle = css(scalec(wood, 0.55)); c.fillRect(0, -w / 2, 6, w); c.fillRect(l - 6, -w / 2, 6, w); c.restore(); };
+  beam(60, 300, 940, 290, 0.24 * k); beam(640, 70, 660, 530, 0.22 * k);
+  c.fillStyle = "#2a2018"; for (const [x, y] of [[650, 296], [642, 300]]) { c.beginPath(); c.arc(x, y, 6, 0, Math.PI * 2); c.fill(); }
+  paintOver(env, s, { seed: 422, sizes: [6, 3], keepBase: 0.7, alpha: 0.6 });
+});
