@@ -293,3 +293,61 @@ export const waterTex = (env: Env, base: string, glint: string, key: string) => 
   for (let i = 0; i < 2500; i++) { const x = r() * w, y = r() * h, l = 4 + r() * 14; c.strokeStyle = css(r() < 0.5 ? scalec(b, 0.7) : mix(b, g, 0.5), 0.5); c.lineWidth = 1.2; c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + l / 2, y - 2, x + l, y); c.stroke(); }
   for (let i = 0; i < 160; i++) { const x = r() * w, y = r() * h; c.fillStyle = css(g, 0.5 + r() * 0.4); c.fillRect(x, y, 3 + r() * 8, 1.5); }
 }, { seed: 392, sizes: [10, 5], flow: () => 0, keepBase: 0.7, alpha: 0.6 });
+
+// ---------------------------------------------------------------- Jerusalem: rooms, the Temple steps, crowds
+// a lime-plastered wall (an upper room, a house courtyard): warm off-white, patched, a dado of grime,
+// beam sockets, a small high window (optional). 10 x 4 m.
+export const plasterTex = (env: Env, color = "#cdbd9c", window = false) => plate(env, `tex:plaster:${color}:${window}`, 1000, 400, (s) => {
+  const c = s.ctx, w = 1000, h = 400, r = rng(401), b = hex(color), k = w / 10;
+  c.fillStyle = css(b); c.fillRect(0, 0, w, h);
+  for (let i = 0; i < 160; i++) { const x = r() * w, y = r() * h, rr = (0.2 + r() * 0.9) * k; const g = c.createRadialGradient(x, y, 0, x, y, rr); g.addColorStop(0, css(scalec(b, 0.85 + r() * 0.25), 0.4)); g.addColorStop(1, css(b, 0)); c.fillStyle = g; c.fillRect(x - rr, y - rr, rr * 2, rr * 2); }
+  const dg = c.createLinearGradient(0, h - 1.1 * k, 0, h); dg.addColorStop(0, css(scalec(b, 0.8), 0)); dg.addColorStop(1, css(scalec(b, 0.55), 0.8)); c.fillStyle = dg; c.fillRect(0, h - 1.1 * k, w, 1.1 * k);
+  for (let i = 0; i < 12; i++) { c.strokeStyle = css(scalec(b, 0.6), 0.4); c.lineWidth = 1; c.beginPath(); let x = r() * w, y = r() * h; c.moveTo(x, y); for (let q = 0; q < 6; q++) { x += (r() - 0.5) * 30; y += r() * 25; c.lineTo(x, y); } c.stroke(); }
+  c.fillStyle = css(scalec(hex("#4a3828"), 0.9)); for (let x = 0.4 * k; x < w; x += 1.2 * k) c.fillRect(x, 0, 0.22 * k, 0.26 * k);
+  if (window) { c.fillStyle = "#f6ecd2"; c.fillRect(w * 0.7, 0.9 * k, 0.7 * k, 0.9 * k); c.fillStyle = css(scalec(b, 0.6)); c.fillRect(w * 0.7 - 0.08 * k, 1.8 * k, 0.86 * k, 0.1 * k); }
+  paintOver(env, s, { seed: 402, sizes: [10, 5, 2.5], keepBase: 0.62, alpha: 0.7 });
+});
+// the southern wall of the Temple Mount: Herodian ashlar, each great stone with its drafted margin; the
+// Huldah gates (a double and a triple arch) at the head of the steps. 90 x 30 m. lit: sun on the face.
+export const templeWallTex = (env: Env) => plate(env, `tex:temple`, 2700, 900, (s) => {
+  const c = s.ctx, w = 2700, h = 900, r = rng(411), k = w / 90, stone = hex("#d9c8a4");
+  c.fillStyle = css(scalec(stone, 0.6)); c.fillRect(0, 0, w, h);
+  for (let y = h; y > 0; y -= 1.1 * k) { let x = -r() * 4 * k; while (x < w) { const sw = (2.5 + r() * 6) * k, col = scalec(stone, 0.82 + r() * 0.24); c.fillStyle = css(col); c.fillRect(x + 2, y - 1.1 * k + 2, sw - 4, 1.1 * k - 4); c.strokeStyle = css(mix(col, [1, 0.97, 0.9], 0.25), 0.7); c.lineWidth = 2; c.strokeRect(x + 6, y - 1.1 * k + 6, sw - 12, 1.1 * k - 12); c.fillStyle = css(scalec(col, 0.8), 0.35); c.fillRect(x + 2, y - 5, sw - 4, 3); x += sw; } }
+  // the gates: dark arched openings at ground level
+  const arch = (cx: number, n: number) => { for (let i = 0; i < n; i++) { const x = cx + (i - (n - 1) / 2) * 5.2 * k, aw = 4.2 * k, ah = 7 * k; c.fillStyle = "#231d16"; c.beginPath(); c.moveTo(x - aw / 2, h); c.lineTo(x - aw / 2, h - ah + aw / 2); c.arc(x, h - ah + aw / 2, aw / 2, Math.PI, 0); c.lineTo(x + aw / 2, h); c.closePath(); c.fill(); c.strokeStyle = css(scalec(stone, 1.05)); c.lineWidth = 0.5 * k; c.beginPath(); c.arc(x, h - ah + aw / 2, aw / 2 + 0.3 * k, Math.PI, 0); c.stroke(); } };
+  arch(w * 0.3, 2); arch(w * 0.68, 3);
+  // the colonnade (the Royal Stoa) along the top
+  for (let x = 0; x < w; x += 2.4 * k) { c.fillStyle = css(scalec(stone, 1.05)); c.fillRect(x, 0.6 * k, 0.9 * k, 4.5 * k); c.fillStyle = css(scalec(stone, 0.55)); c.fillRect(x + 0.9 * k, 0.6 * k, 1.5 * k, 4.5 * k); }
+  c.fillStyle = css(scalec(stone, 0.9)); c.fillRect(0, 0, w, 0.7 * k); c.fillRect(0, 5 * k, w, 0.6 * k);
+  paintOver(env, s, { seed: 412, sizes: [14, 7, 3.5], keepBase: 0.6, alpha: 0.72 });
+});
+// a painted crowd, face-on, packed shoulder to shoulder (for the far plaza: thousands). Transparent
+// above the heads. 20 m wide x 2 m tall. facing: 1 toward the viewer, -1 away.
+export const crowdTex = (env: Env, seed: number, facing: 1 | -1, key = "") => plate(env, `tex:crowd:${seed}:${facing}:${key}`, 1400, 140, (s) => {
+  const c = s.ctx, w = 1400, h = 140, r = rng(seed), k = w / 20;
+  const cloth = ["#8a7458", "#9c8a6a", "#6e5c48", "#b3a07c", "#7a6a5a", "#a08060", "#5a6470", "#8a5a50", "#6a6a7a", "#c2b08e", "#4f5a52"].map(hex), skins = ["#a06e54", "#9a6a52", "#a87a60", "#8e624c"].map(hex);
+  for (let row = 0; row < 3; row++) for (let i = 0; i < 70; i++) {
+    const x = (i / 70) * w + (r() - 0.5) * 10 + row * 7, top = h - (1.55 + r() * 0.2 - row * 0.12) * k, col = cloth[Math.floor(r() * cloth.length)], sk = skins[Math.floor(r() * skins.length)], fem = r() < 0.35;
+    c.fillStyle = css(scalec(col, 0.85 + r() * 0.3)); c.beginPath(); c.moveTo(x - 0.24 * k, h); c.lineTo(x - 0.22 * k, top + 0.35 * k); c.quadraticCurveTo(x, top + 0.24 * k, x + 0.22 * k, top + 0.35 * k); c.lineTo(x + 0.24 * k, h); c.closePath(); c.fill();
+    c.fillStyle = css(fem ? scalec(col, 0.9) : sk); c.beginPath(); c.ellipse(x, top + 0.14 * k, 0.1 * k, 0.13 * k, 0, 0, Math.PI * 2); c.fill();
+    if (facing < 0 || !fem) { c.fillStyle = css(hex(fem ? "#6a5a4a" : "#2a1d15"), facing < 0 ? 1 : 0.9); c.beginPath(); c.ellipse(x, top + (facing < 0 ? 0.13 : 0.06) * k, 0.105 * k, (facing < 0 ? 0.13 : 0.07) * k, 0, Math.PI, facing < 0 ? Math.PI * 3 : Math.PI * 2); c.fill(); }
+    if (facing > 0 && !fem) { c.fillStyle = css(hex("#2a1d15"), 0.8); c.beginPath(); c.ellipse(x, top + 0.22 * k, 0.07 * k, 0.05 * k, 0, 0, Math.PI); c.fill(); }
+    c.fillStyle = css([1, 0.97, 0.9], 0.2); c.fillRect(x - 0.22 * k, top + 0.35 * k, 0.1 * k, h - top);
+  }
+  paintOver(env, s, { seed: seed + 1, sizes: [4, 2], keepBase: 0.7, alpha: 0.6 });
+});
+// a flight of steps: treads lying flat and risers standing, from z0 (top, far) down toward z1 (near)
+export const stairs = (ctx: C, env: Env, cam: WCam, tread: Surface, riser: Surface, o: { x0: number; x1: number; z0: number; z1: number; top: number; n: number }) => {
+  const d = (o.z1 - o.z0) / o.n, rise = o.top / o.n;
+  const down = wproj(cam, env, [0, 0, o.z1])[2] < wproj(cam, env, [0, o.top, o.z0])[2];   // the foot is farther: we look down the flight
+  for (let j = 0; j < o.n; j++) { const i = down ? o.n - 1 - j : j, zf = o.z0 + i * d, y = o.top - i * rise; ground(ctx, env, cam, tread, { x0: o.x0, x1: o.x1, z0: zf, z1: zf + d, y, tile: [4, 4] }); card(ctx, env, cam, riser, { at: [(o.x0 + o.x1) / 2, y - rise, zf + d], w: o.x1 - o.x0, h: rise, cols: 6 }); }
+};
+// a crowd seen from above, packed shoulder to shoulder, for lying on the ground (a plaza of thousands):
+// shoulders in every colour of cloth, heads dark or covered, a few faces turned up. tile = 6 m.
+export const crowdTopTex = (env: Env, seed: number) => tex(env, `crowdtop2:${seed}`, 900, 900, (c, w, h) => {
+  const r = rng(seed), k = w / 6, cloth = ["#8a7458", "#9c8a6a", "#6e5c48", "#b3a07c", "#7a6a5a", "#a08060", "#5a6470", "#8a5a50", "#6a6a7a", "#c2b08e", "#4f5a52"].map(hex);
+  c.fillStyle = "#b8a684"; c.fillRect(0, 0, w, h);
+  for (let i = 0; i < 150; i++) { const x = r() * w, y = r() * h, col = cloth[Math.floor(r() * cloth.length)], a = (r() - 0.5) * 0.6, fem = r() < 0.35;
+    wrap(w, h, x, y, 0.35 * k, (X, Y) => { c.fillStyle = "rgba(60,48,36,0.35)"; c.beginPath(); c.ellipse(X + 0.1 * k, Y + 0.12 * k, 0.26 * k, 0.17 * k, a, 0, Math.PI * 2); c.fill(); c.fillStyle = css(scalec(col, 0.8 + r() * 0.3)); c.beginPath(); c.ellipse(X, Y, 0.24 * k, 0.15 * k, a, 0, Math.PI * 2); c.fill(); c.fillStyle = css(mix(col, [1, 0.97, 0.9], 0.25), 0.6); c.beginPath(); c.ellipse(X - 0.05 * k, Y - 0.04 * k, 0.14 * k, 0.07 * k, a, 0, Math.PI * 2); c.fill();
+      c.fillStyle = fem ? css(scalec(col, 0.95)) : css(hex(r() < 0.2 ? "#6a6058" : "#2a1d15")); c.beginPath(); c.ellipse(X + 0.01 * k, Y - 0.02 * k, 0.085 * k, 0.095 * k, 0, 0, Math.PI * 2); c.fill(); }); }
+}, { seed: seed + 1, sizes: [6, 3], keepBase: 0.7, alpha: 0.55 });

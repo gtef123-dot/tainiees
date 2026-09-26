@@ -16,9 +16,9 @@ export const fig = (ctx: Ctx2, env: Env, cam: WCam, f: Figure, pose: BodyPose, p
 };
 // the boat's gentle rock on the water (the same for the boat and everyone standing in it)
 export const rockOf = (t: number, seed: number, amt = 1) => ({ roll: Math.sin(t * 1.05 + seed) * 0.022 * amt, pitch: Math.sin(t * 0.8 + seed) * 0.01 * amt });
-export const boatAt = (ctx: Ctx2, env: Env, cam: WCam, pos: V3, yaw: number, t: number, o: { light?: Light; seed?: number; sail?: "none" | "furled"; rock?: number; roll?: number; paint?: number } = {}): Parts => {
+export const boatAt = (ctx: Ctx2, env: Env, cam: WCam, pos: V3, yaw: number, t: number, o: { light?: Light; seed?: number; sail?: "none" | "furled" | "set"; fill?: number; rock?: number; roll?: number; paint?: number } = {}): Parts => {
   const seed = o.seed ?? 3, r = rockOf(t, seed, o.rock ?? 1), p = wplace(cam, env, pos, yaw, { roll: r.roll + (o.roll ?? 0), pitch: r.pitch });
-  void ctx; return boatParts({ x: p.x, y: p.y, scale: p.scale, yaw: 0, R: p.R, z: p.z, light: o.light ?? LIGHTS.goldenMorning, seed, sail: o.sail ?? "none", paint: o.paint });
+  void ctx; return boatParts({ x: p.x, y: p.y, scale: p.scale, yaw: 0, R: p.R, z: p.z, light: o.light ?? LIGHTS.goldenMorning, seed, sail: o.sail ?? "none", fill: o.fill, paint: o.paint });
 };
 // a point given in a boat's own frame (x along the keel to the bow, y up, z to port) -> world
 export const onBoat = (boat: V3, yaw: number, local: V3): V3 => { const w = apply(rotY(yaw), local); return [boat[0] + w[0], boat[1] + w[1], boat[2] + w[2]]; };

@@ -8,7 +8,7 @@ import type { Parts, Light } from "../figure/head";
 export type Place3 = { R?: M3; x: number; y: number; scale: number; yaw: number; pitch?: number; roll?: number; z?: number; light: Light; paint?: number; alpha?: number };
 
 // ---------------------------------------------------------------- the boat
-export const boatParts = (o: Place3 & { sail?: "furled" | "none"; seed?: number; wet?: number }): Parts => {
+export const boatParts = (o: Place3 & { sail?: "furled" | "none" | "set"; seed?: number; wet?: number; fill?: number }): Parts => {
   const B = newB(), Lh = 4.1, cedar = hex("#7a4e32"), pitch = hex("#2a211c"), inner = hex("#8b6446"), rail = hex("#4e3424");
   const beam = (x: number) => 1.12 * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(x) / Lh, x > 0 ? 2.0 : 2.6)), 0.55);
   const sheer = (x: number) => 0.55 + 0.32 * Math.pow(Math.abs(x) / Lh, 3), keel = (x: number) => -0.58 + 0.25 * Math.pow(Math.abs(x) / Lh, 2);
@@ -38,7 +38,13 @@ export const boatParts = (o: Place3 & { sail?: "furled" | "none"; seed?: number;
   if (o.sail !== "none") {
     tube(B, [[0.6, -0.4, 0], [0.6, 5.2, 0]], [0.075, 0.05], 8, () => hex("#5e4a36"));
     const yard: V3[] = Array.from({ length: 9 }, (_, i) => [0.6 + 0.1, 4.95 - Math.abs(i - 4) * 0.02, lerp(-2.6, 2.6, i / 8)] as V3);
-    tube(B, yard, yard.map((_, i) => 0.09 + 0.07 * Math.sin((i / 8) * Math.PI) + 0.02 * r()), 9, (t) => mix(hex("#b9a27c"), hex("#8f7a58"), Math.abs(t - 0.5)));
+    if (o.sail === "set") {
+      // the square sail let fall from the yard and filling: bellied forward (+x) by `fill`
+      const fl = o.fill ?? 1, rows: V3[][] = [];
+      for (let i = 0; i <= 8; i++) { const v = i / 8; rows.push(Array.from({ length: 9 }, (_, j) => { const u = j / 8; return [0.72 + fl * 0.9 * Math.sin(Math.PI * u) * Math.sin(Math.PI * Math.min(1, v * 1.1)) + 0.05 * Math.sin(u * 9), 4.9 - v * 3.8, lerp(-2.5, 2.5, u) * (1 - 0.06 * v)] as V3; })); }
+      const sc = (_r: number, k: number) => mix(hex("#f0e6cc"), hex("#cbbc9a"), 0.3 + 0.3 * Math.sin(k * 20)); surface(B, rows, false, sc, { flowVertical: true }); surface(B, rows, false, sc, { flowVertical: true, flip: true });
+      tube(B, yard, yard.map(() => 0.07), 7, () => hex("#6a5438"));
+    } else tube(B, yard, yard.map((_, i) => 0.09 + 0.07 * Math.sin((i / 8) * Math.PI) + 0.02 * r()), 9, (t) => mix(hex("#b9a27c"), hex("#8f7a58"), Math.abs(t - 0.5)));
   }
   const R = o.R ?? rotation(o.yaw, o.pitch ?? 0, o.roll ?? 0);
   return { ...toParts(B, { x: o.x, y: o.y, scale: o.scale, R, z: o.z, light: o.light, alpha: o.alpha, paint: o.paint ?? 1, seed: o.seed ?? 3 }), overlays: [] };
