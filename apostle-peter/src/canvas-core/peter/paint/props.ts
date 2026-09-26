@@ -82,14 +82,18 @@ export const boulderParts = (o: Place3 & { w: number; d: number; h: number; seed
 // ---------------------------------------------------------------- fire and light
 // a flame: tongues that lick upward, pure in t; `size` is the flame height in px
 export const flame = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, t: number, seed: number, o: { core?: string; edge?: string; n?: number; alpha?: number } = {}) => {
+  // soft tongues: each a teardrop filled from a hot core low in the flame out to a transparent red edge,
+  // with a smaller white-yellow core inside; they waver and lick up out of step
   const n = o.n ?? 5, core = hex(o.core ?? "#fff0b8"), edge = hex(o.edge ?? "#e0661f"), a = o.alpha ?? 1;
   ctx.save(); ctx.globalCompositeOperation = "screen";
+  const tongue = (bx: number, h: number, w: number, sway: number, k: number, fill: (cx: number, cy: number) => CanvasGradient | string) => {
+    ctx.fillStyle = fill(bx, y - h * 0.25); ctx.beginPath(); ctx.moveTo(bx, y + w * 0.25 * k); ctx.bezierCurveTo(bx - w * 1.1 * k, y + w * 0.1, bx - w * 0.9 * k, y - h * 0.45 * k, bx + sway * k, y - h * k);
+    ctx.bezierCurveTo(bx + w * 0.8 * k + sway * 0.3, y - h * 0.5 * k, bx + w * 1.1 * k, y + w * 0.1, bx, y + w * 0.25 * k); ctx.closePath(); ctx.fill();
+  };
   for (let i = 0; i < n; i++) {
-    const ph = seed * 1.7 + i * 2.1, sway = (fractal(seed + i, t * 2.2 + i, 0.5, 1, 1, 2) - 0.5) * size * 0.5, h = size * (0.55 + 0.45 * fractal(seed + 30 + i, t * 3.1, i, 1, 1, 2)) * (i === 0 ? 1 : 0.75), w = size * (0.22 - i * 0.02);
-    const bx = x + (i - (n - 1) / 2) * w * 0.35;
-    const g = ctx.createLinearGradient(bx, y, bx + sway, y - h); g.addColorStop(0, css(core, 0.95 * a)); g.addColorStop(0.35, css(mix(core, edge, 0.4), 0.85 * a)); g.addColorStop(0.8, css(edge, 0.4 * a)); g.addColorStop(1, css(edge, 0));
-    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(bx - w, y); ctx.bezierCurveTo(bx - w * 0.9, y - h * 0.4, bx + sway * 0.6 - w * 0.2, y - h * 0.7, bx + sway, y - h); ctx.bezierCurveTo(bx + sway * 0.6 + w * 0.3, y - h * 0.6, bx + w * 0.9, y - h * 0.35, bx + w, y); ctx.closePath(); ctx.fill();
-    void ph;
+    const sway = (fractal(seed + i, t * 2.2 + i, 0.5, 1, 1, 2) - 0.5) * size * 0.45, h = size * (0.5 + 0.5 * fractal(seed + 30 + i, t * 3.4, i, 1, 1, 2)) * (i === 0 ? 1 : 0.7), w = size * (0.2 - i * 0.015), bx = x + (i - (n - 1) / 2) * w * 0.55 + Math.sin(t * 5 + i) * w * 0.1;
+    tongue(bx, h, w, sway, 1, (cx, cy) => { const g = ctx.createRadialGradient(cx, cy + h * 0.15, 0, cx, cy, h * 0.85); g.addColorStop(0, css(mix(core, edge, 0.2), 0.85 * a)); g.addColorStop(0.45, css(mix(core, edge, 0.6), 0.55 * a)); g.addColorStop(0.8, css(edge, 0.2 * a)); g.addColorStop(1, css(edge, 0)); return g; });
+    tongue(bx, h * 0.8, w * 0.8, sway * 0.7, 0.55, (cx, cy) => { const g = ctx.createRadialGradient(cx, cy + h * 0.1, 0, cx, cy, h * 0.45); g.addColorStop(0, css(core, 0.9 * a)); g.addColorStop(1, css(core, 0)); return g; });
   }
   ctx.restore();
 };

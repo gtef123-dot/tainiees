@@ -71,3 +71,8 @@ export const lookFrom = (eye: V3, at: V3, scale: number, o: Partial<WCam> = {}):
   const yaw = Math.atan2(d[0], -d[2]), tilt = Math.atan2(-d[1], hz);
   return { target: at, scale, yaw, tilt, focal: scale * dist, ...o };
 };
+// a light at a world position, as a view-space key direction for a figure standing at p
+import { wview } from "../scene";
+import { norm3 } from "../lib/math";
+export const keyFrom = (cam: WCam, p: V3, light: V3): V3 => norm3(apply(wview(cam), [light[0] - p[0], light[1] - p[1], light[2] - p[2]]));
+export const dirView = (cam: WCam, d: V3): V3 => norm3(apply(wview(cam), d));

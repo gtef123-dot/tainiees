@@ -245,3 +245,42 @@ export const trees = (ctx: C, env: Env, cam: WCam, items: { at: V3; kind: TreeKi
   const order = items.map((it) => ({ it, d: wproj(cam, env, it.at)[2] })).sort((a, b) => a.d - b.d);
   for (const { it } of order) { const tx = treeTex(env, it.kind, it.seed, light, dim); card(ctx, env, cam, tx, { at: it.at, w: it.h * (600 / 700), h: it.h, yaw: cam.yaw, cols: 2, alpha }); }
 };
+
+// ---------------------------------------------------------------- the high priest's courtyard (night)
+// Jerusalem ashlar at night: pale limestone gone blue-grey under the moon. kind:
+//   "gallery": the back wall, 16 x 7.5 m, a doorway and a stair below, the upper gallery at 3.2 m
+//              with five columns and a dark room behind (Christ is led along it)
+//   "gate":    a side wall, 14 x 6 m, with the great double gate, one leaf ajar
+//   "street":  the outer wall along the street, 18 x 5 m, rougher, a drain along its foot
+export const courtTex = (env: Env, kind: "gallery" | "gate" | "street") => plate(env, `tex:court:${kind}`, kind === "street" ? 1800 : 1600, kind === "gallery" ? 750 : kind === "gate" ? 686 : 500, (s) => {
+  const c = s.ctx, w = s.w, h = s.h, r = rng(381 + kind.length), k = kind === "gallery" ? w / 16 : kind === "gate" ? w / 14 : w / 18;
+  const stone = hex(kind === "street" ? "#6e6a64" : "#8c8a84"), mortar = hex("#3e3c3a");
+  const blocks = (x0: number, y0: number, x1: number, y1: number, ch = 0.45) => { c.fillStyle = css(mortar); c.fillRect(x0, y0, x1 - x0, y1 - y0); for (let y = y1; y > y0 + 1; y -= ch * k) { let x = x0 - r() * k * 0.6; while (x < x1) { const bw = (0.6 + r() * 0.9) * k * (kind === "street" ? 0.7 : 1), col = scalec(stone, 0.78 + r() * 0.35); c.fillStyle = css(col); c.fillRect(Math.max(x0, x + 2), Math.max(y0, y - ch * k + 2), Math.min(x1, x + bw - 2) - Math.max(x0, x + 2), Math.min(ch * k - 4, y - y0 - 2)); c.fillStyle = css(mix(col, [0.95, 0.94, 0.9], 0.2), 0.5); c.fillRect(Math.max(x0, x + 4), Math.max(y0, y - ch * k + 3), Math.min(x1, x + bw - 4) - Math.max(x0, x + 4), 2); x += bw; } } };
+  if (kind === "gallery") {
+    const gy = h - 3.2 * k;
+    blocks(0, gy, w, h);
+    // doorway and a stair up to the gallery on the left
+    c.fillStyle = "#0e0d0c"; c.fillRect(w * 0.62, h - 2.3 * k, 1.3 * k, 2.3 * k); c.fillStyle = css(scalec(stone, 0.7)); c.fillRect(w * 0.62 - 0.15 * k, h - 2.45 * k, 1.6 * k, 0.18 * k);
+    for (let i = 0; i < 12; i++) { c.fillStyle = css(scalec(stone, 0.72 + (i % 2) * 0.08)); c.fillRect(w * 0.06 + i * 0.28 * k, h - (i + 1) * 0.27 * k, 3.4 * k - i * 0.28 * k, 0.27 * k); }
+    // the gallery: a dark interior, a floor slab, a balustrade, five columns, the roof beam
+    c.fillStyle = "#121212"; c.fillRect(0, 0.5 * k, w, gy - 0.5 * k);
+    c.fillStyle = css(scalec(stone, 0.85)); c.fillRect(0, gy - 0.25 * k, w, 0.3 * k);
+    for (let x = 0; x < w; x += 0.35 * k) { c.fillStyle = css(scalec(stone, 0.75 + r() * 0.1)); c.fillRect(x + 0.08 * k, gy - 1.05 * k, 0.16 * k, 0.8 * k); }
+    c.fillStyle = css(scalec(stone, 0.9)); c.fillRect(0, gy - 1.15 * k, w, 0.14 * k);
+    for (let i = 0; i < 6; i++) { const x = (i / 5) * (w - 0.5 * k); c.fillStyle = css(scalec(stone, 0.95)); c.fillRect(x, 0.5 * k, 0.45 * k, gy - 0.75 * k); c.fillStyle = css(scalec(stone, 0.7)); c.fillRect(x + 0.32 * k, 0.5 * k, 0.13 * k, gy - 0.75 * k); c.fillStyle = css(stone); c.fillRect(x - 0.08 * k, 0.5 * k, 0.61 * k, 0.2 * k); }
+    c.fillStyle = css(scalec(stone, 0.8)); c.fillRect(0, 0, w, 0.55 * k); c.fillStyle = css(scalec(hex("#5a4632"), 0.8)); for (let x = 0.2 * k; x < w; x += 0.6 * k) c.fillRect(x, 0.35 * k, 0.18 * k, 0.2 * k);
+  } else if (kind === "gate") {
+    blocks(0, 0, w, h);
+    const gx = w * 0.4, gw = 3.2 * k, gh = 4.2 * k;
+    c.fillStyle = "#0b0a0a"; c.beginPath(); c.moveTo(gx, h); c.lineTo(gx, h - gh + gw / 2); c.arc(gx + gw / 2, h - gh + gw / 2, gw / 2, Math.PI, 0); c.lineTo(gx + gw, h); c.closePath(); c.fill();
+    // the leaves of the gate: planks and iron studs; the right leaf stands ajar
+    const leaf = (x0: number, lw: number, dark: number) => { for (let x = x0; x < x0 + lw; x += 0.22 * k) { c.fillStyle = css(scalec(hex("#4a3624"), dark * (0.85 + r() * 0.3))); c.fillRect(x, h - gh + gw / 2 + 4, 0.21 * k, gh - gw / 2 - 4); } c.fillStyle = "#1a1714"; for (let y = h - gh + gw / 2 + 0.4 * k; y < h; y += 0.7 * k) for (let x = x0 + 0.15 * k; x < x0 + lw; x += 0.4 * k) { c.beginPath(); c.arc(x, y, 0.035 * k, 0, Math.PI * 2); c.fill(); } };
+    leaf(gx, gw / 2, 1); leaf(gx + gw / 2 + 0.6 * k, gw / 2 - 0.6 * k, 0.6);
+    c.strokeStyle = css(scalec(stone, 1.1)); c.lineWidth = 0.25 * k; c.beginPath(); c.arc(gx + gw / 2, h - gh + gw / 2, gw / 2 + 0.12 * k, Math.PI, 0); c.stroke();
+  } else {
+    blocks(0, 0, w, h, 0.34);
+    c.fillStyle = "#171514"; c.fillRect(0, h - 0.18 * k, w, 0.18 * k);
+    for (let i = 0; i < 30; i++) { const x = r() * w, y = r() * h * 0.8; const g = c.createLinearGradient(0, y, 0, y + (1 + r() * 2) * k); g.addColorStop(0, "rgba(30,28,26,0.35)"); g.addColorStop(1, "rgba(30,28,26,0)"); c.fillStyle = g; c.fillRect(x, y, 3 + r() * 10, (1 + r() * 2) * k); }
+  }
+  paintOver(env, s, { seed: 382 + kind.length, sizes: [10, 5, 2.5], keepBase: 0.6, alpha: 0.7 });
+});
