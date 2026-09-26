@@ -66,10 +66,9 @@ To change a silence between clips, edit only `gapAfter` in `story/timeline.confi
 
 | # | Milestone | Status |
 |---|---|---|
-| 1 | Script timing: `docs/audio_timing.md`, `docs/shotlist.md` | **done**, waiting for shot-list approval |
-| 2 | Character bible and `out/peter_character_sheet.png` | next |
-| 3 | Environment tests and `out/environment_contact_sheet.png` | |
-| 4 | Storyboard and `out/storyboard_full.png` | |
-| 5 | Animatic at 960×540 with the real narration: `out/peter_animatic.mp4` | |
-| 6 | Animation, shot by shot | |
-| 7 | Polish, review log, contact sheet, `out/apostle_peter_final_1080p.mp4`, `out/poster_frame.png` | |
+| 1 | Script timing: `docs/audio_timing.md`, `docs/shotlist.md` | done |
+| 2 | Character bible and `out/peter_character_sheet.png` | done |
+| 3 | Environments and `out/environment_contact_sheet.png` | done (frames from the film) |
+| 4 | Storyboard `out/storyboard_full.png` | done (from the render) |
+| 5 | Animatic `out/peter_animatic.mp4` (960×540, real narration, score, soundscape) | done |
+| 6–7 | Animation, polish, `out/apostle_peter_final_1080p.mp4`, `out/contact_sheet.png`, `out/poster_frame.png`, `docs/review_log.md` | rendered; the review log scores most shots **below the brief's 8/10 bar** and ranks the fixes |

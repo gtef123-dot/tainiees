@@ -74,7 +74,7 @@ if (mode === "env") {
 
 if (mode === "character") {
   // the engine's sheet (heads, ages, expressions, costume) + Peter as he appears in the film, A to E
-  const dir = src, sheet = join(dir, "sheet.png"), CAP = [["A · Simon", "02.2"], ["B · the confession", "05.4"], ["C · the denial", "07.5"], ["C · restored", "08.6"], ["D · the preacher", "09.4"], ["E · Rome", "10.4"]];
+  const dir = src, sheet = join(dir, "sheet.png"), CAP = [["A · Simon", "02.2"], ["B · the confession", "05.4"], ["C · the denial", "07.5"], ["C · restored", "08.6"], ["D · the preacher", "09.4"], ["E · Rome, the end", "11.4"]];
   const strip = CAP.map(([name, id], i) => { const f = join(dir, `film${i + 1}.png`); return existsSync(f) ? `<div class="p"><img src="${img(f)}"><div class="c" style="font-size:17px"><b>${name}</b> <span style="color:#8a7a64">shot ${id}</span></div></div>` : ""; }).join("");
   await shoot(`<!doctype html><meta charset="utf-8"><style>${CSS}body{background:#d4c4a6;color:#3a2e24;padding:0}.p .c{color:#3a2e24}.p .c b{color:#3a2e24}.strip{padding:10px 60px 40px}.strip h2{font-weight:normal;font-size:24px;margin:0 0 12px}</style><img src="${img(sheet)}" style="display:block;width:2560px"><div class="strip"><h2>In the film: the same head and body, posed, at every age <span style="font-size:17px;color:#6a5a4a">(frames from the render)</span></h2><div class="row" style="--w:393px">${strip}</div></div>`, join(ROOT, "out/peter_character_sheet.png"), 2560);
 }
