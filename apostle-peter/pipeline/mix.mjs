@@ -2,8 +2,8 @@
 // start frame; music and soundscape stems (if present) are ducked under it by the narration's own
 // envelope, then the whole is set to about -16 LUFS with the true peak under -1 dBTP.
 //
-//   node pipeline/mix.mjs [--out out/mix.wav] [--music .tmp/music.wav] [--sfx .tmp/sfx.wav] [--duck 12] [--sfxDuck 6]
-//                         [--musicGain 0.5] [--sfxGain 0.5]
+//   node pipeline/mix.mjs [--out out/mix.wav] [--music .tmp/music.wav] [--sfx .tmp/sfx.wav] [--duck 9] [--sfxDuck 5]
+//                         [--musicGain 0.6] [--sfxGain 0.4] [--margin 10] [--stems] [--no-level]
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -24,9 +24,23 @@ T.clips.forEach((c, k) => { const pcm = decode(join(ROOT, c.file), 1), at = Math
 const levelled = clipGain.map((g, k) => (g ? `${T.clips[k].clip ?? k + 1}: ${g > 0 ? "+" : ""}${g.toFixed(1)} dB` : "")).filter(Boolean);
 // the voice envelope (fast attack, slow release), for ducking
 const env = new Float32Array(N); { let e = 0; const att = Math.exp(-1 / (0.01 * SR)), rel = Math.exp(-1 / (0.35 * SR)); for (let i = 0; i < N; i++) { const a = Math.abs(voice[i]); e = a > e ? att * e + (1 - att) * a : rel * e + (1 - rel) * a; env[i] = e; } }
-const L = new Float32Array(N), R = new Float32Array(N), duckDb = Number(arg("duck", 12));
+const wavOut = (file, l, r) => { const pcm = Buffer.alloc(N * 8); for (let i = 0; i < N; i++) { pcm.writeFloatLE(l[i], i * 8); pcm.writeFloatLE(r[i], i * 8 + 4); } const h = Buffer.alloc(44); h.write("RIFF", 0); h.writeUInt32LE(36 + pcm.length, 4); h.write("WAVEfmt ", 8); h.writeUInt32LE(16, 16); h.writeUInt16LE(3, 20); h.writeUInt16LE(2, 22); h.writeUInt32LE(SR, 24); h.writeUInt32LE(SR * 8, 28); h.writeUInt16LE(8, 32); h.writeUInt16LE(32, 34); h.write("data", 36); h.writeUInt32LE(pcm.length, 40); writeFileSync(file, Buffer.concat([h, pcm])); };
+const L = new Float32Array(N), R = new Float32Array(N), duckDb = Number(arg("duck", 9));
 const bed = (file, gain, duck = duckDb) => { if (!file || !existsSync(file)) return; const s = decode(file, 2); for (let i = 0; i < N && i * 2 + 1 < s.length; i++) { const speak = Math.min(1, env[i] * 14), g = gain * Math.pow(10, (-duck * speak) / 20); L[i] += s[i * 2] * g; R[i] += s[i * 2 + 1] * g; } };
-bed(arg("music"), Number(arg("musicGain", 1))); bed(arg("sfx"), Number(arg("sfxGain", 1)), Number(arg("sfxDuck", duckDb)));
+bed(arg("music", join(ROOT, ".tmp/music.wav")), Number(arg("musicGain", 0.6))); bed(arg("sfx", join(ROOT, ".tmp/sfx.wav")), Number(arg("sfxGain", 0.4)), Number(arg("sfxDuck", 5)));
+// intelligibility guard: wherever he speaks, the bed stays at least --margin dB (default 10) under the
+// voice, measured in 300 ms windows; the extra cut is smoothed (60 ms in, 400 ms out) so it breathes
+{
+  const margin = Number(arg("margin", 10)), win = Math.round(0.3 * SR), hop = Math.round(0.01 * SR), nH = Math.ceil(N / hop), need = new Float32Array(nH).fill(1);
+  const cv = new Float64Array(N + 1), cb = new Float64Array(N + 1); for (let i = 0; i < N; i++) { cv[i + 1] = cv[i] + voice[i] ** 2; cb[i + 1] = cb[i] + (L[i] ** 2 + R[i] ** 2) / 2; }
+  for (let h = 0; h < nH; h++) { const a = Math.max(0, h * hop - (win >> 1)), b = Math.min(N, a + win), v = 10 * Math.log10((cv[b] - cv[a]) / (b - a) + 1e-12), bd = 10 * Math.log10((cb[b] - cb[a]) / (b - a) + 1e-12); if (v > -45) { const over = bd - (v - margin); if (over > 0) need[h] = Math.pow(10, -over / 20); } }
+  let g = 1; const at = Math.exp(-1 / (0.06 * SR / hop)), rl = Math.exp(-1 / (0.4 * SR / hop)), gh = new Float32Array(nH);
+  for (let h = nH - 1, m = 1; h >= 0; h--) { m = Math.min(need[h], 1 - (1 - m) * at); gh[h] = m; } // look ahead: start the cut before the word
+  for (let h = 0; h < nH; h++) { g = gh[h] < g ? gh[h] : 1 - (1 - g) * rl; gh[h] = g; }
+  let cut = 0; for (let i = 0; i < N; i++) { const x = gh[Math.min(nH - 1, Math.floor(i / hop))]; L[i] *= x; R[i] *= x; if (x < 0.9) cut++; }
+  console.log(`intelligibility guard: bed pulled further down for ${(cut / SR).toFixed(1)} s (margin ${margin} dB)`);
+}
+if (process.argv.includes("--stems")) { wavOut(join(ROOT, ".tmp/mix-bed.wav"), L, R); wavOut(join(ROOT, ".tmp/mix-voice.wav"), voice, voice); }
 for (let i = 0; i < N; i++) { L[i] += voice[i]; R[i] += voice[i]; }
 // loudness: measure integrated LUFS with ffmpeg on a temporary file, then one static gain, peak-safe
 const tmp = resolve(ROOT, ".tmp"); mkdirSync(tmp, { recursive: true });

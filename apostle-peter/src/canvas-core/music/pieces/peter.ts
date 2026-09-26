@@ -2,21 +2,27 @@
 // beat number below IS the film time in seconds (docs/audio_timing.md). No rubato and no ritard:
 // the music must land where the pictures and the narration are.
 //
-// THE MOTIF (Peter): D A G F E D, a rising fifth (the rock), then an eager step down home.
-//   01 prologue      D dorian, low strings, alone in the mist
-//   02 fisherman     dorian, harp ostinato on the water; the motif restated higher
-//   03 the call      D major; the motif on the piano, alone, as He looks at him
-//   04 beside Him    walking line; the storm (38.2 s) is one gust; lydian stillness after it
-//   05 confession    builds over a cello pulse to D major on «Εσύ είσαι ο Χριστός» (50 s)
-//   06 Tabor         D lydian (the raised G#): the motif turned to light, bells
-//   07 denial        D minor, piano alone, the motif broken; three tolls (71-73 s); silence; weeping
-//   08 restoration   the motif whole again in minor at dawn, turning to D major on the third question (92 s)
-//   09 Pentecost     the motif in full, strings in octaves, harp ostinato, bells (96 s)
-//   10 Rome          aeolian, the motif darkened; footsteps (128.5 s) on the timpani
-//   11 martyrdom     a lament; minor plagal cadence into D major on «Peace» (142 s)
+// Instruments, from the brief: warm strings, the ney (breathy reed flute), a frame drum, a lyre
+// (the harp, played by hand), a low cello, and wordless voices. No piano, no "ancient East" loop.
+//
+// THE THEME (Peter): D A G F# E D, a rising fifth (the rock), then an eager step down home.
+//   01 prologue      D dorian: the ney alone, the seed of the theme (D-A, falling back), in the mist
+//   02 fisherman     dorian: lyre ostinato on the water, cello and frame drum like oars, a work song
+//   03 the call      D major: the ney gives the whole theme for the first time as He looks at him
+//   04 beside Him    the theme expands in the strings; the storm (38.2 s) is one gust; lydian stillness
+//   05 confession    builds over a cello pulse and the drum to D major on «Εσύ είσαι ο Χριστός» (50 s)
+//   06 Tabor         D lydian (the raised G#): the theme turned to light, bells, wordless voices ("oo")
+//   07 denial        D minor: the theme breaks apart on the lyre, sparse; three tolls (71-73 s); silence;
+//                    the cello weeps
+//   08 restoration   the ney returns, slowly, the theme whole in minor, turning to D major on the third
+//                    question (92 s)
+//   09 Pentecost     the full theme for the first time: strings in octaves, voices, drum, bells (96 s)
+//   10 Rome          lower and darker: the theme on the solo cello; the boots (128.5 s) on the drum
+//   11 martyrdom     the music simplifies: a lament; a minor plagal cadence into D major at «peace» (142 s)
 //   12 feast         bells
-//   13 meaning       falls and rises (σηκωθεί 154.4 s), climbs, and the motif lands whole on
-//                    «δυνατοί, πιστοί και γενναίοι» (164 s); the coda empties onto the lake
+//   13 meaning       falls and rises (σηκωθεί 154.4 s); on «δυνατοί, πιστοί και γενναίοι» (164 s) the ney
+//                    gives the theme again in its first, gentle form, over richer harmony. The man he
+//                    was called to become.
 import { line, type Piece, type Note, type Role, type Section, type Chord } from "../plan";
 
 const B = 4;
@@ -37,12 +43,12 @@ const CH: [number, string][] = [
   [128, "Dm"], [130, "Eb/D"], [132, "Dm"], [134, "Gm"], [136, "Bb"], [138, "Asus4"], [139, "A"], [140, "Gm"], [142, "D"],
   [144, "D"], [146, "G"], [148, "Bm"], [150, "A"],
   [152, "Bm"], [154, "G"], [156, "D/F#"], [158, "G"], [160, "Em7"], [162, "A7sus4"], [163, "A"],
-  [164, "D"], [166, "G/D"], [167, "D"], [168, "D"],
+  [164, "Dadd9"], [165, "F#m7"], [166, "Gmaj7"], [167, "D/F#"], [168, "Em7"], [169, "Dadd9"],
 ];
 const END = 170.5; // everything is released by here; the film ends at 171.133
 
 const PC: Record<string, number> = { C: 0, "C#": 1, Db: 1, D: 2, "D#": 3, Eb: 3, E: 4, F: 5, "F#": 6, Gb: 6, G: 7, "G#": 8, Ab: 8, A: 9, "A#": 10, Bb: 10, B: 11 };
-const Q: Record<string, number[]> = { "": [0, 4, 7], m: [0, 3, 7], sus2: [0, 2, 7], sus4: [0, 5, 7], add9: [0, 4, 7, 2], "7": [0, 4, 7, 10], m7: [0, 3, 7, 10], "7sus4": [0, 5, 7, 10] };
+const Q: Record<string, number[]> = { "": [0, 4, 7], m: [0, 3, 7], sus2: [0, 2, 7], sus4: [0, 5, 7], add9: [0, 4, 7, 2], "7": [0, 4, 7, 10], m7: [0, 3, 7, 10], "7sus4": [0, 5, 7, 10], maj7: [0, 4, 7, 11] };
 const chord = (sym: string) => {
   const m = /^([A-G](?:#|b)?)([^/]*)(?:\/([A-G](?:#|b)?))?$/.exec(sym); if (!m || !Q[m[2]]) throw new Error(`chord ${sym}`);
   const root = PC[m[1]], iv = Q[m[2]];
@@ -55,7 +61,7 @@ const spans = CH.map(([t, s], i) => ({ a: t, b: i + 1 < CH.length ? CH[i + 1][0]
 const DYN: [number, number][] = [
   [0, 0.6], [8, 0.8], [19, 1.0], [21.4, 0.62], [32, 0.8], [37.9, 1.0], [39.5, 0.75], [44, 0.8], [49.9, 1.12], [53.5, 0.75],
   [59.6, 0.9], [60, 1.15], [63.9, 1.05], [64, 0.62], [73.6, 0.5], [80, 0.72], [91.6, 0.95], [96, 1.15], [107, 1.05],
-  [108, 0.85], [116, 0.8], [128, 0.8], [137, 0.95], [142, 1.0], [144, 0.9], [152, 0.8], [163.9, 1.18], [166, 1.0], [170.5, 0.55],
+  [108, 0.85], [116, 0.8], [128, 0.8], [137, 0.95], [142, 1.0], [144, 0.9], [152, 0.8], [163.9, 1.08], [166, 0.95], [170.5, 0.55],
 ];
 const dyn = (t: number) => { for (let i = 1; i < DYN.length; i++) if (t < DYN[i][0]) { const [a, va] = DYN[i - 1], [b, vb] = DYN[i]; return va + ((vb - va) * (t - a)) / (b - a); } return DYN[DYN.length - 1][1]; };
 const shaped = (ns: Note[]) => ns.map((n) => (n.role === "drum" ? n : { ...n, v: n.v * dyn(n.t) }));
@@ -94,7 +100,7 @@ const TEX: Tex[] = [
   { to: 152, pad: 0.45, harp: "e8", hv: 0.44, bass: "hold", bv: 0.5 }, // the feast
   { to: 160, pad: 0.46, harp: "e8", hv: 0.44, bass: "hold", bv: 0.52 }, // the meaning
   { to: 164, pad: 0.54, harp: "s16", hv: 0.46, bass: "pulse8", bv: 0.6 }, // called to be strong again
-  { to: 168, pad: 0.62, harp: "hi16", hv: 0.46, bass: "hold", bv: 0.66 }, // faithful and brave
+  { to: 168, pad: 0.56, harp: "e8", hv: 0.42, bass: "hold", bv: 0.6 }, // faithful and brave: the call again, gently
   { to: END, pad: 0.4, harp: "q", hv: 0.36, bass: "hold", bv: 0.42 }, // the lake, morning
 ];
 const texAt = (t: number) => TEX.find((x) => t < x.to - 1e-9) ?? TEX[TEX.length - 1];
@@ -171,69 +177,77 @@ const harpNotes = (): Note[] => {
 };
 
 // ---------------------------------------------------------------- the lines (written by hand)
-// strings: the motif and its transformations
+// the ney: the voice of the motif. It is heard alone at the start, it calls, it falls silent through
+// the denial, it returns slowly at the lake, and it has the last word.
+const neyLine: Note[] = [
+  ...L(0, "r:2 D4:1 A4:1 | A4:2 G4:.5 F4:.5 E4:1 | D4:3", "melody", 0.5), // the seed, alone in the mist
+  ...L(24, "D5:1 A5:1.5 G5:.5 F#5:1 | E5:1.5 D5:.5 E5:1 C#5:1 | D5:2", "melody", 0.6), // the call: the theme, first time whole
+  ...L(80, "D4:1.5 A4:1.5 G4:.5 F4:.5 | E4:1 F4:1 G4:1 A4:1 | Bb4:1.5 A4:.5 G4:1 A4:1 | D5:1 A5:1.5 G5:.5 F#5:1", "melody", 0.5), // it returns, slowly
+  ...L(164, "D5:1 A5:1.5 G5:.5 F#5:1 | E5:1 D5:1.5", "melody", 0.55), // the last word: the call again, richer beneath
+];
+// strings: the theme expanding (following, confession, Tabor, Pentecost), the meaning rising
 const melody: Note[] = [
-  ...L(4, "D4:1 A4:1.5 G4:.5 F4:1 | E4:1 D4:3", "melody", 0.62), // prologue, 4-12
-  ...L(12, "A4:1 D5:1.5 C5:.5 B4:1 | A4:1 G4:.5 A4:.5 F4:1 E4:1 | D4:1.5", "melody", 0.66), // the lake, 12-21.5
+  ...L(12, "A4:2 B4:1 D5:1 | C5:2 A4:1 G4:1 | A4:1.5", "melody", 0.6), // the lake at work (a work song, not yet the theme)
   ...L(32, "F#4:1 A4:1 D5:1.5 C#5:.5 | B4:1 D5:1 r:1.5 E5:.5 | G#5:2 F#5:1 E5:1", "melody", 0.64), // beside Him; lydian after the storm
   ...L(44, "F#4:1 B4:1.5 A4:.5 G4:1 | D5:1 C#5:1 D5:2 | D5:1 B4:1 A4:2", "melody", 0.7), // the confession
   ...L(56, "A5:2 B5:1 G#5:1 | A5:1.5 G#5:.5 F#5:1 E5:1", "melody", 0.6), // Tabor: the motif turned to light
   ...L(75.25, "D6:2.5", "melody", 0.28), // His eyes: one thin line
-  ...L(92, "D5:1 A5:1.5 G5:.5 F#5:1", "melody", 0.6), // restored (with the piano)
-  ...L(96, "D5:1 A5:1.5 G5:.5 F#5:1 | G5:1 F#5:.5 E5:.5 D5:1 E5:1 | F#5:1 A5:1 D6:1.5 C#6:.5 | B5:2 A5:2 | G5:1 F#5:1 E5:2", "melody", 0.72), // Pentecost
-  ...L(116, "D4:1 A4:1.5 G4:.5 F4:1 | F4:1 D4:1 E4:2 | A4:2 G4:1 E4:1", "melody", 0.6), // Rome
-  ...L(132, "A4:2 G4:1 F4:1 | D4:1 F4:1 E4:2 | D4:1 Bb4:1 A4:2", "melody", 0.58), // lament
-  ...L(152, "D5:1 B4:1 G4:1 B4:1 | D5:1 F#5:1 A5:1.5 G5:.5 | G5:1 F#5:1 E5:1 C#5:1 | D5:1 A5:1.5 G5:.5 F#5:1 | E5:1 D5:1.5", "melody", 0.68), // the meaning
+  ...L(92, "D5:1 A5:1.5 G5:.5 F#5:1", "melody", 0.55), // restored, with the ney
+  ...L(96, "D5:1 A5:1.5 G5:.5 F#5:1 | G5:1 F#5:.5 E5:.5 D5:1 E5:1 | F#5:1 A5:1 D6:1.5 C#6:.5 | B5:2 A5:2 | G5:1 F#5:1 E5:2", "melody", 0.72), // Pentecost: the full theme
+  ...L(132, "A4:2 G4:1 F4:1 | D4:1 F4:1 E4:2 | D4:1 Bb4:1 A4:2", "melody", 0.56), // the lament, simple
+  ...L(152, "D5:1 B4:1 G4:1 B4:1 | D5:1 F#5:1 A5:1.5 G5:.5 | G5:1 F#5:1 E5:1 C#5:1", "melody", 0.62), // falls, rises, climbs
 ];
-// Pentecost and the climax: the motif doubled an octave down (violas), the voice of many
-const octaves: Note[] = [...melody.filter((n) => (n.t >= 96 && n.t < 108) || (n.t >= 160 && n.t < 170)).map((n) => ({ ...n, p: n.p - 12, v: n.v * 0.7, role: "inner" as Role }))];
-
-// piano: the call, the denial, the restoration
-const piano: Note[] = [
-  // the call: He looks at him; the motif in major, alone
-  ...L(24, "D5:1 A5:1.5 G5:.5 F#5:1 | E5:1.5 D5:.5 E5:1 C#5:1 | D5:2", "melody", 0.55),
-  ...L(24, "[D3 A3]:2 [B2 F#3]:2 | [G2 D3]:2 [A2 E3]:2 | [D2 A2 F#3]:2", "accomp", 0.42, { roll: 0.03 }),
-  // the denial: the motif broken
-  ...L(64, "r:1 A4:1.5 G4:.5 F4:1 | E4:2 r:1 [C#4 E4]:1@0.8 | r:2", "melody", 0.5),
-  ...L(64, "[D2 A2]:4 | [Bb1 F2]:2 [G1 D2]:1 [A1 A2]:1@1.1 | [A1 A2]:1@1.15 [A1 A2]:1@1.2 r:2", "bass", 0.5),
-  // weeping
-  ...L(76, "Bb4:1.5 A4:.5 G4:1 F4:.5 E4:.5", "melody", 0.4),
-  ...L(76, "[G2 D3]:2 [D2 A2]:2", "bass", 0.34, { roll: 0.05 }),
-  // the tear becomes the lake: the motif whole again, in minor
-  ...L(80, "D4:1 A4:1.5 G4:.5 F4:1 | E4:1 F4:1 G4:1 A4:1 | Bb4:1.5 A4:.5 G4:1 A4:1 | D5:1 A5:1.5 G5:.5 F#5:1 | [D4 F#4 A4 D5]:2", "melody", 0.5),
-  ...L(80, "[D2 A2 F3]:2 [Bb1 F2 D3]:2 | [F2 C3 A3]:2 [C2 G2 E3]:2 | [G2 D3 Bb3]:2 [A2 E3 G3]:1 [A2 E3 C#4]:1 | [D2 A2 F#3]:2 [B1 F#2 D3]:1 [A1 E2 C#3]:1", "accomp", 0.4, { roll: 0.03 }),
-  // the arrival chords
-  ...L(50, "[D2 A2 D3 F#3]:2", "bass", 0.62, { roll: 0.04 }),
-  ...L(142, "[D2 A2 F#3]:2", "bass", 0.46, { roll: 0.06 }),
-  ...L(164, "[D2 A2 D3 F#3]:2", "bass", 0.6, { roll: 0.04 }),
-  // the lake, morning: the motif's first cell, very quietly, once more
-  ...L(166.5, "D5:1 A5:2", "melody", 0.34),
+// Pentecost: the theme doubled an octave down (violas), the voice of many
+const octaves: Note[] = melody.filter((n) => n.t >= 96 && n.t < 108).map((n) => ({ ...n, p: n.p - 12, v: n.v * 0.7, role: "inner" as Role }));
+// a solo cello: the weeping, and Rome (the theme lower and darker)
+const cello: Note[] = [
+  ...L(76, "Bb3:1.5 A3:.5 G3:1 F3:.5 E3:.5", "melody", 0.45),
+  ...L(116, "D3:1 A3:1.5 G3:.5 F3:1 | F3:1 D3:1 E3:2 | A3:2 G3:1 E3:1", "melody", 0.6),
 ];
+// the lyre (harp, played by hand): the broken theme in the courtyard, and the arrival chords
+const lyre: Note[] = [
+  ...L(64, "r:1 A4:1.5 G4:.5 F4:1 | E4:2 r:1 [C#4 E4]:1@0.8 | r:2", "melody", 0.85),
+  ...L(50, "[D3 A3 D4 F#4 A4]:2", "accomp", 0.62, { roll: 0.05 }),
+  ...L(142, "[D3 A3 F#4 A4 D5]:2", "accomp", 0.5, { roll: 0.07 }),
+  ...L(96, "[D3 A3 D4 F#4 A4 D5]:2", "accomp", 0.62, { roll: 0.04 }),
+];
+// three tolls as he denies Him (71-73 s): cello and the open frame drum
+const tolls: Note[] = [71, 72, 73].map((t, i) => ({ t, d: 0.9, p: 33, v: 0.5 + 0.08 * i, role: "bass" as Role }));
 
-// bells: the confession, Tabor, Pentecost, the feast, the climax, the last light
+// bells: the confession, Tabor, Pentecost, the feast, the last light
 const bells: Note[] = [
   ...L(50, "[D6 A6]:2", "color", 0.5),
   ...L(56, "A6:2 B6:1 G#6:1 | A6:1.5 G#6:.5 F#6:1 E6:1", "color", 0.42),
   ...L(96, "[D6 A6]:4", "color", 0.5),
   ...L(104, "[F#6 A6]:2", "color", 0.42),
   ...L(144, "A5:1 F#5:1 D5:1 A5:1 | B5:1 F#5:1 E5:1 C#5:1", "color", 0.45), // the feast's peal
-  ...L(164, "[D6 A6]:2", "color", 0.48),
-  ...L(169, "D6:1", "color", 0.3),
+  ...L(164, "[D6 A6]:2", "color", 0.34),
+  ...L(169, "D6:1", "color", 0.26),
 ];
 // the church bell: 29 June
 const churchBell: Note[] = [...L(144, "D4:2 A3:2 | D4:2", "color", 0.5)];
+// wordless voices: Tabor ("oo"), Pentecost ("ah"), peace, and under the last word
+const choirSpans: [number, number][] = [[54, 64], [95.5, 108], [142, 144.4], [152, 170.5]];
+const choir = () => pad().filter((n) => choirSpans.some(([a, b]) => n.t >= a - 1e-9 && n.t < b)).map((n) => ({ ...n, v: n.v * 0.9, role: "inner" as Role }));
 
-// timpani (the soft kick): the storm, the arrivals, footsteps, the cross
+// timpani (the soft kick): the storm and the great arrivals only
 const timp: Note[] = [
   ...Array.from({ length: 11 }, (_, i) => ({ t: 38 + i * 0.125, d: 0.1, p: 38, v: 0.35 + 0.05 * i, role: "drum" as Role, kind: "k" })),
   { t: 39.4, d: 0.5, p: 38, v: 0.95, role: "drum", kind: "k" },
   { t: 50, d: 1, p: 38, v: 0.8, role: "drum", kind: "k" },
-  { t: 60, d: 1, p: 38, v: 0.6, role: "drum", kind: "k" },
   { t: 96, d: 1, p: 38, v: 0.85, role: "drum", kind: "k" },
-  { t: 104, d: 1, p: 38, v: 0.7, role: "drum", kind: "k" },
-  ...[128.55, 129.55, 130.55, 131.3].map((t, i) => ({ t, d: 0.3, p: 38, v: 0.45 + 0.1 * i, role: "drum" as Role, kind: "k" })),
-  { t: 137, d: 1, p: 38, v: 0.55, role: "drum", kind: "k" },
-  { t: 164, d: 1, p: 38, v: 0.8, role: "drum", kind: "k" },
+  { t: 137, d: 1, p: 38, v: 0.5, role: "drum", kind: "k" },
+];
+// frame drum: the oars (02), the wind of Pentecost, the road to Rome, the boots, the tolls
+const fd = (t0: number, t1: number, pat: [number, string, number][], v: number, len = 4): Note[] => { const out: Note[] = []; for (let t = t0; t < t1 - 1e-9; t += len) for (const [o, kind, a] of pat) if (t + o < t1 - 1e-9) out.push({ t: t + o, d: 0.2, p: 40, v: v * a, role: "drum", kind }); return out; };
+const drum: Note[] = [
+  ...fd(8, 21.4, [[0, "d", 1], [1.5, "t", 0.6], [2, "d", 0.8], [3, "t", 0.5], [3.5, "t", 0.4]], 0.34), // the oars
+  ...fd(44, 50, [[0, "d", 1], [2, "d", 0.8], [3.5, "t", 0.5]], 0.3), // the confession gathers
+  ...fd(96, 108, [[0, "d", 1], [1, "t", 0.55], [1.5, "t", 0.4], [2, "d", 0.85], [3, "t", 0.55], [3.5, "d", 0.6]], 0.44), // Pentecost
+  ...fd(116, 124, [[0, "d", 1], [1, "t", 0.5], [2, "d", 0.8], [3, "t", 0.5]], 0.28), // the road
+  ...[128.55, 129.55, 130.55, 131.3].map((t, i) => ({ t, d: 0.3, p: 40, v: 0.34 + 0.08 * i, role: "drum" as Role, kind: "d" })), // the boots
+  ...[71, 72, 73].map((t, i) => ({ t, d: 0.3, p: 40, v: 0.42 + 0.06 * i, role: "drum" as Role, kind: "d" })), // the tolls
+  { t: 164, d: 0.3, p: 40, v: 0.4, role: "drum", kind: "d" },
 ];
 
 const SECTIONS: Section[] = [
@@ -260,14 +274,18 @@ export const peterScore = (): Piece => {
     plan: { style: "cinematic", tempo: 60, meter: "4/4", rubato: 0, ritard: 1, sections: SECTIONS },
     parts: [
       { id: "violins", inst: "strings", role: "accomp", notes: shaped(pad()), opts: { attack: 1.0, release: 1.5, bright: 0.72, width: 0.9 }, gainDb: -5 },
-      { id: "cellos", inst: "strings", role: "bass", notes: shaped(bassNotes()), opts: { attack: 0.35, release: 1.1, bass: true, bright: 0.55 }, gainDb: -3 },
+      { id: "cellos", inst: "strings", role: "bass", notes: shaped([...bassNotes(), ...tolls]), opts: { attack: 0.35, release: 1.1, bass: true, bright: 0.55 }, gainDb: -3 },
       { id: "melody", inst: "strings", role: "melody", notes: shaped(melody), opts: { attack: 0.28, release: 0.9, bright: 0.95, width: 0.5 }, gainDb: 0 },
       { id: "violas", inst: "strings", role: "inner", notes: shaped(octaves), opts: { attack: 0.3, release: 0.9, bright: 0.8, width: 0.7 }, gainDb: -4 },
-      { id: "harp", inst: "harp", role: "color", notes: shaped(harpNotes()), gainDb: -1, pan: -0.15 },
-      { id: "piano", inst: "piano", role: "melody", notes: shaped(piano), gainDb: 0 },
+      { id: "celloSolo", inst: "strings", role: "melody", notes: shaped(cello), opts: { attack: 0.3, release: 1.0, bass: true, bright: 0.7, width: 0.3 }, gainDb: 1 },
+      { id: "ney", inst: "ney", role: "melody", notes: shaped(neyLine), opts: { breath: 0.5 }, gainDb: 1, send: 1.3 },
+      { id: "voices", inst: "voices", role: "inner", notes: shaped(choir()), opts: { attack: 1.4, release: 1.6, vowel: 0.3 }, gainDb: 0 },
+      { id: "harp", inst: "harp", role: "color", notes: shaped(harpNotes()), gainDb: -2, pan: -0.15 },
+      { id: "lyre", inst: "harp", role: "melody", notes: shaped(lyre), gainDb: 7, pan: 0.1 },
       { id: "bells", inst: "fmBell", role: "color", notes: shaped(bells), gainDb: -9, pan: 0.2 },
       { id: "churchBell", inst: "bell", role: "color", notes: shaped(churchBell), gainDb: -10 },
-      { id: "timpani", inst: "kick", role: "drum", notes: timp, opts: { soft: 1 }, gainDb: -3 },
+      { id: "timpani", inst: "kick", role: "drum", notes: timp, opts: { soft: 1 }, gainDb: -7 },
+      { id: "frameDrum", inst: "frameDrum", role: "drum", notes: drum, gainDb: -2 },
     ],
   };
 };

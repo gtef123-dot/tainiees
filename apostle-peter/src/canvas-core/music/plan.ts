@@ -10,7 +10,7 @@ export const beatsPerBar = (m: Meter) => (m === "3/4" ? 3 : m === "4/4" ? 4 : m 
 export type Role = "melody" | "inner" | "bass" | "accomp" | "color" | "drum";
 /** t, d in beats from the piece start; p = MIDI; v = written velocity 0..1 (performance shapes it). */
 export type Note = { t: number; d: number; p: number; v: number; role: Role; roll?: number; kind?: string };
-export type InstId = "piano" | "musicBox" | "bell" | "celesta" | "marimba" | "vibes" | "harp" | "guitar" | "strings" | "fmBell" | "ePiano" | "pulse" | "triangle" | "noiseDrum" | "kick" | "snare" | "hat" | "bass" | "vinyl";
+export type InstId = "piano" | "musicBox" | "bell" | "celesta" | "marimba" | "vibes" | "harp" | "guitar" | "strings" | "fmBell" | "ePiano" | "pulse" | "triangle" | "noiseDrum" | "kick" | "snare" | "hat" | "bass" | "vinyl" | "ney" | "frameDrum" | "voices";
 export type Part = { id: string; inst: InstId; role: Role; notes: Note[]; gainDb?: number; pan?: number; opts?: Record<string, number | boolean | string>; send?: number };
 export type Section = {
   id: string; bars: number; mood: MoodId | [MoodId, MoodId, number]; key: string; mode: ModeId; melody: MelodyType[];

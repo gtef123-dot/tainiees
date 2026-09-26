@@ -198,6 +198,69 @@ const step = (t, gain, hob = 0, pan = 0, room = 0, seed = 1) => {
   bed(regions([[SH["09.1"].a, SH["09.3"].a, 0.12, 0.3, 0.4], [SH["10.4"].a, SH["11.1"].b, 0.15, 0.5, 0.5], [SH["11.3"].a, SH["11.4"].a, 0.15, 0.3, 0.3], [SH["12.1"].a, SH["12.2"].b, 0.08, 1, 1]]), () => { const y = lp.tick(bn()); return [y, y]; });
 }
 
+// ---------------------------------------------------------------- wood and rope: stick-slip creaks
+// a train of tiny slips (rate gliding) each ringing a few wooden modes
+const creak = (t, len, gain, { rate = [35, 70], modes = [340, 690, 1180], pan = 0, seed = 1, room = 0 } = {}) => {
+  const r = rng(seed), res = modes.map((f) => ({ f, c: 0, s: 0, w: (TAU * f) / SR })), dec = Math.exp(-1 / (0.006 * SR)); let ph = 0;
+  event(t, len + 0.05, (x) => {
+    const u = x / len, f = rate[0] + (rate[1] - rate[0]) * Math.sin(Math.PI * Math.min(1, u)) * (0.8 + 0.2 * r());
+    ph += f / SR; let kick = 0; if (ph >= 1) { ph -= 1; kick = (0.5 + r()) * Math.sin(Math.PI * Math.min(1, u)); }
+    let y = 0; for (const m of res) { const c2 = (m.c * Math.cos(m.w) - m.s * Math.sin(m.w)) * dec + kick; m.s = (m.c * Math.sin(m.w) + m.s * Math.cos(m.w)) * dec; m.c = c2; y += m.s; }
+    return y * 0.3;
+  }, gain, pan, room);
+};
+{
+  const r = rng(111);
+  // the boats: 02 (at work), 04.4 (the storm, hard), 09.9 (aboard), 13.7 (the empty boat rocking)
+  for (const [a, b, g, every] of [[SH["02.1"].a, SH["02.5"].a, 0.35, 2.2], [SH["04.4"].a, SH["04.4"].b, 0.8, 0.45], [SH["04.5"].a, SH["04.5"].b, 0.2, 1.8], [SH["09.9"].a, SH["09.9"].b, 0.4, 0.9], [SH["13.7"].a, DUR - 1.2, 0.28, 1.9], [SH["03.4"].a, SH["03.4"].b, 0.22, 1.4]])
+    for (let t = a + r() * 0.5; t < b - 0.3; t += every * (0.7 + 0.6 * r())) creak(t, 0.35 + r() * 0.5, g, { rate: [28 + r() * 15, 55 + r() * 40], pan: r() * 1.2 - 0.6, seed: 1110 + Math.round(t * 10) });
+  // rope under load: 01.1 the hand hauling, 02.4 hauling with Andrew
+  for (const [a, b] of [[0.3, SH["01.1"].b], [SH["02.4"].a, SH["02.5"].a]]) for (let t = a; t < b - 0.3; t += 0.7 + r() * 0.6) creak(t, 0.25 + r() * 0.25, 0.3, { rate: [60, 140], modes: [900, 1500, 2300], pan: -0.2, seed: 1120 + Math.round(t * 10) });
+  // the beams of the cross, far off (11.4-11.5): wood under strain, nothing more
+  creak(SH["11.4"].a + 0.6, 1.1, 0.22, { rate: [18, 34], modes: [180, 420, 760], seed: 1131, room: 0.6 });
+  creak(SH["11.5"].a + 0.8, 0.9, 0.16, { rate: [16, 30], modes: [170, 400, 700], seed: 1132, room: 0.6 });
+}
+
+// ---------------------------------------------------------------- gulls over the lake
+{
+  const r = rng(121);
+  const gull = (t, gain, pan, seed) => { const rr = rng(seed), bp = new Biq("bp", 2400, 1.5), f0 = 1100 + rr() * 300; let ph = 0;
+    event(t, 0.42, (x) => { const u = x / 0.42, f = f0 * (u < 0.3 ? 1 + 0.9 * (u / 0.3) : 1.9 - 1.1 * ((u - 0.3) / 0.7)); ph += f / SR; if (ph > 1) ph -= 1; const e = Math.sin(Math.PI * u) ** 0.7; return bp.tick((2 * ph - 1) + 0.3 * (rr() * 2 - 1)) * e * 1.2; }, gain, pan, 0.5); };
+  for (const [a, b, rate] of [[SH["01.1"].a + 1, SH["03.1"].a, 0.28], [SH["08.1"].a + 1, SH["08.3"].a, 0.25], [SH["13.7"].a + 0.5, DUR - 1.5, 0.35]])
+    for (let t = a; t < b; t += (1 + r() * 3) / rate) { const n = 1 + Math.floor(r() * 3), pan = r() * 1.6 - 0.8, g = 0.06 + r() * 0.05; for (let k = 0; k < n; k++) gull(t + k * (0.45 + r() * 0.15), g * (1 - 0.2 * k), pan, 1210 + Math.round(t * 10) + k); }
+}
+
+// ---------------------------------------------------------------- the roads: sheep bells far off, cloth
+{
+  const r = rng(131);
+  const clink = (t, gain, pan, seed) => { const rr = rng(seed), f = 900 + rr() * 700, modes = [[1, 1, 0.35], [2.32, 0.5, 0.2], [3.9, 0.3, 0.12], [5.1, 0.2, 0.08]];
+    event(t, 0.6, (x) => { let y = 0; for (const [m, a, tau] of modes) y += Math.sin(TAU * f * m * x) * a * Math.exp(-x / tau); return y * Math.min(1, x / 0.002) * 0.4; }, gain, pan, 0.5); };
+  for (const [a, b] of [[SH["04.1"].a, SH["04.2"].a], [SH["10.1"].a, SH["10.2"].a], [SH["09.8"].a, SH["09.9"].a]])
+    for (let t = a + 0.2; t < b; t += 0.25 + r() * 0.9) clink(t, 0.035 + r() * 0.03, 0.5 + r() * 0.4 * (r() < 0.5 ? -1 : 1), 1310 + Math.round(t * 100));
+  const swish = (t, len, gain, pan, seed) => { const rr = rng(seed), bp = new Biq("bp", 1400 + rr() * 1200, 0.8); event(t, len, (x) => bp.tick(rr() * 2 - 1) * Math.sin(Math.PI * x / len) ** 2 * 0.6, gain, pan); };
+  // cloth: walking (05.1, 10.1, 11.3), the hands offered and bound (11.1, 11.2), mantles lifting in the wind (09.2)
+  for (const [a, b, every, g] of [[SH["05.1"].a, SH["05.1"].b, 0.44, 0.1], [SH["10.1"].a, SH["10.1"].b, 0.62, 0.08], [SH["11.3"].a, SH["11.3"].b, 0.55, 0.08], [SH["09.2"].a, SH["09.3"].a, 0.18, 0.12]])
+    for (let t = a + 0.25; t < b; t += every * (0.85 + 0.3 * r())) swish(t, 0.18 + r() * 0.15, g, r() * 0.6 - 0.3, 1320 + Math.round(t * 100));
+  for (const t of [SH["11.1"].a + 0.5, SH["11.1"].a + 1.1, SH["11.2"].a + 0.3, SH["11.2"].a + 0.8]) swish(t, 0.3, 0.14, 0, 1330 + Math.round(t * 10));
+}
+
+// ---------------------------------------------------------------- night: crickets (Tabor before dawn, the courtyard)
+{
+  const r = rng(141);
+  for (const [a, b, g] of [[SH["06.1"].a, SH["06.2"].b, 0.05], [SH["07.1"].a, SH["07.6"].b, 0.035]])
+    for (let c = 0; c < 4; c++) { const f = 4200 + r() * 900, per = 0.45 + r() * 0.35, pan = r() * 1.6 - 0.8;
+      for (let t = a + r() * per; t < b; t += per * (0.95 + 0.1 * r())) event(t, 0.07, (x) => { const k = Math.floor(x / 0.017), u = (x - k * 0.017) / 0.012; return k < 4 && u < 1 ? Math.sin(TAU * f * x) * Math.sin(Math.PI * u) : 0; }, g * (0.6 + 0.4 * r()), pan, 0.3); }
+}
+
+// ---------------------------------------------------------------- Rome: carts on stone
+{
+  const r = rng(151), a = SH["10.2"].a, b = SH["10.4"].a;
+  for (let t = a + 0.5; t < b - 1; t += 2 + r() * 2) {
+    const len = 2.5 + r() * 1.5, p0 = r() * 2 - 1, rr = rng(1500 + Math.round(t * 10)), bn = brown(rr), lp = new Biq("lp", 180); let ph = 0;
+    event(t, len, (x) => { const u = x / len, e = Math.sin(Math.PI * u) ** 2; ph += 1.6 / SR; let clack = 0; if ((ph * 7) % 1 < 7 / SR * 1.6) clack = 0; const knock = ((x * 3.1) % 1) < 0.015 ? (rr() * 2 - 1) * 1.5 : 0; return (lp.tick(bn()) * 2.5 + knock * 0.5) * e; }, 0.18, p0 * 0.8, 0.5);
+  }
+}
+
 // ---------------------------------------------------------------- level, and write
 let peak = 0; for (let i = 0; i < N; i++) peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]));
 const g = 0.7 / peak; for (let i = 0; i < N; i++) { L[i] *= g; R[i] *= g; }

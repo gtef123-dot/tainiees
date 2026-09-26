@@ -9,8 +9,11 @@ import { clamp } from "../lib/math";
 export type Surface = { canvas: OffscreenCanvas | HTMLCanvasElement; ctx: CanvasRenderingContext2D; w: number; h: number };
 export const surface = (env: Env, w: number, h: number): Surface => { const L = env.canvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h))); return { canvas: L.canvas as OffscreenCanvas, ctx: L.ctx, w: Math.round(w), h: Math.round(h) }; };
 
-// plates are pure functions of their key, kept in a small LRU so a long film does not hold every set
-const LRU_MAX = 24;
+// plates are pure functions of their key, kept in an LRU bounded by PIXELS, not count: a set like the
+// Via Appia holds ~40 small plates (18 tombs, 16 pines, ground, sky) and a count cap made it repaint
+// all of them every frame. ~600 MB of RGBA per page; a long film still never holds every set.
+const LRU_BYTES = 600e6;
+const sizeOf = (s: Surface) => s.w * s.h * 4;
 export const plate = (env: Env, key: string, w: number, h: number, build: (s: Surface) => void): Surface => {
   const store = (env.cache.get("plates") as Map<string, Surface> | undefined) ?? new Map<string, Surface>();
   env.cache.set("plates", store);
@@ -18,7 +21,8 @@ export const plate = (env: Env, key: string, w: number, h: number, build: (s: Su
   if (hit) { store.delete(key); store.set(key, hit); return hit; }
   const s = surface(env, w, h); build(s);
   store.set(key, s);
-  while (store.size > LRU_MAX) { const k = store.keys().next().value as string; store.delete(k); }
+  let bytes = 0; for (const v of store.values()) bytes += sizeOf(v);
+  while (bytes > LRU_BYTES && store.size > 1) { const k = store.keys().next().value as string, v = store.get(k)!; store.delete(k); bytes -= sizeOf(v); }
   return s;
 };
 

@@ -36,6 +36,9 @@ const voice = (pt: Part, keys: Played[], sr: number, n: number, seed: number) =>
     case "hat": return I.hat(keys, sr, n, o, r);
     case "bass": return I.bass(keys, sr, n, o);
     case "vinyl": return I.vinyl(keys, sr, n, o, r);
+    case "ney": return I.ney(keys, sr, n, o, r);
+    case "frameDrum": return I.frameDrum(keys, sr, n, o, r);
+    case "voices": return I.voices(keys, sr, n, o, r);
     default: throw new Error(`no instrument ${pt.inst}`);
   }
 };

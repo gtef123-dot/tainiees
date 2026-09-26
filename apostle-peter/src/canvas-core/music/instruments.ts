@@ -232,3 +232,66 @@ export const vinyl = (keys: Played[], sr: number, n: number, _o: Opts, r: Rng): 
     for (let i = 0; i < len; i++) { const pop = r() < 7 / sr ? (r() - 0.5) * 0.5 * k.v : 0; const hiss = gauss(r) * 0.004 * k.v; zl += lp * (hiss + pop - zl); zr += lp * (hiss * 0.8 + pop - zr); out.L[i0 + i] += zl; out.R[i0 + i] += zr; } }
   return out;
 };
+
+// ---------------------------------------------------------------- the old instruments (for "The Rock")
+/** Ney: an end-blown reed flute, mostly breath. A sine body with a little 2nd/3rd harmonic, breath
+ *  noise band-passed on the pitch, a noisy "chiff" and a scoop up from 40 cents flat on each onset,
+ *  and a vibrato that arrives late. Legato notes overlap by the performer's timing. */
+export const ney = (keys: Played[], sr: number, n: number, o: Opts, r: Rng): Out => {
+  const out = { L: new Float32Array(n), R: new Float32Array(n) }, breath = num(o, "breath", 0.45), [gl, gr] = pan(num(o, "pan", -0.1));
+  for (const k of keys) {
+    const f = f0(k.p), i0 = Math.round(k.t * sr), dur = k.off - k.t, rel = 0.16, len = Math.min(n - i0, Math.ceil((dur + rel * 3) * sr));
+    const bp1 = new SVF(sr, f, 9), bp2 = new SVF(sr, 2 * f, 7), hp = new SVF(sr, 2500, 0.7), g = Math.pow(k.v, 1.1) * 0.22, vr = 4.6 + r() * 0.8, vph = r() * TAU;
+    let ph = 0, fl = 0;
+    for (let i = 0; i < len; i++) {
+      const t = i / sr, atk = 1 - Math.exp(-t / 0.06), env = (t < dur ? atk : atk * Math.exp(-(t - dur) / rel)) * (1 + 0.04 * Math.sin(TAU * 0.9 * t + vph));
+      const scoop = Math.pow(2, (-40 * Math.exp(-t / 0.07)) / 1200), vib = 1 + 0.0075 * clamp((t - 0.35) / 0.5, 0, 1) * Math.sin(TAU * vr * t + vph);
+      ph += (f * scoop * vib) / sr; if (ph >= 1) ph -= 1;
+      const body = Math.sin(TAU * ph) + 0.12 * Math.sin(2 * TAU * ph) + 0.05 * Math.sin(3 * TAU * ph);
+      fl = 0.995 * fl + 0.005 * gauss(r); const w = gauss(r);
+      bp1.tick(w); bp2.tick(w); hp.tick(w);
+      const air = ((bp1.bp * 2.2) / 9 + bp2.bp / 7) * breath * 3 + hp.hp * 0.05 * (0.4 + 2.5 * Math.exp(-t / 0.05)), y = (body * (0.9 + fl) * (1 - 0.6 * Math.exp(-t / 0.05)) + air) * env * g;
+      const j = i0 + i; out.L[j] += y * gl; out.R[j] += y * gr;
+    }
+  }
+  return out;
+};
+/** Frame drum (tar / bendir family). kind "d": the open centre stroke (a low membrane with a pitch
+ *  drop and inharmonic modes); kind "t": the rim stroke (a dry knock). No jingles. */
+export const frameDrum = (keys: Played[], sr: number, n: number, o: Opts, r: Rng): Out => {
+  const out = { L: new Float32Array(n), R: new Float32Array(n) }, low = num(o, "pitch", 78);
+  for (const k of keys) {
+    const i0 = Math.round(k.t * sr), rim = k.kind === "t", len = Math.min(n - i0, Math.ceil((rim ? 0.25 : 0.9) * sr)), [gl, gr] = pan(rim ? 0.18 : -0.05);
+    const modes = rim ? [[410, 0.5, 0.05], [690, 0.35, 0.04], [1130, 0.25, 0.03]] : [[low, 1, 0.32], [low * 1.59, 0.35, 0.16], [low * 2.14, 0.22, 0.1], [low * 2.65, 0.12, 0.07]];
+    const lp = new SVF(sr, rim ? 3500 : 1200, 0.7), phs = modes.map(() => 0), g = Math.pow(k.v, 1.2) * (rim ? 0.3 : 0.55);
+    for (let i = 0; i < len; i++) {
+      const t = i / sr; let y = 0;
+      modes.forEach(([f, a, tau], m) => { const drop = rim ? 1 : 1 + 0.25 * Math.exp(-t / 0.03); phs[m] += (f * drop) / sr; y += Math.sin(TAU * phs[m]) * a * Math.exp(-t / tau); });
+      y += lp.tick(gauss(r)) * Math.exp(-t / (rim ? 0.012 : 0.02)) * (rim ? 0.9 : 0.5);
+      const j = i0 + i; out.L[j] += y * g * gl; out.R[j] += y * g * gr;
+    }
+  }
+  return out;
+};
+/** Wordless voices: three detuned sawtooth singers per note through vowel formants ("oo" 0 .. "ah" 1),
+ *  a slow swell, a late vibrato. A pad, never a lyric. */
+export const voices = (keys: Played[], sr: number, n: number, o: Opts, r: Rng): Out => {
+  const out = { L: new Float32Array(n), R: new Float32Array(n) }, atk = num(o, "attack", 0.9), rel = num(o, "release", 1.2), vowel = num(o, "vowel", 0.35), w = num(o, "width", 0.8);
+  const F = [[350 + 350 * vowel, 1, 6], [850 + 300 * vowel, 0.45, 8], [2400 + 200 * vowel, 0.16, 10]];
+  for (const k of keys) {
+    const f = f0(k.p), i0 = Math.round(k.t * sr), dur = k.off - k.t, len = Math.min(n - i0, Math.ceil((dur + rel * 1.6) * sr)), g = Math.pow(k.v, 1.2) * 0.2;
+    const singers = [-8, 0, 7].map((c, s) => ({ inc: (f * Math.pow(2, c / 1200)) / sr, ph: r(), pg: pan(((s - 1) * w) + pitchPan(k.p, 0.2)), vr: 5 + r(), vp: r() * TAU, fL: F.map(([ff, , q]) => new SVF(sr, ff, q)) }));
+    for (let i = 0; i < len; i++) {
+      const t = i / sr, env = t < dur ? 1 - Math.exp(-t / (atk / 3)) : (1 - Math.exp(-dur / (atk / 3))) * Math.exp(-(t - dur) / (rel / 3));
+      let l = 0, rr = 0;
+      for (const s of singers) {
+        const vib = 1 + 0.005 * clamp((t - 0.5) / 0.8, 0, 1) * Math.sin(TAU * s.vr * t + s.vp), inc = s.inc * vib;
+        s.ph += inc; if (s.ph >= 1) s.ph -= 1; const saw = 2 * s.ph - 1 - blep(s.ph, inc) + 0.08 * gauss(r);
+        let y = 0; s.fL.forEach((fl, m) => { fl.tick(saw); y += (fl.bp * F[m][1]) / F[m][2]; }); // SVF band output peaks at Q
+        l += y * s.pg[0]; rr += y * s.pg[1];
+      }
+      const j = i0 + i; out.L[j] += l * env * g; out.R[j] += rr * env * g;
+    }
+  }
+  return out;
+};
