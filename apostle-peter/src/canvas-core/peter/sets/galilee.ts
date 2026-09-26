@@ -6,11 +6,12 @@ import { plate, paintOver, blurInto, type Surface } from "../paint/plates";
 import { sky, clouds, streaks, ridge, ridgeProfile, olive, tree, vgrad, grassTufts, field, rock, lake, road } from "../paint/nature";
 import { type WCam, panOf } from "../scene";
 
-export type HillTime = "golden" | "day" | "late" | "backlit";
+export type HillTime = "golden" | "day" | "late" | "backlit" | "predawn";
 const T: Record<HillTime, { sky: [number, string][]; sun: { x: number; y: number; r: number; color: string; glow: number }; haze: string; ridges: string[]; lake: [string, string]; cloud: [string, string] }> = {
   backlit: { sky: [[0, "#8aa2b8"], [0.55, "#e2cf9e"], [0.85, "#f7d898"], [1, "#fbe3b0"]], sun: { x: 900, y: 430, r: 34, color: "#fff4d2", glow: 1.0 }, haze: "#f2d8a6", ridges: ["#b8b0a8", "#9a9796", "#7f8076", "#686b52"], lake: ["#f4dfb0", "#9fb0b0"], cloud: ["#fde6b8", "#b0a8a4"] },
   golden: { sky: [[0, "#7e9ab4"], [0.6, "#d6c7a2"], [1, "#f0d7a2"]], sun: { x: 260, y: 360, r: 26, color: "#fff0c6", glow: 0.8 }, haze: "#e6d2a8", ridges: ["#aeaaa6", "#8f9190", "#76806c", "#5f6a48"], lake: ["#e8d6ac", "#7f9ea8"], cloud: ["#fbe6bd", "#a9a7aa"] },
   day: { sky: [[0, "#6c93b8"], [0.6, "#a8c1d1"], [1, "#dcdcc8"]], sun: { x: 1500, y: 60, r: 22, color: "#fffaf0", glow: 0.45 }, haze: "#cfd6d0", ridges: ["#a9b3b8", "#8d9a9c", "#72806a", "#5d6c44"], lake: ["#a9c3c8", "#4d7a88"], cloud: ["#ffffff", "#b8c3cc"] },
+  predawn: { sky: [[0, "#141c34"], [0.5, "#2c3654"], [0.82, "#5a5f78"], [1, "#8a8494"]], sun: { x: 1500, y: 700, r: 1, color: "#a8a4b0", glow: 0.2 }, haze: "#5a5e72", ridges: ["#4a4e62", "#3a3e50", "#2c3040", "#20242e"], lake: ["#6a6a7c", "#2a3040"], cloud: ["#6a6a80", "#2a2e40"] },
   late: { sky: [[0, "#7d93b0"], [0.55, "#d9b98e"], [1, "#efc98e"]], sun: { x: 1650, y: 330, r: 28, color: "#ffe6b0", glow: 0.9 }, haze: "#e6c898", ridges: ["#b0a2a0", "#948c8e", "#7a7a6a", "#62653f"], lake: ["#e8c898", "#7a8f9a"], cloud: ["#fcdcaa", "#a39aa0"] },
 };
 const P = (env: Env, key: string, w: number, h: number, draw: (c: CanvasRenderingContext2D) => void, paint?: Parameters<typeof paintOver>[2]) =>

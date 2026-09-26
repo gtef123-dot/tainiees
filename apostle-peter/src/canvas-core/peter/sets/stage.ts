@@ -234,12 +234,14 @@ export const cliffTex = (env: Env, glowAmt = 1) => plate(env, `tex:cliff:${glowA
 
 // a tree seen side-on, on a transparent card (oak, fig, poplar, olive, cypress, pine), 600 x 700 px
 import { paintTree, type TreeKind } from "../paint/nature";
-export const treeTex = (env: Env, kind: TreeKind, seed: number, light: -1 | 1 = -1) => plate(env, `tex:tree2:${kind}:${seed}:${light}`, 600, 700, (s) => {
+export const treeTex = (env: Env, kind: TreeKind, seed: number, light: -1 | 1 = -1, dim = 0) => plate(env, `tex:tree2:${kind}:${seed}:${light}:${dim}`, 600, 700, (s) => {
   paintTree(s.ctx, 300, 690, 670, seed, kind, light);
   paintOver(env, s, { seed: seed + 1, sizes: [6, 3], keepBase: 0.75, alpha: 0.55 });
+  // night: the same tree under a dark blue wash (only where the tree is)
+  if (dim > 0) { s.ctx.save(); s.ctx.globalCompositeOperation = "source-atop"; s.ctx.fillStyle = `rgba(12,16,34,${dim})`; s.ctx.fillRect(0, 0, 600, 700); s.ctx.restore(); }
 });
 // stand a scatter of tree cards around the scene (each faces the camera), far to near
-export const trees = (ctx: C, env: Env, cam: WCam, items: { at: V3; kind: TreeKind; h: number; seed: number }[], light: -1 | 1 = -1, alpha = 1) => {
+export const trees = (ctx: C, env: Env, cam: WCam, items: { at: V3; kind: TreeKind; h: number; seed: number }[], light: -1 | 1 = -1, alpha = 1, dim = 0) => {
   const order = items.map((it) => ({ it, d: wproj(cam, env, it.at)[2] })).sort((a, b) => a.d - b.d);
-  for (const { it } of order) { const tx = treeTex(env, it.kind, it.seed, light); card(ctx, env, cam, tx, { at: it.at, w: it.h * (600 / 700), h: it.h, yaw: cam.yaw, cols: 2, alpha }); }
+  for (const { it } of order) { const tx = treeTex(env, it.kind, it.seed, light, dim); card(ctx, env, cam, tx, { at: it.at, w: it.h * (600 / 700), h: it.h, yaw: cam.yaw, cols: 2, alpha }); }
 };
