@@ -32,17 +32,11 @@ const draw = (ctx: Ctx, _f: number, env: Env) => {
   label(ctx, "Expressions (stage B)", 60, 850, 24, "#3a2e24", "left");
   ex.forEach((e, i) => { const x = 180 + i * 270, y = 985, fig = PETER_FIG.B, sc = 160 / (fig.height / 7.3), yaw = -0.35 + (i % 2) * 0.1, pose = { neck: { pitch: e === "ashamed" || e === "crying" ? 0.3 : 0.02 } }, at = aim(fig, pose, "head", yaw, sc, x, y - 10);
     ctx.save(); ctx.beginPath(); ctx.rect(x - 130, y - 125, 260, 205); ctx.clip(); drawFigure(ctx, fig, pose, { x: at.x, y: at.y, scale: sc, yaw, light, expr: FACE[e], t: 1.3 }, env); ctx.restore(); label(ctx, e, x, 1112, 20); });
-  // full figures
+  // full figures: the one outfit, fading and wearing over 35 years; Christ in undyed linen and madder red
   label(ctx, "Figures and costume", 60, 1165, 24, "#3a2e24", "left");
-  const figs = [PETER_FIG.A, PETER_FIG.B, { ...PETER_FIG.C, costume: { ...PETER_FIG.C.costume, hood: 0.8 } }, PETER_FIG.D, PETER_FIG.E, CHRIST_FIG];
-  figs.forEach((f, i) => drawFigure(ctx, f, { armL: { out: 0.1, elbow: 0.2 }, armR: { out: 0.1, elbow: 0.2 } }, { x: 170 + i * 250, y: 1575, scale: 225, yaw: -0.35, light, expr: i === 2 ? FACE.frightened : FACE.neutral }, env));
-  // hands: the hands tell the story
-  const hands: [string, keyof typeof HANDS, object][] = [["grip · the rope", "grip", { raise: 0.9, elbow: 0.9, out: 0.1 }], ["release · the net", "release", { raise: 0.8, elbow: 0.9, out: 0.1, pronate: 1.2 }], ["open · the confession", "open", { raise: 1.0, elbow: 0.6, out: 0.35, pronate: 1.5 }], ["defensive · the denial", "defensive", { raise: 0.5, elbow: 1.9, out: -0.1 }]];
-  hands.forEach(([n, h, arm], i) => {
-    const px = 1680 + (i % 2) * 420, py = 1190 + Math.floor(i / 2) * 210, pw = 400, ph = 195, sc = 1300, pose = { armR: arm as never, handR: HANDS[h] }, at = aim(PETER_FIG.B, pose, "handR", -0.3, sc, px + pw * 0.5, py + ph * 0.48);
-    ctx.save(); ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip(); ctx.fillStyle = "#b9a37f"; ctx.fillRect(px, py, pw, ph);
-    drawFigure(ctx, PETER_FIG.B, pose, { x: at.x, y: at.y, scale: sc, yaw: -0.3, light, paint: 0.6 }, env);
-    ctx.restore(); label(ctx, n, px + 10, py + ph - 10, 18, "#3a2e24", "left");
-  });
+  const figs = [PETER_FIG.A, PETER_FIG.B, { ...PETER_FIG.C, costume: { ...PETER_FIG.C.costume, hood: 1 } }, PETER_FIG.D, PETER_FIG.E, CHRIST_FIG];
+  const notes = ["knee tunic, bare arms", "the grey-blue mantle", "hooded, the night of the denial", "the mantle fading", "worn, pale, 65", "linen and madder red"];
+  figs.forEach((f, i) => { const x = 250 + i * 405; drawFigure(ctx, f, { armL: { out: 0.1, elbow: 0.2 }, armR: { out: 0.1, elbow: 0.2 } }, { x, y: 1560, scale: 215, yaw: -0.35, light, expr: i === 2 ? FACE.frightened : FACE.neutral }, env); label(ctx, notes[i], x, 1592, 18, "#5a4a3a"); });
+  void HANDS;
 };
 export const peterSheet: Film = { meta: { title: "peterSheet", W, H, fps: 30, bpm: 1800, durationFrames: 1, raster: "cpu" }, assets: { images: {} }, shots: [{ id: "sheet", start: 0, end: 1, draw }] };

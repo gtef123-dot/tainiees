@@ -13,11 +13,22 @@ apostle-peter/
     timeline.gen.json     GENERATED: measured durations, frame ranges, pauses, per-word timing
     shots.mjs             the shot list as data: every shot anchored to a word of the narration
     shots.gen.json        GENERATED: every shot resolved to frames (the film's cue table)
+  src/canvas-core/
+    apostlePeter.ts       the film: 66 shots, 5134 frames
+    peter/                the art: figure (one Peter, five ages), sets, paint, shots/c01..c13
+    music/pieces/peter.ts the score, "The Rock", as notes
+    peterSheet.ts         the character sheet (drawn by the same modules as the film)
   pipeline/
     timing.mjs            measures the clips and lays them on the frame grid
     shotlist.mjs          resolves the shots and writes docs/shotlist.md
-  docs/                   audio_timing.md, shotlist.md, style_guide.md (later: character_bible.md, review_log.md)
-  out/                    renders (from Milestone 2 on)
+    score.mjs             renders the score (checks every sync beat lands on its second)
+    sfx.mjs               synthesizes the soundscape
+    mix.mjs               narration + score + soundscape -> one mix at -16 LUFS
+    audio.mjs             score + sfx + mix in one command
+    render.mjs            renders the film (or stills) in headless Chromium
+    sheets.mjs            storyboard, contact sheet, environment and character sheets
+  docs/                   audio_timing.md, shotlist.md, style_guide.md, character_bible.md, review_log.md
+  out/                    the deliverables
 ```
 
 ## Rebuild the timing and shot list
@@ -29,10 +40,23 @@ node pipeline/timing.mjs      # -> story/timeline.gen.json, docs/audio_timing.md
 node pipeline/shotlist.mjs    # -> story/shots.gen.json, docs/shotlist.md
 ```
 
+## Rebuild the sound and the film
+
+```bash
+node pipeline/audio.mjs                                                   # -> .tmp/mix.wav (score, soundscape, narration)
+node pipeline/render.mjs --out out/apostle_peter_final_1080p.mp4 --audio .tmp/mix.wav      # 1920x1080
+node pipeline/render.mjs --out out/peter_animatic.mp4 --scale 0.5 --audio .tmp/mix.wav     # 960x540
+node pipeline/render.mjs --frames 1534,2802 --outdir out/frames                           # stills
+```
+
+Every frame and every sample is a pure function of the source: the same commit renders the same film.
+
 ## Replacing an ElevenLabs clip
 
 1. Export the new take from ElevenLabs and save it over the old file with the **same name**, e.g. `audio/narration/peter_07.mp3`. Do not trim, speed up or edit it.
-2. Run the two commands above.
+2. Run `node pipeline/timing.mjs` and `node pipeline/shotlist.mjs`.
+3. Run `node pipeline/audio.mjs`. The soundscape follows the new cuts by itself. The score is written in film seconds, so `score.mjs` checks each of its 14 hits against the new cuts and names any hit that is now more than 0.5 s off the picture (re-time it in `src/canvas-core/music/pieces/peter.ts`).
+4. Re-render.
 
 That's all. `timing.mjs` re-measures every clip to the sample, re-detects the pauses and re-aligns the words. It moves the clip and every clip after it on the frame grid. `shotlist.mjs` re-resolves every shot from its word anchor, so the cuts follow the new voice. It also fails loudly if a shot has collapsed to zero frames, or if an anchor word no longer exists (for example, if the text itself changed; it is locked, so that should never happen). Both generated files record each clip's sha256, so a render can always say exactly which audio it was built from.
 
