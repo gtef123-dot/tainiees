@@ -10,9 +10,11 @@ export type Anchor = { x: number; y: number; z: number; dx: number; dy: number; 
 
 export class DepthGrid {
   x0 = 0; y0 = 0; cell = 4; W = 1; H = 1; z = new Float32Array(1);
-  constructor(tris: Tri[], cell: number) {
+  constructor(tris: Tri[], cell: number, view: [number, number, number, number] = [-80, -80, 2000, 1160]) {
     let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
     for (const t of tris) { x0 = Math.min(x0, t.ax, t.bx, t.cx); y0 = Math.min(y0, t.ay, t.by, t.cy); x1 = Math.max(x1, t.ax, t.bx, t.cx); y1 = Math.max(y1, t.ay, t.by, t.cy); }
+    // only what can be seen needs a depth: clamp to the frame (a close prop can span metres off-screen)
+    x0 = Math.max(x0, view[0]); y0 = Math.max(y0, view[1]); x1 = Math.min(x1, view[2]); y1 = Math.min(y1, view[3]); if (x1 < x0) x1 = x0; if (y1 < y0) y1 = y0;
     if (!tris.length) return;
     this.x0 = x0; this.y0 = y0; this.cell = cell; this.W = Math.max(1, Math.ceil((x1 - x0) / cell) + 1); this.H = Math.max(1, Math.ceil((y1 - y0) / cell) + 1);
     this.z = new Float32Array(this.W * this.H).fill(-1e9);

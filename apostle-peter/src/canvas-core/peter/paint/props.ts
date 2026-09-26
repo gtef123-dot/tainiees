@@ -69,6 +69,16 @@ export const netPileParts = (o: Place3 & { w: number; d: number; h: number; seed
   return { ...toParts(B, { x: o.x, y: o.y, scale: o.scale, R: o.R ?? rotation(o.yaw, o.pitch ?? 0, o.roll ?? 0), z: o.z, light: o.light, paint: o.paint ?? 1, seed: o.seed }), overlays: [] };
 };
 
+// a boulder (basalt by the lake, limestone on the hills): a lumpy dome with a flat base, w x d
+// wide and h high, its facets from fractal noise so no two are alike
+export const boulderParts = (o: Place3 & { w: number; d: number; h: number; seed: number; color?: string; moss?: number }): Parts => {
+  const B = newB(), c = hex(o.color ?? "#4f4a45"), rows: V3[][] = [], K = 22;
+  for (let i = 0; i <= 9; i++) { const f = i / 9, ph = f * Math.PI * 0.5; rows.push(Array.from({ length: K }, (_, k) => { const a = (k / K) * Math.PI * 2, n = fractal(o.seed, Math.cos(a) * 1.6 + 5, f * 2.2 + Math.sin(a), 1, 1, 3), rr = Math.cos(ph) * (0.8 + 0.4 * n) + 0.02; return [Math.cos(a) * rr * o.w / 2, Math.sin(ph) * o.h * (0.85 + 0.3 * n) - 0.02, Math.sin(a) * rr * o.d / 2] as V3; })); }
+  rows.push(Array.from({ length: K }, () => [0, o.h * 1.0, 0] as V3));
+  surface(B, rows.reverse(), true, (_r, _k, p) => { const v = 0.78 + fractal(o.seed + 9, p[0] * 7, p[1] * 7 + p[2] * 7, 1, 1, 3) * 0.45, top = clamp(p[1] / o.h); return mix(scalec(c, v), [0.42, 0.44, 0.3], (o.moss ?? 0) * smooth(0.6, 1, top) * 0.5); });
+  return { ...toParts(B, { x: o.x, y: o.y, scale: o.scale, R: o.R ?? rotation(o.yaw, o.pitch ?? 0, o.roll ?? 0), z: o.z, light: o.light, paint: o.paint ?? 1, seed: o.seed }), overlays: [] };
+};
+
 // ---------------------------------------------------------------- fire and light
 // a flame: tongues that lick upward, pure in t; `size` is the flame height in px
 export const flame = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, t: number, seed: number, o: { core?: string; edge?: string; n?: number; alpha?: number } = {}) => {

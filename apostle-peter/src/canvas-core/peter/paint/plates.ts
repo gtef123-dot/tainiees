@@ -10,7 +10,7 @@ export type Surface = { canvas: OffscreenCanvas | HTMLCanvasElement; ctx: Canvas
 export const surface = (env: Env, w: number, h: number): Surface => { const L = env.canvas(Math.max(1, Math.round(w)), Math.max(1, Math.round(h))); return { canvas: L.canvas as OffscreenCanvas, ctx: L.ctx, w: Math.round(w), h: Math.round(h) }; };
 
 // plates are pure functions of their key, kept in a small LRU so a long film does not hold every set
-const LRU_MAX = 14;
+const LRU_MAX = 24;
 export const plate = (env: Env, key: string, w: number, h: number, build: (s: Surface) => void): Surface => {
   const store = (env.cache.get("plates") as Map<string, Surface> | undefined) ?? new Map<string, Surface>();
   env.cache.set("plates", store);

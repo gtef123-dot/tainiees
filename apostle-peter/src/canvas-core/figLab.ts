@@ -37,6 +37,15 @@ const TESTS: ((ctx: CanvasRenderingContext2D, env: Env) => void)[] = [
 ];
 TESTS.push((ctx, env) => { plain(ctx, env); const cam: WCam = { target: [0, 1.5, 0.3], scale: 980, yaw: -0.45, tilt: 0.02, cy: 520, cx: 1060 };
   renderParts(ctx, [one(ctx, env, cam, PETER_FIG.A, { bend: 0.1, neck: { pitch: 0.2, yaw: -0.25 }, armR: { target: [0.0, 1.62, 0.14], pole: [-0.5, -0.6, -0.3] }, armL: { raise: 0.3, elbow: 0.7 } }, [0, 0, 0], 0.15)], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0 }); });
+import { shoreWorld } from "./peter/sets/lake";
+import { lookFrom } from "./peter/shots/kit";
+const C32 = lookFrom([-0.3, 1.17, -1.35], [0, 1.07, 0.1], 1850, { cy: 500, cx: 1010 });
+TESTS.push((ctx, env) => { begin(ctx, env); shoreWorld(ctx, env, C32, "day", -2.2, { blur: 1 }); });
+TESTS.push((ctx, env) => { plain(ctx, env); renderParts(ctx, [one(ctx, env, C32, PETER_FIG.A, { root: [0, -0.4, 0], legL: { hip: 1.45, knee: 1.55 }, legR: { hip: 1.4, knee: 1.5 }, neck: { pitch: -0.1 } }, [0, 0, 0.3], Math.PI)], { env, cell: 2, tol: 0.03 * C32.scale, paint: 0.62 }); });
+TESTS.push((ctx, env) => { plain(ctx, env); renderParts(ctx, [one(ctx, env, C32, PETER_FIG.A, { root: [0, -0.4, 0], legL: { hip: 1.45, knee: 1.55 }, legR: { hip: 1.4, knee: 1.5 }, neck: { pitch: -0.1 } }, [0, 0, 0.3], Math.PI)], { env, cell: 2, tol: 0.03 * C32.scale, paint: 0 }); });
+import { ground, pebbleTex } from "./peter/sets/stage";
+const C34 = lookFrom([2.2, 1.24, -0.8], [-6.5, 0.75, -1.4], 120, { cy: 520, cx: 960 });
+TESTS.push((ctx, env) => { plain(ctx, env); ground(ctx, env, C34, pebbleTex(env, 1024), { x0: -46, x1: 34, z0: -2.25, z1: 57.8, tile: [2, 2] }); });
 const draw = (ctx: CanvasRenderingContext2D, f: number, env: Env) => { TESTS[Math.min(TESTS.length - 1, f)](ctx, env); finish(ctx, env, 0, { grain: 0.04, vignette: 0.2 }); };
 export const figLab: Film = { meta: { title: "figLab", W: 1920, H: 1080, fps: 30, bpm: 1800, durationFrames: TESTS.length, raster: "cpu" }, assets: { images: {} }, shots: [{ id: "lab", start: 0, end: TESTS.length, draw: draw as never }] };
 void lakeWorld;

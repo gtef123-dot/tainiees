@@ -454,6 +454,23 @@ export const scratch = (env: Env, ctx: CanvasRenderingContext2D) => {
   if (!L) { const l = env.canvas(W, H); L = { canvas: l.canvas as OffscreenCanvas, ctx: l.ctx }; env.cache.set(key, L); }
   L.ctx.setTransform(ctx.getTransform()); return L;
 };
+// two reusable scratch buffers per canvas size for blurs (half and third resolution)
+const blurBufs = (env: Env, W: number, H: number) => {
+  const key = `blurbufs:${W}x${H}`; let b = env.cache.get(key) as { a: { canvas: OffscreenCanvas; ctx: CanvasRenderingContext2D }; b: { canvas: OffscreenCanvas; ctx: CanvasRenderingContext2D } } | undefined;
+  if (!b) { const la = env.canvas(Math.ceil(W / 2) + 2, Math.ceil(H / 2) + 2), lb = env.canvas(Math.ceil(W / 1.5) + 2, Math.ceil(H / 1.5) + 2); b = { a: { canvas: la.canvas as OffscreenCanvas, ctx: la.ctx }, b: { canvas: lb.canvas as OffscreenCanvas, ctx: lb.ctx } }; env.cache.set(key, b); }
+  return b;
+};
+// soften a region of a layer in place: down by k (in two steps when k is big), back up with smoothing
+const softenRegion = (env: Env, src: CanvasImageSource, g: CanvasRenderingContext2D, W: number, H: number, X0: number, Y0: number, w: number, h: number, k: number) => {
+  const { a, b } = blurBufs(env, W, H), put = (c: CanvasRenderingContext2D) => { c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = "high"; };
+  put(a.ctx); put(b.ctx);
+  if (k <= 3) { const sw = Math.max(1, Math.ceil(w / k)), sh = Math.max(1, Math.ceil(h / k)); b.ctx.clearRect(0, 0, sw + 2, sh + 2); b.ctx.drawImage(src, X0, Y0, w, h, 0, 0, sw, sh); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(X0, Y0, w, h); g.imageSmoothingEnabled = true; g.drawImage(b.canvas as CanvasImageSource, 0, 0, sw, sh, X0, Y0, w, h); g.restore(); return; }
+  const w2 = Math.max(1, Math.ceil(w / 2)), h2 = Math.max(1, Math.ceil(h / 2)), wk = Math.max(1, Math.ceil(w / k)), hk = Math.max(1, Math.ceil(h / k));
+  a.ctx.clearRect(0, 0, w2 + 2, h2 + 2); a.ctx.drawImage(src, X0, Y0, w, h, 0, 0, w2, h2);
+  b.ctx.clearRect(0, 0, wk + 2, hk + 2); b.ctx.drawImage(a.canvas as CanvasImageSource, 0, 0, w2, h2, 0, 0, wk, hk);
+  a.ctx.clearRect(0, 0, w2 + 2, h2 + 2); a.ctx.drawImage(b.canvas as CanvasImageSource, 0, 0, wk, hk, 0, 0, w2, h2);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(X0, Y0, w, h); g.imageSmoothingEnabled = true; g.drawImage(a.canvas as CanvasImageSource, 0, 0, w2, h2, X0, Y0, w, h); g.restore();
+};
 export const renderParts = (ctx: CanvasRenderingContext2D, parts: Parts[], o: { seam?: number; cell?: number; tol?: number; paint?: number; env?: Env; fx?: LayerFx; soften?: number } = {}) => {
   const tris = parts.flatMap((p) => p.tris).sort((a, b) => a.z - b.z), anchors = parts.flatMap((p) => p.anchors).sort((a, b) => a.z - b.z), ovs = parts.flatMap((p) => p.overlays).sort((a, b) => a.z - b.z);
   if (!tris.length && !ovs.length) return;
@@ -473,7 +490,7 @@ export const renderParts = (ctx: CanvasRenderingContext2D, parts: Parts[], o: { 
     const from = ti; while (ti < tris.length && tris[ti].z < z) ti++;
     fillTris(g, tris.slice(from, ti), seam);
     // close up, soften the facets before the brush marks go on (once, before any overlay is drawn)
-    if (L && o.soften && !softened && o.env) { softened = true; const k = Math.max(2, Math.round(o.soften)), w = X1 - X0, h = Y1 - Y0, key = `soft:${Math.ceil(w / k)}x${Math.ceil(h / k)}`; let sm = o.env.cache.get(key) as { canvas: OffscreenCanvas; ctx: CanvasRenderingContext2D } | undefined; if (!sm) { const l = o.env.canvas(Math.ceil(w / k), Math.ceil(h / k)); sm = { canvas: l.canvas as OffscreenCanvas, ctx: l.ctx }; o.env.cache.set(key, sm); } sm.ctx.setTransform(1, 0, 0, 1, 0, 0); sm.ctx.clearRect(0, 0, sm.canvas.width, sm.canvas.height); sm.ctx.imageSmoothingEnabled = true; sm.ctx.drawImage(L.canvas as CanvasImageSource, X0, Y0, w, h, 0, 0, sm.canvas.width, sm.canvas.height); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = true; g.globalCompositeOperation = "source-atop"; g.globalAlpha = 0.85; g.drawImage(sm.canvas as CanvasImageSource, 0, 0, sm.canvas.width, sm.canvas.height, X0, Y0, w, h); g.restore(); }
+    if (L && o.soften && !softened && o.env) { softened = true; softenRegion(o.env, L.canvas as CanvasImageSource, g, ctx.canvas.width, ctx.canvas.height, X0, Y0, X1 - X0, Y1 - Y0, Math.max(2, Math.round(o.soften))); g.setTransform(tr); }
     const a0 = ai; while (ai < anchors.length && anchors[ai].z < z) ai++;
     if (paint > 0) { if (L) g.globalCompositeOperation = "source-atop"; paintAnchors(g, anchors.slice(a0, ai), grid, tol, paint); g.globalCompositeOperation = "source-over"; }
   };
@@ -488,12 +505,7 @@ export const renderParts = (ctx: CanvasRenderingContext2D, parts: Parts[], o: { 
     if (fx.haze && fx.hazeAmt) { g.globalAlpha = fx.hazeAmt; g.fillStyle = `rgb(${fx.haze.map((v) => Math.round(v * 255)).join(",")})`; g.fillRect(X0, Y0, X1 - X0, Y1 - Y0); }
     g.restore();
     // depth of field / rack focus: the whole layer softened by scaling down and up
-    if (fx.blur && fx.blur > 0.4 && o.env) {
-      const k = Math.max(1.5, fx.blur), w = X1 - X0, h = Y1 - Y0, sw = Math.max(1, Math.ceil(w / k)), sh = Math.max(1, Math.ceil(h / k)), key = `dof:${sw}x${sh}`;
-      let sm = o.env.cache.get(key) as { canvas: OffscreenCanvas; ctx: CanvasRenderingContext2D } | undefined; if (!sm) { const l = o.env.canvas(sw, sh); sm = { canvas: l.canvas as OffscreenCanvas, ctx: l.ctx }; o.env.cache.set(key, sm); }
-      sm.ctx.setTransform(1, 0, 0, 1, 0, 0); sm.ctx.clearRect(0, 0, sw, sh); sm.ctx.imageSmoothingEnabled = true; sm.ctx.drawImage(L.canvas as CanvasImageSource, X0, Y0, w, h, 0, 0, sw, sh);
-      g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(X0, Y0, w, h); g.imageSmoothingEnabled = true; g.drawImage(sm.canvas as CanvasImageSource, 0, 0, sw, sh, X0, Y0, w, h); g.restore();
-    }
+    if (fx.blur && fx.blur > 0.4 && o.env) softenRegion(o.env, L.canvas as CanvasImageSource, g, ctx.canvas.width, ctx.canvas.height, X0, Y0, X1 - X0, Y1 - Y0, Math.max(1.5, fx.blur));
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = fx.alpha ?? 1;
     if (fx.waterY === undefined) ctx.drawImage(L.canvas as CanvasImageSource, X0, Y0, X1 - X0, Y1 - Y0, X0, Y0, X1 - X0, Y1 - Y0);
     else {

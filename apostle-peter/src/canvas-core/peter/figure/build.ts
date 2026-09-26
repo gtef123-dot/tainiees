@@ -72,6 +72,7 @@ export const toParts = (B: Builder, o: Proj): { tris: Tri[]; anchors: Anchor[] }
       if (!B.anchor[a]) continue;
       if (!B.noCull[a] && nrm[a][2] + nrm[b][2] + nrm[c][2] < 0.2) continue;
       const pa = proj[a], pb = proj[b], pc = proj[c], area = Math.abs((pb[0] - pa[0]) * (pc[1] - pa[1]) - (pb[1] - pa[1]) * (pc[0] - pa[0])) * 0.5;
+      if (Math.max(pa[0], pb[0], pc[0]) < -60 || Math.min(pa[0], pb[0], pc[0]) > 1980 || Math.max(pa[1], pb[1], pc[1]) < -60 || Math.min(pa[1], pb[1], pc[1]) > 1140) continue;   // off-frame: no marks
       const bs = B.brush[a] ?? 1, per = bw * bs * bl * bs * 0.45, want = Math.min(24, area / per);
       if (want < 0.05) continue;
       const fa = apply(Rb, B.flow[a]); let dx = fa[0], dy = -fa[1]; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;

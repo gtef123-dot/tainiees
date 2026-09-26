@@ -55,3 +55,19 @@ export const shadow = (ctx: Ctx2, env: Env, cam: WCam, p: V3, r: number, amt = 0
   const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx); g.addColorStop(0, `rgba(30,24,18,${amt})`); g.addColorStop(0.55, `rgba(30,24,18,${amt * 0.55})`); g.addColorStop(1, "rgba(30,24,18,0)");
   ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, rx, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 };
+// a joint of a posed figure standing at pos, turned by yaw, in world space (for aiming cameras, hands, props)
+import { joints } from "../figure/body";
+export const worldJoint = (f: Figure, pose: BodyPose, pos: V3, yaw: number, name: keyof ReturnType<typeof joints>): V3 => {
+  const j = joints(f, pose)[name] as V3, w = apply(rotY(yaw), j); return [pos[0] + w[0], pos[1] + w[1], pos[2] + w[2]];
+};
+// a point in a figure's own frame (x to its left, y up, z forward) -> world
+export const inFrame = (pos: V3, yaw: number, local: V3): V3 => { const w = apply(rotY(yaw), local); return [pos[0] + w[0], pos[1] + w[1], pos[2] + w[2]]; };
+// the yaw that turns a figure (or a camera: use camYaw) to face from a toward b
+export const faceYaw = (a: V3, b: V3) => Math.atan2(b[0] - a[0], b[2] - a[2]);
+export const camYaw = (from: V3, to: V3) => Math.atan2(to[0] - from[0], -(to[2] - from[2]));
+// a perspective camera standing at `eye` looking at `at` (scale: px per metre at `at`'s depth)
+export const lookFrom = (eye: V3, at: V3, scale: number, o: Partial<WCam> = {}): WCam => {
+  const d: V3 = [at[0] - eye[0], at[1] - eye[1], at[2] - eye[2]], dist = Math.hypot(d[0], d[1], d[2]), hz = Math.hypot(d[0], d[2]);
+  const yaw = Math.atan2(d[0], -d[2]), tilt = Math.atan2(-d[1], hz);
+  return { target: at, scale, yaw, tilt, focal: scale * dist, ...o };
+};
