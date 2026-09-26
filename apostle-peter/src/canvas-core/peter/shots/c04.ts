@@ -98,7 +98,7 @@ const s043 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
 // night squall, from inside the heeling boat: the horizon swings, black swells heave past the rail,
 // spray bursts over the gunwale onto Peter clinging there; then at once the wind drops, glass-still
 const s044 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
-  const t = f / 30, n = prog(f, s), calm = smooth(0.72, 0.82, n), storm = 1 - calm, T = t - s.start / 30;
+  const t = f / 30, n = prog(f, s), calm = smooth(0.72, 0.82, n), storm = 1 - calm, T = t;
   const heel = storm * (0.2 * Math.sin(T * 3.1 + 0.6) + 0.07 * Math.sin(T * 7.3)) + calm * 0.02 * Math.sin(T * 1.2), BOAT: V3 = [0, 0, 0];
   const cam = lookFrom(onBoat(BOAT, 0, [-1.6, 1.3, -0.5]), onBoat(BOAT, 0, [0.6, 0.85, 1.4]), 520, { cy: 540, cx: 960, t, shake: 1.8 * storm, roll: heel });
   begin(ctx, env);

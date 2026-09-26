@@ -359,3 +359,21 @@ export const beamsTex = (env: Env) => plate(env, "tex:beams", 1000, 600, (s) => 
   c.fillStyle = "#2a2018"; for (const [x, y] of [[650, 296], [642, 300]]) { c.beginPath(); c.arc(x, y, 6, 0, Math.PI * 2); c.fill(); }
   paintOver(env, s, { seed: 422, sizes: [6, 3], keepBase: 0.7, alpha: 0.6 });
 });
+// an icon's gold ground: leaf laid in squares, burnished unevenly, the gesso showing at the cracks
+export const goldTex = (env: Env) => plate(env, "tex:gold", 1200, 700, (s) => {
+  const c = s.ctx, w = 1200, h = 700, r = rng(431), base = hex("#c49a4a");
+  c.fillStyle = css(base); c.fillRect(0, 0, w, h);
+  for (let y = 0; y < h; y += 60) for (let x = (y / 60) % 2 ? -30 : 0; x < w; x += 60) { c.fillStyle = css(scalec(mix(base, [1, 0.9, 0.6], r() * 0.3), 0.88 + r() * 0.2), 0.8); c.fillRect(x + 1, y + 1, 58, 58); }
+  const g = c.createRadialGradient(w * 0.45, h * 0.35, 20, w * 0.45, h * 0.35, w * 0.7); g.addColorStop(0, "rgba(255,238,190,0.35)"); g.addColorStop(1, "rgba(90,60,20,0.3)"); c.fillStyle = g; c.fillRect(0, 0, w, h);
+  for (let i = 0; i < 40; i++) { c.strokeStyle = "rgba(120,80,40,0.35)"; c.lineWidth = 1; c.beginPath(); let x = r() * w, y = r() * h; c.moveTo(x, y); for (let k = 0; k < 8; k++) { x += (r() - 0.5) * 40; y += (r() - 0.3) * 20; c.lineTo(x, y); } c.stroke(); }
+  paintOver(env, s, { seed: 432, sizes: [8, 4], keepBase: 0.75, alpha: 0.5 });
+});
+// a strip of parchment with a line lettered on it (the film's one piece of writing)
+export const parchmentTex = (env: Env, text: string) => plate(env, `tex:parch:${text}`, 1400, 220, (s) => {
+  const c = s.ctx, w = 1400, h = 220, r = rng(441);
+  c.fillStyle = "#e6d6b2"; c.fillRect(0, 0, w, h);
+  for (let i = 0; i < 3000; i++) { c.fillStyle = `rgba(120,90,50,${r() * 0.12})`; c.fillRect(r() * w, r() * h, 1 + r() * 3, 1 + r() * 2); }
+  const g = c.createLinearGradient(0, 0, 0, h); g.addColorStop(0, "rgba(120,80,40,0.25)"); g.addColorStop(0.2, "rgba(120,80,40,0)"); g.addColorStop(0.8, "rgba(120,80,40,0)"); g.addColorStop(1, "rgba(120,80,40,0.3)"); c.fillStyle = g; c.fillRect(0, 0, w, h);
+  c.fillStyle = "#5a3a22"; c.font = 'italic 86px "DejaVu Serif", serif'; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(text, w / 2, h / 2 + 4);
+  paintOver(env, s, { seed: 442, sizes: [4, 2], keepBase: 0.85, alpha: 0.35 });
+});

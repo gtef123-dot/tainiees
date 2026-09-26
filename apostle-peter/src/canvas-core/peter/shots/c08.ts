@@ -32,7 +32,7 @@ const crew = (ctx: Ctx2, env: Env, cam: WCam, t: number, boat: V3, by: number, L
 // across the moon in it... and the rings go on spreading, now on the lake at dawn: the boat offshore,
 // seven men hauling empty nets, mist on the water, and on the shore a small fire with a figure beside it
 const s081 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
-  const t = f / 30, n = prog(f, s), T = t - s.start / 30, dis = smooth(0.4, 0.56, n);
+  const t = f / 30, n = prog(f, s), T = t, dis = smooth(0.4, 0.56, n);
   const drops = [0.25, 0.95, 1.55];
   // A: the gutter at night
   if (dis < 1) {

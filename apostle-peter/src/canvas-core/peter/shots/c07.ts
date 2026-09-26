@@ -54,7 +54,7 @@ const warmers = (ctx: Ctx2, env: Env, cam: WCam, t: number, skip: Figure[] = [],
 // black; a torch passes close across the lens and its light reveals the courtyard from a high corner:
 // servants and guards round the brazier, and up on the gallery the bound Christ
 const s071 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
-  const t = f / 30, n = prog(f, s), T = t - s.start / 30, pass = clamp(T / 1.3), reveal = smooth(0.08, 0.45, n);
+  const t = f / 30, n = prog(f, s), T = t, pass = clamp(T / 1.3), reveal = smooth(0.08, 0.45, n);
   const cam = lookFrom([5.6, 4.4, 6.2], [lerp(-0.2, 0.3, n), 1.2, -2.6], 165, { cy: 520, cx: 960, t, shake: 0.1 });
   begin(ctx, env);
   courtyard(ctx, env, cam, t);
