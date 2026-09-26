@@ -1,4 +1,4 @@
-// CLIP 03 — THE CALLING. «Όταν ο Χριστός τον κάλεσε, άφησε τα δίχτυα του και τον ακολούθησε.»
+// CLIP 03 — THE CALL. «Μια μέρα, ο Χριστός τον κάλεσε να Τον ακολουθήσει. Ο Πέτρος άφησε τα δίχτυα του, τη βάρκα του και την προηγούμενη ζωή του, και έγινε μαθητής Του.»
 // One beach, one late morning. Peter mends a net on a boulder by the beached boat; Christ comes along
 // the shore and stops a few paces off; the look; the net slips from his hands; he follows.
 import type { Env } from "../../core";

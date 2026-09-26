@@ -162,14 +162,26 @@ export const figureParts = (ctx: CanvasRenderingContext2D, fig: Figure, pose: Bo
   const torsoLen = D.chestUp + D.neckUp - 0.05;
   for (const [t, rx, rz] of torsoProfile) { const cpt = add3([J.pelvis[0], beltY, J.pelvis[2]], mul3(up, t * torsoLen)); torsoRows.push(ring(cpt, rx * (0.92 + 0.08 * fig.bulk), rz * (0.92 + 0.08 * fig.bulk), segs, pose.twist ?? 0, 0, Math.PI * 2, (a) => 0.004 * Math.sin(a * 7 + t * 5))); }
   surface(B, torsoRows, true, clothCol(tunicC, 11));
-  // skirt: from the belt to the hem, always around both legs
+  // skirt: from the belt to the hem, always around both legs. The cloth follows a PATH, not heights:
+  // from the belt to between the knees, then straight down under gravity, so the same tunic covers the
+  // thighs of a man sitting on a rock, falls from the knees of one kneeling, and hangs to the shins of
+  // one standing (its length is the standing length: belt to tunicLen)
   const legAt = (hip: V3, knee: V3, ankle: V3, y: number): V3 => { if (y >= knee[1]) { const t = clamp((hip[1] - y) / Math.max(1e-3, hip[1] - knee[1])); return add3(hip, mul3(sub3(knee, hip), t)); } const t = clamp((knee[1] - y) / Math.max(1e-3, knee[1] - ankle[1])); return add3(knee, mul3(sub3(ankle, knee), t)); };
-  const hemY = c.tunicLen, skirtRows: V3[][] = [];
-  for (let i = 0; i <= 9; i++) {
-    const t = i / 9, y = lerp(beltY, hemY, t), a = legAt(J.hipL, J.kneeL, J.ankleL, y), b = legAt(J.hipR, J.kneeR, J.ankleR, y), m = mul3(add3(a, b), 0.5);
-    const rx = Math.abs(a[0] - b[0]) / 2 + 0.085 + 0.045 * t, rz = Math.max(Math.abs(a[2] - b[2]) / 2 + 0.08, 0.12) + 0.03 * t;
-    const drape = ((place.t ?? 0) * 0.7 + t * 3) , folds = (ang: number) => (0.006 + 0.016 * t) * Math.sin(ang * 11 + 1.3 + Math.sin(drape) * 0.3) + 0.005 * t * Math.sin(ang * 5);
-    skirtRows.push(ring([m[0], y, m[2]], rx, rz, segs, pose.twist ?? 0, 0, Math.PI * 2, folds));
+  const B0: V3 = [J.pelvis[0], beltY, J.pelvis[2]], KM = mul3(add3(J.kneeL, J.kneeR), 0.5), seg1 = Math.max(0.05, Math.hypot(KM[0] - B0[0], KM[1] - B0[1], KM[2] - B0[2]));
+  const dThigh = norm3(sub3(KM, B0)), lat0 = norm3(sub3(J.hipL, J.hipR));
+  const drapeAt = (u: number) => {
+    const w = smooth(seg1 - 0.12, seg1 + 0.1, u), d = norm3(add3(mul3(dThigh, 1 - w), mul3([0, -1, 0], w)));
+    const c: V3 = u <= seg1 ? add3(B0, mul3(sub3(KM, B0), u / seg1)) : [KM[0], Math.max(0.03, KM[1] - (u - seg1)), KM[2]];
+    const legPt = (hip: V3, knee: V3, ankle: V3): V3 => u <= seg1 ? add3(hip, mul3(sub3(knee, hip), u / seg1)) : add3(knee, mul3(norm3(sub3(ankle, knee)), Math.min(u - seg1, 0.4)));
+    const la = legPt(J.hipL, J.kneeL, J.ankleL), lb = legPt(J.hipR, J.kneeR, J.ankleR);
+    const ux = norm3(sub3(lat0, mul3(d, dot3(lat0, d)))), vz = cross3(d, ux), sep = sub3(la, lb);
+    return { c, d, ux, vz, hx: Math.abs(dot3(sep, ux)) / 2, hz: Math.abs(dot3(sep, vz)) / 2 };
+  };
+  const dRing = (u: number, rx: number, rz: number, n: number, a0 = 0, a1 = Math.PI * 2, wob?: (a: number) => number): V3[] => { const q = drapeAt(u); return Array.from({ length: n }, (_, k) => { const a = a0 + ((a1 - a0) * k) / (a1 - a0 >= Math.PI * 2 - 1e-6 ? n : n - 1), ww = wob ? wob(a) : 0; return add3(q.c, add3(mul3(q.ux, Math.sin(a) * (q.hx + rx + ww)), mul3(q.vz, Math.cos(a) * (Math.max(q.hz, 0.04) + rz + ww)))); }); };
+  const Lsk = Math.max(0.08, D.hipY + 0.06 - c.tunicLen), skirtRows: V3[][] = [];
+  for (let i = 0; i <= 11; i++) {
+    const t = i / 11, drape = ((place.t ?? 0) * 0.7 + t * 3), folds = (ang: number) => (0.006 + 0.016 * t) * Math.sin(ang * 11 + 1.3 + Math.sin(drape) * 0.3) + 0.005 * t * Math.sin(ang * 5);
+    skirtRows.push(dRing(Lsk * t, 0.085 + 0.045 * t, 0.07 + 0.03 * t, segs, 0, Math.PI * 2, folds));
   }
   surface(B, skirtRows, true, clothCol(tunicC, 12));
   // belt
@@ -199,7 +211,7 @@ export const figureParts = (ctx: CanvasRenderingContext2D, fig: Figure, pose: Bo
   // legs below the hem, and sandalled feet
   for (const side of [1, -1]) {
     const hp = side > 0 ? J.hipL : J.hipR, k = side > 0 ? J.kneeL : J.kneeR, a = side > 0 ? J.ankleL : J.ankleR, toe = side > 0 ? J.toeL : J.toeR;
-    if (hemY > k[1] - 0.02) tube(B, [add3(hp, [0, -0.08, 0]), add3(hp, mul3(sub3(k, hp), 0.55)), k], [0.075, 0.068, 0.052], segs >= 22 ? 12 : 8, () => skin);
+    if (Lsk < seg1 - 0.02) tube(B, [add3(hp, [0, -0.08, 0]), add3(hp, mul3(sub3(k, hp), 0.55)), k], [0.075, 0.068, 0.052], segs >= 22 ? 12 : 8, () => skin);
     tube(B, [k, add3(k, mul3(sub3(a, k), 0.4)), a], [0.05, 0.047, 0.034], segs >= 22 ? 12 : 8, () => skin);
     const fd0 = sub3(toe, a), fd = norm3([fd0[0], 0, fd0[2]]), fl = norm3(cross3([0, 1, 0], fd)), lift = Math.max(0, a[1] - D.ankleH);
     const heel = add3(a, [fd[0] * -0.05, -a[1] + lift, fd[2] * -0.05]), len = D.foot + 0.05, footRows: V3[][] = [];
@@ -211,22 +223,24 @@ export const figureParts = (ctx: CanvasRenderingContext2D, fig: Figure, pose: Bo
   }
   // mantle: hangs from the shoulders round the back and sides, open at the front, over the head if hooded
   if (c.mantle) {
-    const mRows: V3[][] = [], mLen = c.mantleLen ?? 0.35, open = 0.95, hood = c.hood ?? 0;
+    const mRows: V3[][] = [], mLen = c.mantleLen ?? 0.35, open = 0.72, hood = c.hood ?? 0;
     const arcN = segs, a0 = open, a1 = Math.PI * 2 - open;
     const levels: [number, number, number, number][] = [];
-    for (let i = 0; i <= 12; i++) {
-      const t = i / 12, y = lerp(J.neck[1] - 0.02, mLen, t);
-      let rx: number, rz: number, cx = J.pelvis[0], cz = J.pelvis[2];
-      if (y > beltY) { const f = clamp((y - beltY) / torsoLen); const sh = smooth(0.65, 0.88, f); rx = lerp(0.2, D.shoulderW + 0.05, sh) - smooth(0.9, 1.0, f) * 0.12; rz = lerp(0.15, 0.135, sh) - smooth(0.92, 1.0, f) * 0.05; const cp = add3([J.pelvis[0], beltY, J.pelvis[2]], mul3(up, f * torsoLen)); cx = cp[0]; cz = cp[2]; }
-      else { const a = legAt(J.hipL, J.kneeL, J.ankleL, y), b = legAt(J.hipR, J.kneeR, J.ankleR, y); rx = Math.abs(a[0] - b[0]) / 2 + 0.12 + 0.05 * clamp((beltY - y) / 0.6); rz = Math.max(Math.abs(a[2] - b[2]) / 2 + 0.1, 0.155); cx = (a[0] + b[0]) / 2; cz = (a[2] + b[2]) / 2; }
+    const nTop = 7, Lm = D.hipY + 0.06 - mLen, nLow = Lm > 0.05 ? 6 : 0;
+    for (let i = 0; i <= nTop; i++) {
+      const t = i / (nTop + nLow), y = lerp(J.neck[1] - 0.02, beltY, i / nTop);
+      const f = clamp((y - beltY) / torsoLen), sh = smooth(0.65, 0.88, f); let rx = lerp(0.2, D.shoulderW + 0.05, sh) - smooth(0.9, 1.0, f) * 0.12; const rz = lerp(0.15, 0.135, sh) - smooth(0.92, 1.0, f) * 0.05; const cp = add3([J.pelvis[0], beltY, J.pelvis[2]], mul3(up, f * torsoLen));
       // arms push the mantle out where they are
-      for (const e of [J.elbowL, J.elbowR]) if (Math.abs(e[1] - y) < 0.12) rx = Math.max(rx, Math.abs(e[0] - cx) + 0.07 * (1 - Math.abs(e[1] - y) / 0.12));
-      levels.push([y, rx, rz, 0]); const op = lerp(0.62, open, smooth(0, 0.35, t)); mRows.push(ring([cx, y, cz - 0.012], rx, rz, arcN, pose.twist ?? 0, op, Math.PI * 2 - op, (ang) => (0.006 + 0.022 * t) * Math.sin(ang * 7 + 0.7 + t * 0.8) + 0.01 * t * Math.sin(ang * 3.3) + 0.004 * Math.sin(ang * 17)));
+      for (const e of [J.elbowL, J.elbowR]) if (Math.abs(e[1] - y) < 0.12) rx = Math.max(rx, Math.abs(e[0] - cp[0]) + 0.07 * (1 - Math.abs(e[1] - y) / 0.12));
+      levels.push([y, rx, rz, 0]); const op = lerp(0.62, open, smooth(0, 0.35, t)); mRows.push(ring([cp[0], y, cp[2] - 0.012], rx, rz, arcN, pose.twist ?? 0, op, Math.PI * 2 - op, (ang) => (0.006 + 0.022 * t) * Math.sin(ang * 7 + 0.7 + t * 0.8) + 0.01 * t * Math.sin(ang * 3.3) + 0.004 * Math.sin(ang * 17)));
     }
+    for (let i = 1; i <= nLow; i++) { const t = (nTop + i) / (nTop + nLow), u = (Lm * i) / nLow; mRows.push(dRing(u, 0.12 + 0.05 * (i / nLow), 0.1 + 0.02 * (i / nLow), arcN, open, Math.PI * 2 - open, (ang) => (0.006 + 0.022 * t) * Math.sin(ang * 7 + 0.7 + t * 0.8) + 0.01 * t * Math.sin(ang * 3.3) + 0.004 * Math.sin(ang * 17))); }
     if (hood > 0) {
-      const hc = add3(J.neck, apply(J.head, [0, D.hh * 0.45, -D.hh * 0.05]));
-      const hoodRows: V3[][] = [];
-      for (let i = 0; i <= 6; i++) { const t = i / 6, y = lerp(J.neck[1] - 0.02, hc[1] + D.hh * 0.62 * hood, t); const r = lerp(0.17, 0.02 + 0.13 * (1 - t), smooth(0.4, 1, t)) + 0.06 * Math.sin(Math.PI * t * 0.9); hoodRows.push(ring([lerp(J.neck[0], hc[0], t), y, lerp(J.neck[2] - 0.02, hc[2] - 0.03, t)], r * 1.05, r, arcN, 0, 1.25, Math.PI * 2 - 1.25)); }
+      // a mantle drawn up over the head: it follows the skull (in the head's own frame, so it turns
+      // with the head), closes over the crown, frames the face and falls to the shoulders
+      const hh = D.hh, prof: [number, number, number, number][] = [[-0.08, 0.84, 0.95, 1.05], [0.3, 0.64, 0.95, 1.1], [0.62, 0.66, 1.05, 1.15], [0.95, 0.63, 1.0, 1.1], [1.2, 0.5, 0.85, 0.8], [1.36, 0.3, 0.6, 0.45], [1.44, 0.08, 0.3, 0.2]];
+      const hoodRows = prof.map(([yy, rr, sx, open]) => Array.from({ length: arcN }, (_, k) => { const a0 = lerp(1.25, open, 1), a = a0 + ((Math.PI * 2 - 2 * a0) * k) / (arcN - 1), r = rr * hh * (1 + 0.05 * Math.sin(a * 5 + yy * 3)); return add3(J.neck, apply(J.head, [Math.sin(a) * r * sx, yy * hh, -0.1 * hh + Math.cos(a) * r])); }));
+      // below the jaw the hood's sides fall into the mantle's collar
       surface(B, hoodRows.reverse(), false, clothCol(mantC, 21), { noCull: true });
     }
     surface(B, mRows, false, clothCol(mantC, 22), { noCull: true });

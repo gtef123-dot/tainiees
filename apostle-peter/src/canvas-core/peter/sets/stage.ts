@@ -36,8 +36,9 @@ const quadTo = (ctx: C, env: Env, tex: Surface, u0: number, v0: number, uw: numb
 // drawn at once from a baked copy of the texture.
 const baked = (env: Env, t: Surface) => plate(env, `bake4:${t.w}x${t.h}:${(t.canvas as unknown as { __id?: number }).__id ?? ""}`, t.w, t.h, (s) => { for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) s.ctx.drawImage(t.canvas as CanvasImageSource, 0, 0, t.w, t.h, (i * t.w) / 4, (j * t.h) / 4, t.w / 4, t.h / 4); });
 let texIds = 0;
-export const ground = (ctx: C, env: Env, cam: WCam, tx: Surface, o: { x0: number; x1: number; z0: number; z1: number; y?: number; tile?: [number, number]; alpha?: number; maxCell?: number }) => {
-  const y = o.y ?? 0, c0: WCam = { ...cam, shake: 0 }, P = (x: number, z: number) => wproj(c0, env, [x, y, z]);
+// slope: the ground rises this many metres per metre toward +z (a hillside)
+export const ground = (ctx: C, env: Env, cam: WCam, tx: Surface, o: { x0: number; x1: number; z0: number; z1: number; y?: number; slope?: number; tile?: [number, number]; alpha?: number; maxCell?: number }) => {
+  const y = o.y ?? 0, sl = o.slope ?? 0, c0: WCam = { ...cam, shake: 0 }, P = (x: number, z: number) => wproj(c0, env, [x, y + sl * z, z]);
   const sh = cam.shake ? [wproj(cam, env, cam.target)[0] - wproj(c0, env, cam.target)[0], wproj(cam, env, cam.target)[1] - wproj(c0, env, cam.target)[1]] : [0, 0];
   const [tw, th] = o.tile ?? [o.x1 - o.x0, o.z1 - o.z0], maxCell = o.maxCell ?? 170, tiled = !!o.tile;
   const anyTex = tx.canvas as unknown as { __id?: number }; if (anyTex.__id === undefined) anyTex.__id = ++texIds;
@@ -149,3 +150,58 @@ export const bandTex = (env: Env, color: RGB, key: string) => plate(env, `tex:ba
 });
 // blurred copy of a texture (for the soft background of a close-up)
 export const softTex = (env: Env, t: Surface, key: string, r: number) => plate(env, `${key}:soft${r}`, t.w, t.h, (s) => { const b = blurInto(env, t, r); s.ctx.drawImage(b.canvas as CanvasImageSource, 0, 0); });
+
+// ---------------------------------------------------------------- face-on card textures
+// ripe wheat seen from the side, transparent above: stems, blades, bearded heads catching the light.
+// One card is 4 m wide x 1.3 m tall; it repeats edge to edge.
+export const wheatTex = (env: Env, lit: string, shade: string, key: string) => plate(env, `tex:wheat:${key}`, 1200, 390, (s) => {
+  const c = s.ctx, w = 1200, h = 390, r = rng(341), L = hex(lit), D = hex(shade), k = h / 1.3;
+  for (let pass = 0; pass < 3; pass++) for (let i = 0; i < 520; i++) {
+    const x = r() * w, ht = (0.8 + r() * 0.35) * k * (0.85 + pass * 0.08), lean = (r() - 0.5) * 22, tone = 0.55 + pass * 0.2 + r() * 0.15, top = h - ht;
+    wrap(w, h, x, h / 2, 40, (X) => {
+      c.strokeStyle = css(mix(D, L, tone * 0.7)); c.lineWidth = 1.6; c.beginPath(); c.moveTo(X, h + 2); c.quadraticCurveTo(X + lean * 0.3, h - ht * 0.5, X + lean, top); c.stroke();
+      if (r() < 0.5) { c.strokeStyle = css(mix(D, L, tone * 0.5), 0.8); c.lineWidth = 2.2; c.beginPath(); c.moveTo(X + lean * 0.2, h - ht * 0.35); c.quadraticCurveTo(X + lean * 0.2 + 14 * (r() - 0.5) * 2, h - ht * 0.55, X + lean * 0.4 + 26 * (r() - 0.5), h - ht * 0.45); c.stroke(); }
+      // the head: a slim ear, lit on one side, with awns
+      const hx = X + lean, hy = top, hl = 26 + r() * 10, a = -Math.PI / 2 + lean * 0.012;
+      c.fillStyle = css(mix(D, L, tone)); c.beginPath(); c.ellipse(hx + Math.cos(a) * hl * 0.5, hy + Math.sin(a) * hl * 0.5, 4.2, hl * 0.55, a + Math.PI / 2, 0, Math.PI * 2); c.fill();
+      c.fillStyle = css(mix(L, [1, 0.97, 0.85], 0.35), 0.7); c.beginPath(); c.ellipse(hx + Math.cos(a) * hl * 0.5 - 1.5, hy + Math.sin(a) * hl * 0.5, 1.6, hl * 0.45, a + Math.PI / 2, 0, Math.PI * 2); c.fill();
+      c.strokeStyle = css(mix(D, L, tone), 0.55); c.lineWidth = 0.8; for (let q = 0; q < 5; q++) { c.beginPath(); c.moveTo(hx + Math.cos(a) * hl * (0.3 + q * 0.15), hy + Math.sin(a) * hl * (0.3 + q * 0.15)); c.lineTo(hx + Math.cos(a) * hl * (0.6 + q * 0.2) + (q % 2 ? 7 : -7), hy + Math.sin(a) * hl * (0.6 + q * 0.2) - 6); c.stroke(); }
+    });
+  }
+  paintOver(env, s, { seed: 342, sizes: [8, 4], flow: () => -Math.PI / 2, keepBase: 0.7, alpha: 0.55 });
+});
+// dry summer grass on a hillside, seen from above (tile = 3 m)
+export const grassTex = (env: Env, base = "#a39a62", px = 900) => tex(env, `grass:${base}:${px}`, px, px, (c, w, h) => {
+  const r = rng(351), b = hex(base), k = w / 3;
+  c.fillStyle = css(scalec(b, 0.85)); c.fillRect(0, 0, w, h);
+  for (let i = 0; i < 200; i++) { const x = r() * w, y = r() * h, s = (0.2 + r() * 0.5) * k; wrap(w, h, x, y, s, (X, Y) => { const g = c.createRadialGradient(X, Y, 0, X, Y, s); g.addColorStop(0, css(scalec(b, 0.8 + r() * 0.35), 0.4)); g.addColorStop(1, css(b, 0)); c.fillStyle = g; c.fillRect(X - s, Y - s, 2 * s, 2 * s); }); }
+  for (let i = 0; i < 9000; i++) { const x = r() * w, y = r() * h, l = 4 + r() * 12, a = r() * Math.PI; c.strokeStyle = css(mix(scalec(b, 0.6 + r() * 0.7), [0.45, 0.5, 0.3], r() * 0.3), 0.6); c.lineWidth = 1; c.beginPath(); c.moveTo(x, y); c.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); c.stroke(); }
+  for (let i = 0; i < 60; i++) { const x = r() * w, y = r() * h, s = (0.02 + r() * 0.06) * k; wrap(w, h, x, y, s * 1.3, (X, Y) => { c.fillStyle = css(hex("#8a8274"), 0.9); c.beginPath(); c.ellipse(X, Y, s, s * 0.7, r(), 0, Math.PI * 2); c.fill(); }); }
+}, { seed: 352, sizes: [10, 5, 2.5], keepBase: 0.6, alpha: 0.7 });
+// a street front of basalt courtyard houses (Capernaum): dark stone in rough courses, lime mortar,
+// doorways with wooden lintels, an outside stair, a roof of beams and packed mud. 12 m x 4 m.
+export const streetTex = (env: Env, key: string, o: { sun: -1 | 1; lit?: number } = { sun: -1 }) => plate(env, `tex:street:${key}`, 1800, 600, (s) => {
+  const c = s.ctx, w = 1800, h = 600, r = rng(361 + key.length), k = w / 12, lit = o.lit ?? 1, stone = [hex("#3a3734"), hex("#46423c"), hex("#302e2c"), hex("#4e4840")];
+  let x = 0;
+  while (x < w) {
+    const hw = (3 + r() * 3) * k, hh = (2.6 + r() * 1.0) * k, top = h - hh;
+    // rough basalt fieldstones laid in mud: a dark bed, then irregular stones of every size in loose courses
+    c.fillStyle = css(scalec(hex("#2a2622"), lit)); c.fillRect(x, top, hw, hh);
+    for (let y = h; y > top + 4; ) { const ch = (0.14 + r() * 0.16) * k; for (let bx = x + r() * 6; bx < x + hw - 4; ) { const bw = Math.min((0.16 + r() * 0.4) * k, x + hw - bx), col = scalec(stone[Math.floor(r() * 4)], (0.75 + r() * 0.5) * lit), j = () => (r() - 0.5) * 0.05 * k, yy = Math.max(top, y - ch);
+      c.fillStyle = css(col); c.beginPath(); c.moveTo(bx + 3 + j(), y - 3 + j()); c.lineTo(bx + bw * 0.5 + j(), y - 2 + j()); c.lineTo(bx + bw - 3 + j(), y - 4 + j()); c.lineTo(bx + bw - 2 + j(), yy + ch * 0.5 + j()); c.lineTo(bx + bw - 4 + j(), yy + 3 + j()); c.lineTo(bx + bw * 0.4 + j(), yy + 2 + j()); c.lineTo(bx + 3 + j(), yy + 4 + j()); c.closePath(); c.fill();
+      c.fillStyle = css(mix(col, [0.85, 0.82, 0.76], 0.18), 0.6); c.fillRect(bx + 5, yy + 4, bw - 10, Math.max(1.5, ch * 0.12));
+      bx += bw + 1; } y -= ch; }
+    // the roof edge: beam ends and a lip of mud
+    c.fillStyle = css(scalec(hex("#6a5440"), lit)); c.fillRect(x - 4, top - 0.18 * k, hw + 8, 0.2 * k); for (let bx = x + 10; bx < x + hw; bx += 0.5 * k) { c.fillStyle = css(scalec(hex("#4a3a2c"), lit)); c.beginPath(); c.arc(bx, top - 0.08 * k, 0.07 * k, 0, Math.PI * 2); c.fill(); }
+    // a doorway with a lintel, dark inside
+    if (r() < 0.8) { const dx = x + hw * (0.2 + r() * 0.5), dw = 0.9 * k, dh = 1.9 * k; c.fillStyle = "#15120f"; c.fillRect(dx, h - dh, dw, dh); c.fillStyle = css(scalec(hex("#6e5638"), lit)); c.fillRect(dx - 0.12 * k, h - dh - 0.18 * k, dw + 0.24 * k, 0.18 * k); c.fillStyle = css(hex("#2a2420"), 0.8); c.fillRect(dx + dw * 0.1, h - dh, dw * 0.3, dh); }
+    // an outside stair to the roof
+    if (r() < 0.35) { const sx = x + hw - 1.6 * k; for (let i = 0; i < 8; i++) { c.fillStyle = css(scalec(stone[i % 4], 1.1 * lit)); c.fillRect(sx + i * 0.18 * k, h - (i + 1) * 0.3 * k, 1.6 * k - i * 0.18 * k, 0.3 * k); } }
+    // light: the sunlit face and a cast shadow line at the corner
+    const g = c.createLinearGradient(x, 0, x + hw, 0); g.addColorStop(0, css([0, 0, 0], o.sun > 0 ? 0.25 : 0)); g.addColorStop(1, css([0, 0, 0], o.sun > 0 ? 0 : 0.25)); c.fillStyle = g; c.fillRect(x, top, hw, hh);
+    x += hw + (r() < 0.3 ? (0.8 + r() * 1.2) * k : 0);
+  }
+  // dust at the foot of the walls
+  const g = c.createLinearGradient(0, h - 0.5 * k, 0, h); g.addColorStop(0, "rgba(150,130,100,0)"); g.addColorStop(1, "rgba(150,130,100,0.45)"); c.fillStyle = g; c.fillRect(0, h - 0.5 * k, w, 0.5 * k);
+  paintOver(env, s, { seed: 362, sizes: [10, 5, 2.5], keepBase: 0.6, alpha: 0.7 });
+});

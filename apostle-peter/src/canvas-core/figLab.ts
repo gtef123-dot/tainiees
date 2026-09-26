@@ -46,6 +46,10 @@ TESTS.push((ctx, env) => { plain(ctx, env); renderParts(ctx, [one(ctx, env, C32,
 import { ground, pebbleTex } from "./peter/sets/stage";
 const C34 = lookFrom([2.2, 1.24, -0.8], [-6.5, 0.75, -1.4], 120, { cy: 520, cx: 960 });
 TESTS.push((ctx, env) => { plain(ctx, env); ground(ctx, env, C34, pebbleTex(env, 1024), { x0: -46, x1: 34, z0: -2.25, z1: 57.8, tile: [2, 2] }); });
+import { extra } from "./peter/figure/extras";
+import { grounded } from "./peter/figure/body";
+TESTS.push((ctx, env) => { plain(ctx, env); const cam = lookFrom([0.3, 1.3, 3.2], [0, 0.8, 0], 330, { cy: 560 }); const w = extra(4201, "woman"), m = extra(4202, "man"); const sit = { bend: 0.3, legL: { hip: 1.95, knee: 2.6, out: 0.1 }, legR: { hip: 1.9, knee: 2.62, out: 0.1 }, armL: { raise: 0.6, elbow: 1.2 }, armR: { raise: 0.55, elbow: 1.2 } };
+  renderParts(ctx, [one(ctx, env, cam, w, {}, [-1.5, 0, 0], 0.3), one(ctx, env, cam, w, grounded(w, sit), [-0.4, 0, 0], 0.3), one(ctx, env, cam, m, grounded(m, sit), [0.7, 0, 0], Math.PI), one(ctx, env, cam, w, grounded(w, sit), [1.8, 0, 0], Math.PI)], { env, cell: 2, tol: 10, paint: 0.5 }); });
 const draw = (ctx: CanvasRenderingContext2D, f: number, env: Env) => { TESTS[Math.min(TESTS.length - 1, f)](ctx, env); finish(ctx, env, 0, { grain: 0.04, vignette: 0.2 }); };
 export const figLab: Film = { meta: { title: "figLab", W: 1920, H: 1080, fps: 30, bpm: 1800, durationFrames: TESTS.length, raster: "cpu" }, assets: { images: {} }, shots: [{ id: "lab", start: 0, end: TESTS.length, draw: draw as never }] };
 void lakeWorld;
