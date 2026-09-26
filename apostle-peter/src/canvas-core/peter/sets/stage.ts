@@ -11,7 +11,7 @@ import { plate, paintOver, blurInto, type Surface } from "../paint/plates";
 import { type WCam, wproj } from "../scene";
 
 type C = CanvasRenderingContext2D;
-const behind = (cam: WCam, z: number) => !!cam.focal && z / cam.scale >= (cam.focal / cam.scale) * 0.85;
+const behind = (cam: WCam, z: number) => !!cam.focal && cam.focal / cam.scale - z / cam.scale < 0.12;   // nearer than 12 cm to the lens
 const mapTo = (ctx: C, env: Env, tex: Surface, u0: number, v0: number, uw: number, vh: number, o: [number, number], a: [number, number], b: [number, number], pad = 0.015) => {
   ctx.setTransform(env.scale * (a[0] - o[0]), env.scale * (a[1] - o[1]), env.scale * (b[0] - o[0]), env.scale * (b[1] - o[1]), env.scale * o[0], env.scale * o[1]);
   ctx.drawImage(tex.canvas as CanvasImageSource, u0, v0, Math.max(0.5, uw), Math.max(0.5, vh), -pad, -pad, 1 + 2 * pad, 1 + 2 * pad);
@@ -284,3 +284,12 @@ export const courtTex = (env: Env, kind: "gallery" | "gate" | "street") => plate
   }
   paintOver(env, s, { seed: 382 + kind.length, sizes: [10, 5, 2.5], keepBase: 0.6, alpha: 0.7 });
 });
+// open water seen from above, for lying flat in the world (the lake between a boat and the shore):
+// a base colour, long wind-streaks, small ripples, a few glints. tile = 6 m.
+export const waterTex = (env: Env, base: string, glint: string, key: string) => tex(env, `water:${key}`, 900, 900, (c, w, h) => {
+  const r = rng(391), b = hex(base), g = hex(glint), k = w / 6;
+  c.fillStyle = css(b); c.fillRect(0, 0, w, h);
+  for (let i = 0; i < 120; i++) { const y = r() * h, x = r() * w, l = (1 + r() * 3) * k; wrap(w, h, x, y, l, (X, Y) => { c.strokeStyle = css(scalec(b, 0.85 + r() * 0.3), 0.5); c.lineWidth = 2 + r() * 5; c.beginPath(); c.moveTo(X - l / 2, Y); c.lineTo(X + l / 2, Y + (r() - 0.5) * 6); c.stroke(); }); }
+  for (let i = 0; i < 2500; i++) { const x = r() * w, y = r() * h, l = 4 + r() * 14; c.strokeStyle = css(r() < 0.5 ? scalec(b, 0.7) : mix(b, g, 0.5), 0.5); c.lineWidth = 1.2; c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + l / 2, y - 2, x + l, y); c.stroke(); }
+  for (let i = 0; i < 160; i++) { const x = r() * w, y = r() * h; c.fillStyle = css(g, 0.5 + r() * 0.4); c.fillRect(x, y, 3 + r() * 8, 1.5); }
+}, { seed: 392, sizes: [10, 5], flow: () => 0, keepBase: 0.7, alpha: 0.6 });

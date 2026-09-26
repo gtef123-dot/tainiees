@@ -76,3 +76,5 @@ import { wview } from "../scene";
 import { norm3 } from "../lib/math";
 export const keyFrom = (cam: WCam, p: V3, light: V3): V3 => norm3(apply(wview(cam), [light[0] - p[0], light[1] - p[1], light[2] - p[2]]));
 export const dirView = (cam: WCam, d: V3): V3 => norm3(apply(wview(cam), d));
+// a world point in a figure's own frame (the inverse of inFrame): for IK targets that must meet something
+export const toLocal = (pos: V3, yaw: number, p: V3): V3 => apply(rotY(-yaw), [p[0] - pos[0], p[1] - pos[1], p[2] - pos[2]]);

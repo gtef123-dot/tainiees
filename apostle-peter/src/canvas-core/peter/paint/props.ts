@@ -118,3 +118,22 @@ export const oilLamp = (ctx: CanvasRenderingContext2D, x: number, y: number, s: 
   flame(ctx, x + s * 0.7, y - s * 0.05, s * 0.55 * flick, t, seed, { n: 2 });
 };
 export { lerp, add3 };
+// a fire of coals on the beach (John 21:9): a ring of stones, a bed of glowing charcoal, low flames,
+// two fish and a flat loaf on a grill of green sticks. w: the width of the ring in px.
+export const coalBed = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, t: number, seed: number, o: { fish?: boolean; flames?: number } = {}) => {
+  const r = rng(seed);
+  ctx.save();
+  // stones round the fire (the far ones first)
+  for (let i = 0; i < 11; i++) { const a = Math.PI + (i / 10) * Math.PI, sx = x + Math.cos(a) * w * 0.5, sy = y + Math.sin(a) * w * 0.14, sr = w * (0.07 + r() * 0.04); ctx.fillStyle = css(scalec([0.32, 0.3, 0.28], 0.8 + r() * 0.4)); ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0, 0, Math.PI * 2); ctx.fill(); }
+  // the coals: black, then red, then orange-white where the air reaches them, breathing
+  ctx.fillStyle = "#1a1210"; ctx.beginPath(); ctx.ellipse(x, y, w * 0.44, w * 0.12, 0, 0, Math.PI * 2); ctx.fill();
+  for (let i = 0; i < 70; i++) { const cx = x + (r() - 0.5) * w * 0.8, cy = y + (r() - 0.5) * w * 0.18, cr = w * (0.018 + r() * 0.03), heat = 0.5 + 0.5 * Math.sin(t * (1 + r() * 2.5) + r() * 6); ctx.fillStyle = css(mix([0.3, 0.06, 0.03], [1, 0.6, 0.22], heat * (0.3 + r() * 0.7))); ctx.beginPath(); ctx.ellipse(cx, cy, cr * 1.3, cr * 0.7, r() * 3, 0, Math.PI * 2); ctx.fill(); }
+  for (let i = 0; i < 11; i++) { const a = (i / 10) * Math.PI, sx = x + Math.cos(a) * w * 0.5, sy = y + Math.sin(a) * w * 0.14, sr = w * (0.075 + r() * 0.04); ctx.fillStyle = css(scalec([0.36, 0.33, 0.3], 0.8 + r() * 0.4)); ctx.beginPath(); ctx.ellipse(sx, sy, sr, sr * 0.7, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "rgba(255,140,60,0.25)"; ctx.beginPath(); ctx.ellipse(sx, sy - sr * 0.4, sr * 0.8, sr * 0.3, 0, Math.PI, 0); ctx.fill(); }
+  ctx.restore();
+  flame(ctx, x, y - w * 0.02, w * 0.3 * (o.flames ?? 1), t, seed + 3, { n: 4, alpha: 0.85 });
+  if (o.fish) {
+    ctx.save(); ctx.strokeStyle = "#5a4a30"; ctx.lineWidth = Math.max(1, w * 0.012); for (const k of [-0.12, 0.12]) { ctx.beginPath(); ctx.moveTo(x - w * 0.36, y - w * 0.12 + k * w * 0.2); ctx.lineTo(x + w * 0.36, y - w * 0.1 + k * w * 0.2); ctx.stroke(); }
+    for (const [fx, fy] of [[-0.16, -0.14], [0.08, -0.12]]) { const cx = x + fx * w, cy = y + fy * w; ctx.fillStyle = "#8a6a48"; ctx.beginPath(); ctx.ellipse(cx, cy, w * 0.11, w * 0.028, 0.05, 0, Math.PI * 2); ctx.fill(); ctx.beginPath(); ctx.moveTo(cx + w * 0.1, cy); ctx.lineTo(cx + w * 0.15, cy - w * 0.025); ctx.lineTo(cx + w * 0.15, cy + w * 0.025); ctx.closePath(); ctx.fill(); ctx.fillStyle = "rgba(255,210,150,0.4)"; ctx.beginPath(); ctx.ellipse(cx - w * 0.01, cy - w * 0.012, w * 0.07, w * 0.008, 0, 0, Math.PI * 2); ctx.fill(); }
+    ctx.fillStyle = "#b08a56"; ctx.beginPath(); ctx.ellipse(x + w * 0.3, y - w * 0.13, w * 0.08, w * 0.035, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
+};

@@ -100,12 +100,12 @@ const wprojY = (cam: WCam, env: Env, z: number) => wproj({ ...cam, shake: 0 }, e
 
 // the shore seen from ANY direction: the lake plates, then a pebble beach lying in true perspective
 // from the waterline (world z = shoreZ) toward the viewer, a wet band, and the foam line
-import { ground, groundLine, pebbleTex, bandTex, softTex, earthTex } from "./stage";
+import { ground, groundLine, pebbleTex, bandTex, softTex, earthTex, waterTex } from "./stage";
 import { wplace } from "../scene";
 const LIGHTC: Record<LakeTime, [string, number]> = { morning: ["#f0c890", 0.16], golden: ["#f0b870", 0.2], day: ["#fff4e0", 0.05], noon: ["#fffaf0", 0.04], dawn: ["#f2b88a", 0.18], night: ["#1a2840", 0.62], storm: ["#1e2632", 0.55] };
 // looking inland from the water's edge: the hills of Korazim behind, Capernaum's basalt houses along
 // the top of the beach (horizon at HORIZON like the lake plate, so the two share every camera rule)
-export const landBackdrop = (env: Env, time: LakeTime, w = 2600, h = 760) => P(env, `lake:land:${time}:${w}`, w, h, (c) => {
+export const landBackdrop = (env: Env, time: LakeTime, w = 2600, h = 760) => P(env, `lake:land2:${time}:${w}`, w, h, (c) => {
   const S = SKY[time], cx = (w - 1920) / 2, night = time === "night" || time === "storm", sun = time === "dawn" ? 1 : -1;
   sky(c, w, h, S.stops.map(([t, col]) => [t * (HORIZON + 20) / h, col] as [number, string]).concat([[1, S.stops[S.stops.length - 1][1]]]));
   clouds(c, 13, 14, [0, 40, w, HORIZON - 220], { lit: S.cloud[0], shade: S.cloud[1], alpha: night ? 0.3 : 0.5, flat: 0.34, size: 120 });
@@ -116,6 +116,7 @@ export const landBackdrop = (env: Env, time: LakeTime, w = 2600, h = 760) => P(e
   // the village: basalt courtyard houses, flat roofs of beams and mud, a few palms
   const mat = night ? "basalt" : "basalt";
   for (let k = 0; k < 16; k++) { const x = -60 + k * 170 + ((k * 41) % 60), hw = 110 + ((k * 29) % 70), hh = 60 + ((k * 17) % 40); house(c, x, HORIZON + 22, hw, hh, 30 + ((k * 13) % 25), { mat, roof: "flat", sunSide: sun as -1 | 1, lit: night ? 0.25 : 0.85, door: k % 3 === 0 ? 1 : 0, windows: 1, seed: 480 + k, stair: k % 5 === 2 }); if (k % 4 === 1) tree(c, x + hw + 20, HORIZON + 20, 120, 900 + k, { kind: "palm", light: sun }); }
+  c.fillStyle = night ? "#1a2030" : "#8a8466"; c.fillRect(0, HORIZON + 18, w, h - HORIZON - 18);
   grassTufts(c, 45, 120, [0, HORIZON + 5, w, HORIZON + 30], night ? "#20283a" : "#7a7650", 12);
   vgrad(c, 0, HORIZON - 200, w, HORIZON + 30, [[0, css(hz, 0)], [1, css(hz, night ? 0.1 : 0.3)]]);
   void cx;
@@ -131,6 +132,7 @@ export const landWorld = (ctx: CanvasRenderingContext2D, env: Env, cam: WCam, ti
 export const shoreWorld = (ctx: CanvasRenderingContext2D, env: Env, cam: WCam, time: LakeTime, shoreZ: number, o: { blur?: number; mist?: number; t?: number; span?: number } = {}) => {
   const inland = Math.cos(cam.yaw) < 0;
   if (inland) landWorld(ctx, env, cam, time, o); else lakeWorld(ctx, env, cam, time, o);
+  if (inland) { const W = SKY[time].water; ground(ctx, env, cam, waterTex(env, W[1], SKY[time].skyRefl, time), { x0: cam.target[0] - 80, x1: cam.target[0] + 80, z0: -300, z1: shoreZ + 0.3, tile: [6, 6] }); }
   const t = o.t ?? 0, x0 = cam.target[0] - (o.span ?? 40), x1 = cam.target[0] + (o.span ?? 40), blur = o.blur ?? 0;
   let peb: Surface = pebbleTex(env, 1024); if (blur > 0.3) peb = softTex(env, peb, "tex:pebbles:1024", Math.round(6 + 14 * blur));
   ground(ctx, env, cam, peb, { x0, x1, z0: shoreZ - 0.05, z1: shoreZ + (inland ? 32 : 60), tile: [2, 2] });

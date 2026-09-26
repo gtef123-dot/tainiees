@@ -60,7 +60,7 @@ import { type V3, type M3, view, apply, mmul, rotY, rotZ, rotX, sub3 } from "./l
 // target (a point at the target's depth still maps 1 m -> scale px); unset, it is orthographic.
 // Figures and props take WEAK perspective: each is scaled by the depth of its own root.
 export type WCam = { target: V3; scale: number; yaw: number; tilt: number; roll?: number; cx?: number; cy?: number; shake?: number; t?: number; pan0?: number; focal?: number };
-export const depthK = (c: WCam, vz: number) => { if (!c.focal) return 1; const D = c.focal / c.scale; return D / Math.max(D * 0.08, D - vz); };
+export const depthK = (c: WCam, vz: number) => { if (!c.focal) return 1; const D = c.focal / c.scale; return D / Math.max(0.06, D - vz); };   // near plane 6 cm
 export const panOf = (c: WCam, k = 1000, lim = 320) => Math.max(-lim, Math.min(lim, -(c.yaw - (c.pan0 ?? c.yaw)) * k));
 export const wview = (c: WCam): M3 => view(c.yaw, c.tilt, c.roll ?? 0);
 export const wproj = (c: WCam, env: Env, p: V3): [number, number, number] => {
