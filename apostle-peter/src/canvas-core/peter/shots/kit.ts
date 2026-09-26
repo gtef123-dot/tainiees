@@ -78,3 +78,12 @@ export const keyFrom = (cam: WCam, p: V3, light: V3): V3 => norm3(apply(wview(ca
 export const dirView = (cam: WCam, d: V3): V3 => norm3(apply(wview(cam), d));
 // a world point in a figure's own frame (the inverse of inFrame): for IK targets that must meet something
 export const toLocal = (pos: V3, yaw: number, p: V3): V3 => apply(rotY(-yaw), [p[0] - pos[0], p[1] - pos[1], p[2] - pos[2]]);
+// a bronze helmet (galea) with cheek-pieces and a crest, set on a figure's head as an overlay
+import type { Overlay } from "../figure/head";
+import { drawCtx } from "../figure/mesh";
+export const helmet = (cam: WCam, env: Env, f: Figure, pose: BodyPose, pos: V3, yaw: number, lit = 1): Overlay => {
+  const top = worldJoint(f, pose, pos, yaw, "headTop"), face = worldJoint(f, pose, pos, yaw, "face"), c: V3 = [top[0] * 0.55 + face[0] * 0.45, top[1] * 0.6 + face[1] * 0.4 + 0.02, top[2] * 0.55 + face[2] * 0.45];
+  const s = wproj(cam, env, c), sc = wplace(cam, env, c, 0).scale, r = 0.135 * sc;
+  return { z: s[2] + 0.2 * sc, draw: () => { const g = drawCtx.ctx; if (!g) return; g.save(); const gr = g.createRadialGradient(s[0] - r * 0.35, s[1] - r * 0.5, r * 0.1, s[0], s[1], r * 1.1); gr.addColorStop(0, `rgba(${Math.round(210 * lit)},${Math.round(170 * lit)},${Math.round(100 * lit)},1)`); gr.addColorStop(0.6, `rgba(${Math.round(130 * lit)},${Math.round(95 * lit)},${Math.round(55 * lit)},1)`); gr.addColorStop(1, "rgba(40,28,18,1)"); g.fillStyle = gr; g.beginPath(); g.ellipse(s[0], s[1], r, r * 0.92, 0, Math.PI * 1.05, Math.PI * 1.95 + 0.2); g.lineTo(s[0] + r * 0.95, s[1] + r * 0.2); g.lineTo(s[0] - r * 0.95, s[1] + r * 0.2); g.closePath(); g.fill();
+    g.fillStyle = "rgba(60,40,24,1)"; g.fillRect(s[0] - r * 1.05, s[1] + r * 0.1, r * 2.1, r * 0.16); g.fillStyle = "#7a1c16"; g.beginPath(); g.ellipse(s[0], s[1] - r * 0.95, r * 0.9, r * 0.28, 0, Math.PI, 0); g.fill(); g.restore(); } };
+};

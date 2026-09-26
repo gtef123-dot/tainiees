@@ -40,3 +40,5 @@ export const crowd = (seed: number, n: number, mix: Partial<Record<ExtraKind, nu
   const r = rng(seed), kinds = Object.entries(mix) as [ExtraKind, number][], tot = kinds.reduce((s, [, w]) => s + w, 0);
   return Array.from({ length: n }, (_, i) => { let x = r() * tot, k: ExtraKind = kinds[0][0]; for (const [kk, w] of kinds) { if (x < w) { k = kk; break; } x -= w; } return extra(seed * 100 + i, k); });
 };
+// a Roman soldier: red wool tunic, a dark cloak, the bronze helmet drawn by helmetOverlay
+export const soldier = (seed: number): Figure => { const f = extra(seed, "man"); return { ...f, id: { ...f.id, beard: 0, mustache: 0, hairLong: 0, hairVol: 0.8 }, height: 1.7 + (seed % 5) * 0.02, bulk: 1.08, costume: { tunic: "#8a2e24", tunicLen: 0.52, sleeves: "short", mantle: "#4a3a30", mantleLen: 0.62, belt: "#3a2a1c", sandal: "#3a2a1c", dirt: 0.25 } }; };

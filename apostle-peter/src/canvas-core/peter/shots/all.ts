@@ -8,3 +8,4 @@ import "./c06";
 import "./c07";
 import "./c08";
 import "./c09";
+import "./c10";
