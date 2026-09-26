@@ -1,0 +1,1747 @@
+{
+ "_generated": "by pipeline/shotlist.mjs; do not edit",
+ "fps": 30,
+ "totalFrames": 5134,
+ "shots": [
+  {
+   "id": "01.1",
+   "title": "The hand and the rope",
+   "loc": "LAKE",
+   "age": "A",
+   "emotion": "Absorbed in work; calm strength",
+   "action": "Frame 0 is already moving: a weathered hand hauls a wet rope over the gunwale, knuckles white, water streaming from the net's knots. The rope comes taut; the camera rises with the net and reveals young Simon standing in the boat in the morning mist, feet braced on the ribs.",
+   "cam": "ECU at gunwale level, 60 cm from the hand",
+   "move": "One continuous crane up and back (ECU → medium wide) over 4.6 s; no cut",
+   "fg": "Dripping net knots, rope fibres, water drops on the lens edge",
+   "bg": "Mist on the lake, the far shore's cliff as a pale shape, a second boat half-lost in mist",
+   "light": "Golden morning: low sun behind the mist, warm rim on hand and rope, cool blue shadow water",
+   "trans": "The net swings up across the lens and wipes the frame (covered switch) ◆",
+   "sound": "Rope creak under strain, drips, water lapping the hull, one distant gull",
+   "music": "Silence for 1 s, then the intimate motif: a solo plucked lyre phrase, one breath of ney",
+   "start": 0,
+   "end": 134,
+   "frames": 134,
+   "narration": [
+    {
+     "clip": 1,
+     "text": "Ο Άγιος Πέτρος ήταν ένας από τους δώδεκα μαθητές του Χριστού"
+    }
+   ],
+   "clip": 1
+  },
+  {
+   "id": "01.2",
+   "title": "Hero: behind Christ",
+   "loc": "ROAD",
+   "age": "B",
+   "emotion": "Belonging; purpose (a glimpse of the man he will become)",
+   "action": "Flash-forward. On a ridge path the disciples walk in single file; Christ leads, Peter one pace behind Him, the others strung out after. Sunlight breaks over the ridge across them.",
+   "cam": "Low, beside the path, 3/4 front",
+   "move": "Slow lateral track with the walkers; the camera stays low",
+   "fg": "Dry thistles and grass heads passing close",
+   "bg": "The lake far below, hills in layered haze",
+   "light": "The sun clears the ridge as they pass: flare and long warm light across the figures, backlit dust",
+   "trans": "The sun flare fills the frame and becomes the glitter on the lake (match on light)",
+   "sound": "Sandals on dust, wind over grass, fabric",
+   "music": "The motif rises a fourth, strings enter under it: a promise, not yet the theme",
+   "start": 134,
+   "end": 244,
+   "frames": 110,
+   "narration": [
+    {
+     "clip": 1,
+     "text": "και ένας από τους κορυφαίους Αποστόλους."
+    }
+   ],
+   "clip": 1
+  },
+  {
+   "id": "02.1",
+   "title": "The cast net",
+   "loc": "LAKE",
+   "age": "A",
+   "emotion": "Energetic, physically confident",
+   "action": "Simon swings a circular cast net and throws; it blooms open overhead against the sky, the lead weights ringing its edge.",
+   "cam": "Water level beside the boat, low angle up at Simon",
+   "move": "Slight handheld bob with the swell",
+   "fg": "Water surface filling the lower third; a splash hits the lens",
+   "bg": "Sky, a gull crossing, the mast",
+   "light": "Morning sun from frame left, warm skin, sun through the net's mesh",
+   "trans": "Cut on action as the net hits the water",
+   "sound": "The net's whoosh, weights hissing into the water, lap of waves",
+   "music": "Motif continues, lighter; frame drum brushed, not beaten",
+   "start": 244,
+   "end": 320,
+   "frames": 76,
+   "narration": [
+    {
+     "clip": 2,
+     "text": "Πριν γνωρίσει τον Κύριο, ονομαζόταν"
+    }
+   ],
+   "clip": 2
+  },
+  {
+   "id": "02.2",
+   "title": "Simon",
+   "loc": "LAKE",
+   "age": "A",
+   "emotion": "Quick grin, alert, impatient for the catch",
+   "action": "He watches the net sink, wipes lake water off his brow with a forearm and grins at something off-screen. His name lands on his face.",
+   "cam": "MCU, eye level, 3/4 front",
+   "move": "Locked, tiny drift with the boat",
+   "fg": "Out-of-focus rope coil on the gunwale",
+   "bg": "Bright water, soft",
+   "light": "Warm key from the sun, bounce off the water under the chin",
+   "trans": "Cut to the wide",
+   "sound": "Water, boat creak, a man calling across the water (no words)",
+   "music": "Motif",
+   "start": 320,
+   "end": 384,
+   "frames": 64,
+   "narration": [
+    {
+     "clip": 2,
+     "text": "Σίμων και εργαζόταν"
+    }
+   ],
+   "clip": 2
+  },
+  {
+   "id": "02.3",
+   "title": "Lake Gennesaret",
+   "loc": "LAKE",
+   "age": "A",
+   "emotion": "At home in his world",
+   "action": "Establishing: the lake in the morning, three boats working, Simon's boat midground with him and Andrew, the black-basalt village of Capernaum on the shore, women spreading nets on the stones.",
+   "cam": "Wide, at water level from a moored boat's bow",
+   "move": "Slow lateral drift, left to right",
+   "fg": "Another boat's prow and furled sail crossing the foreground",
+   "bg": "Capernaum's basalt houses, smoke from a hearth, Mt Arbel",
+   "light": "Golden morning, haze thinning, water glitter",
+   "trans": "Cut",
+   "sound": "Gulls, oars, voices far off, water",
+   "music": "Motif with a low cello pedal",
+   "start": 384,
+   "end": 465,
+   "frames": 81,
+   "narration": [
+    {
+     "clip": 2,
+     "text": "ως ψαράς στη λίμνη Γεννησαρέτ."
+    }
+   ],
+   "clip": 2
+  },
+  {
+   "id": "02.4",
+   "title": "Hauling with Andrew",
+   "loc": "LAKE",
+   "age": "A",
+   "emotion": "Straining, then a laugh",
+   "action": "Simon and Andrew haul the dragnet rope hand over hand, leaning back, feet braced; the weight wins for a second, the rope slips, Simon laughs and shoulders Andrew and they heave again.",
+   "cam": "Medium two-shot from the stern, slightly low",
+   "move": "Handheld, following the pull",
+   "fg": "Rope running through the frame, taut and wet",
+   "bg": "The net's cork floats curving on the water",
+   "light": "Sun higher, harder shadows, sweat catching light",
+   "trans": "Cut on action",
+   "sound": "Rope creak, grunts of effort, a short laugh (no words), splashes",
+   "music": "Frame drum picks up a work rhythm",
+   "start": 465,
+   "end": 553,
+   "frames": 88,
+   "narration": [
+    {
+     "clip": 2,
+     "text": "Ήταν άνθρωπος απλός, δυναμικός,"
+    }
+   ],
+   "clip": 2
+  },
+  {
+   "id": "02.5",
+   "title": "Into the shallows",
+   "loc": "LAKE",
+   "age": "A",
+   "kind": "montage",
+   "emotion": "Spontaneous",
+   "action": "Without waiting, Simon vaults over the side into waist-deep water.",
+   "cam": "Water level, facing the boat",
+   "move": "Locked; the splash hits the lens",
+   "fg": "Water; drops on the lens",
+   "bg": "The hull, Andrew leaning out",
+   "light": "Backlit spray",
+   "trans": "Cut on action",
+   "sound": "A big splash, then underwater-muffled for 4 frames",
+   "music": "Rhythm continues",
+   "start": 553,
+   "end": 600,
+   "frames": 47,
+   "narration": [
+    {
+     "clip": 2,
+     "text": "αυθόρμητος και"
+    }
+   ],
+   "clip": 2
+  },
+  {
+   "id": "02.6",
+   "title": "The boat ashore",
+   "loc": "LAKE",
+   "age": "A",
+   "kind": "montage",
+   "emotion": "Zeal: all his weight in it",
+   "action": "He drags the bow up the pebbles with his shoulder in it, the keel grinding; he slaps the hull, done.",
+   "cam": "Low on the shore, bow toward camera",
+   "move": "Slight push as the bow comes on",
+   "fg": "Wet basalt pebbles",
+   "bg": "Lake and boats",
+   "light": "Warm morning, wet skin",
+   "trans": "Cut",
+   "sound": "Keel grinding on pebbles, water draining",
+   "music": "Resolves on a held chord",
+   "start": 600,
+   "end": 644,
+   "frames": 44,
+   "narration": [
+    {
+     "clip": 2,
+     "text": "γεμάτος ζήλο."
+    }
+   ],
+   "clip": 2
+  },
+  {
+   "id": "03.1",
+   "title": "A shadow on the net",
+   "loc": "LAKE",
+   "age": "A",
+   "emotion": "Concentration",
+   "action": "Peter mends a torn net by the beached boat, a wooden netting needle passing through the mesh. A shadow falls across the net. Focus racks from his hands to Christ, standing a few paces off on the shore.",
+   "cam": "CU on the hands, low",
+   "move": "Locked; rack focus from hands to Christ",
+   "fg": "Hands, needle, net",
+   "bg": "Christ on the shore, still",
+   "light": "Late morning, soft; the shadow is the only change",
+   "trans": "Cut",
+   "sound": "Lap of water, the netting cord pulled tight, the breeze",
+   "music": "Almost nothing: one low sustained cello note",
+   "start": 644,
+   "end": 719,
+   "frames": 75,
+   "narration": [
+    {
+     "clip": 3,
+     "text": "Μια μέρα, ο Χριστός τον κάλεσε"
+    }
+   ],
+   "clip": 3
+  },
+  {
+   "id": "03.2",
+   "title": "The look",
+   "loc": "LAKE",
+   "age": "A",
+   "kind": "hold",
+   "emotion": "Surprise giving way to being seen",
+   "action": "Peter looks up. Hold the eye contact through the silence. Nothing theatrical: his hands stop moving.",
+   "cam": "MCU, eye level, just off Christ's eyeline",
+   "move": "Locked, a breath of push-in",
+   "fg": "Out-of-focus edge of Christ's mantle",
+   "bg": "The lake, soft",
+   "light": "Soft daylight, Christ's shadow on Peter's chest",
+   "trans": "Cut",
+   "sound": "Only water and the breeze",
+   "music": "Peter's theme is introduced: four notes, cello, very quiet",
+   "start": 719,
+   "end": 802,
+   "frames": 83,
+   "narration": [
+    {
+     "clip": 3,
+     "text": "να Τον ακολουθήσει. Ο Πέτρος"
+    }
+   ],
+   "clip": 3
+  },
+  {
+   "id": "03.3",
+   "title": "The net slips from his hands",
+   "loc": "LAKE",
+   "age": "A",
+   "emotion": "Decision",
+   "action": "Christ turns and walks away along the shore. Peter's eyes follow Him, go to the boat, then down to the net in his hands. The camera tilts down with his gaze: his fingers slowly open and the net slides off into the boat.",
+   "cam": "MCU → CU hands",
+   "move": "Slow tilt down following his eyeline",
+   "fg": "The gunwale",
+   "bg": "Christ walking away, small, out of focus",
+   "light": "Soft daylight",
+   "trans": "Cut when the net lands",
+   "sound": "The wet net slumping into the hull",
+   "music": "Theme continues, a second phrase",
+   "start": 802,
+   "end": 894,
+   "frames": 92,
+   "narration": [
+    {
+     "clip": 3,
+     "text": "άφησε τα δίχτυα του, τη βάρκα του και την προηγούμενη ζωή του,"
+    }
+   ],
+   "clip": 3
+  },
+  {
+   "id": "03.4",
+   "title": "The abandoned net",
+   "loc": "LAKE",
+   "age": "A",
+   "kind": "hold",
+   "emotion": "Leaving everything",
+   "action": "The camera stays behind in the boat. Peter steps onto the shore, catches up his blue-grey mantle from a rock ◆ and follows Christ along the waterline, growing smaller. The abandoned net stirs in the lake breeze.",
+   "cam": "Low in the boat's stern, net in the foreground",
+   "move": "Locked; the camera stays behind",
+   "fg": "The net rocking gently on the planks",
+   "bg": "Peter and Christ walking away along the curve of the shore",
+   "light": "Warm daylight, sun glint on the water",
+   "trans": "The walking figures dissolve into the walking of 04.1 (motif: walking)",
+   "sound": "Water knocking the hull, the breeze, footsteps fading",
+   "music": "Theme completes its phrase and opens up with violas",
+   "start": 894,
+   "end": 980,
+   "frames": 86,
+   "narration": [
+    {
+     "clip": 3,
+     "text": "και έγινε μαθητής Του."
+    }
+   ],
+   "clip": 3
+  },
+  {
+   "id": "04.1",
+   "title": "Close behind Him",
+   "loc": "ROAD",
+   "age": "B",
+   "emotion": "Fascinated; he listens rather than speaks",
+   "action": "Christ walks through ripe wheat, talking; Peter walks close behind, head tilted to catch every word; the other disciples follow.",
+   "cam": "Hip height beside the path",
+   "move": "Tracking alongside",
+   "fg": "Wheat heads passing close, soft",
+   "bg": "Olive terraces and the lake below",
+   "light": "Warm daylight, wheat glowing",
+   "trans": "Cut",
+   "sound": "Wheat rustle, sandals, larks",
+   "music": "Theme expands: strings in counterpoint, frame drum at walking pace",
+   "start": 980,
+   "end": 1054,
+   "frames": 74,
+   "narration": [
+    {
+     "clip": 4,
+     "text": "Από τότε έζησε κοντά στον Ιησού,"
+    }
+   ],
+   "clip": 4
+  },
+  {
+   "id": "04.2",
+   "title": "The teaching",
+   "loc": "ROAD",
+   "age": "B",
+   "kind": "montage",
+   "emotion": "Awe",
+   "action": "On a hillside above the lake Christ teaches a seated crowd; Peter sits at the front edge, chin on his fist, eyes on Him.",
+   "cam": "Behind the crowd, Peter in profile in the midground",
+   "move": "Slow push through the heads",
+   "fg": "Heads and shoulders of listeners",
+   "bg": "Christ seated on a rock, the lake beyond",
+   "light": "Afternoon, warm",
+   "trans": "Cut",
+   "sound": "Crowd hush, wind, a child's murmur",
+   "music": "Theme",
+   "start": 1054,
+   "end": 1109,
+   "frames": 55,
+   "narration": [
+    {
+     "clip": 4,
+     "text": "άκουσε τη διδασκαλία Του,"
+    }
+   ],
+   "clip": 4
+  },
+  {
+   "id": "04.3",
+   "title": "The crowd surges",
+   "loc": "LAKE",
+   "age": "B",
+   "kind": "montage",
+   "emotion": "Amazement",
+   "action": "In a basalt village street people suddenly rush past toward something we do not see; Peter, jostled, turns and stares: he sees it, and his face tells us. Children weave through legs toward Christ.",
+   "cam": "Medium, inside the crowd",
+   "move": "Handheld, jostled",
+   "fg": "Shoulders and heads crossing",
+   "bg": "Basalt walls, a doorway",
+   "light": "Midday, bright, deep shadows",
+   "trans": "Cut",
+   "sound": "Rising crowd voices, footsteps running",
+   "music": "Theme accelerates",
+   "start": 1109,
+   "end": 1145,
+   "frames": 36,
+   "narration": [
+    {
+     "clip": 4,
+     "text": "είδε τα θαύματά Του"
+    }
+   ],
+   "clip": 4
+  },
+  {
+   "id": "04.4",
+   "title": "The storm",
+   "loc": "LAKE",
+   "age": "B",
+   "kind": "montage",
+   "emotion": "Fear, then astonishment",
+   "action": "Night squall on the lake: the boat heels, spray, Peter clinging to the gunwale; then the wind drops at once and the water goes glassy.",
+   "cam": "Inside the boat, tilted",
+   "move": "Handheld, rolling; stops dead when the wind stops",
+   "fg": "Spray, the sheet and rope",
+   "bg": "Black water, the other disciples",
+   "light": "Storm grey-blue, then calm moonlight",
+   "trans": "Continuous into 04.5",
+   "sound": "Wind and waves, then sudden near silence",
+   "music": "The drum hits once and stops",
+   "start": 1145,
+   "end": 1181,
+   "frames": 36,
+   "narration": [
+    {
+     "clip": 4,
+     "text": "και έγινε μάρτυρας"
+    }
+   ],
+   "clip": 4
+  },
+  {
+   "id": "04.5",
+   "title": "Who is this man?",
+   "loc": "LAKE",
+   "age": "B",
+   "kind": "hold",
+   "emotion": "Growing realisation that the man he follows is unlike anyone",
+   "action": "In the stillness Peter exchanges an astonished glance with Andrew, then turns back to look at Christ standing at the bow. He does not blink. Holds across into clip 05's first words.",
+   "cam": "CU Peter, eye level",
+   "move": "Very slow push-in",
+   "fg": "Andrew's shoulder, soft",
+   "bg": "Christ, dark against the moonlit water",
+   "light": "Moonlight, cool; the first warm glow of dawn on the horizon ◆",
+   "trans": "Cut to daylight on the same eyes (match on eyes)",
+   "sound": "Drips from the rigging, water lapping",
+   "music": "Theme returns softly, questioning",
+   "start": 1181,
+   "end": 1286,
+   "frames": 105,
+   "narration": [
+    {
+     "clip": 4,
+     "text": "μεγάλων γεγονότων."
+    },
+    {
+     "clip": 5,
+     "text": "Ο Πέτρος ξεχώριζε για την"
+    }
+   ],
+   "clip": 4
+  },
+  {
+   "id": "05.1",
+   "title": "Eager on the path",
+   "loc": "ROCK",
+   "age": "B",
+   "emotion": "Love and enthusiasm",
+   "action": "Peter strides ahead up a rocky path, turns and waves the others on, laughing; he helps John up a boulder with one arm.",
+   "cam": "Low, below eye level (confidence)",
+   "move": "Tracking backward ahead of him",
+   "fg": "Boulders",
+   "bg": "The great rock cliff of Caesarea Philippi ahead",
+   "light": "Late afternoon, warm",
+   "trans": "Cut",
+   "sound": "Springs and running water, footsteps on rock",
+   "music": "Theme in a brighter register",
+   "start": 1286,
+   "end": 1350,
+   "frames": 64,
+   "narration": [
+    {
+     "clip": 5,
+     "text": "αγάπη και τον ενθουσιασμό του."
+    }
+   ],
+   "clip": 5
+  },
+  {
+   "id": "05.2",
+   "title": "Beneath the rock",
+   "loc": "ROCK",
+   "age": "B",
+   "emotion": "Attention",
+   "action": "The disciples gather on the rocks below the cliff. Christ, seated, looks up at them and asks (implied, no lip-sync): the conversation stops.",
+   "cam": "Wide, low, the cliff dominating",
+   "move": "Locked, a slow creep in",
+   "fg": "Spring water over stones",
+   "bg": "The rock cliff, plane trees",
+   "light": "Late afternoon, the cliff face glowing, the group in shade",
+   "trans": "Cut",
+   "sound": "Water, wind in plane leaves",
+   "music": "Music thins to a held chord",
+   "start": 1350,
+   "end": 1408,
+   "frames": 58,
+   "narration": [
+    {
+     "clip": 5,
+     "text": "Ήταν εκείνος που"
+    }
+   ],
+   "clip": 5
+  },
+  {
+   "id": "05.3",
+   "title": "The others hesitate",
+   "loc": "ROCK",
+   "age": "B",
+   "emotion": "Instinct overcoming hesitation",
+   "action": "The disciples glance at each other and look down. In the long silence Peter steps forward, almost before he knows he has moved.",
+   "cam": "Medium group shot, eye level",
+   "move": "Slow push that finds Peter as he steps out",
+   "fg": "A disciple's shoulder",
+   "bg": "The cliff",
+   "light": "Soft late sun; rim light starts to find Peter",
+   "trans": "Continuous push into 05.4 (cut on the step)",
+   "sound": "Silence but for water",
+   "music": "Silence",
+   "start": 1408,
+   "end": 1501,
+   "frames": 93,
+   "narration": [
+    {
+     "clip": 5,
+     "text": "ομολόγησε με θάρρος:"
+    }
+   ],
+   "clip": 5
+  },
+  {
+   "id": "05.4",
+   "title": "«Εσύ είσαι ο Χριστός»",
+   "loc": "ROCK",
+   "age": "B",
+   "kind": "hold",
+   "emotion": "Conviction, not shouting",
+   "action": "On «Εσύ» Peter looks straight at Christ. An open, expressive hand comes up. His face is certain and very still through «είσαι ο Χριστός».",
+   "cam": "MCU, slightly below eye level",
+   "move": "Slow push-in throughout",
+   "fg": "Nothing",
+   "bg": "The rock face, soft",
+   "light": "Late afternoon: a soft warm rim around Peter; not supernatural",
+   "trans": "Cut",
+   "sound": "Water, very low",
+   "music": "Theme in full voice for four bars, strings unison",
+   "start": 1501,
+   "end": 1568,
+   "frames": 67,
+   "narration": [
+    {
+     "clip": 5,
+     "text": "«Εσύ είσαι ο Χριστός,"
+    }
+   ],
+   "clip": 5
+  },
+  {
+   "id": "05.5",
+   "title": "Christ's answer",
+   "loc": "ROCK",
+   "age": "B",
+   "emotion": "(Christ) quiet acceptance",
+   "action": "Christ's face as «ο Υιός του Θεού του ζώντος» is spoken: calm, a faint smile. Behind His head the sinking sun flares and whitens.",
+   "cam": "MCU, eye level",
+   "move": "Locked",
+   "fg": "—",
+   "bg": "The sun low over the cliff edge",
+   "light": "The sun flare whitens the frame and contracts to a single point of light",
+   "trans": "The point of light becomes a star above Tabor (sun glare → star)",
+   "sound": "Wind rising",
+   "music": "Theme resolves up; a high string harmonic sustains",
+   "start": 1568,
+   "end": 1640,
+   "frames": 72,
+   "narration": [
+    {
+     "clip": 5,
+     "text": "ο Υιός του Θεού του ζώντος»."
+    }
+   ],
+   "clip": 5
+  },
+  {
+   "id": "06.1",
+   "title": "Tabor before dawn",
+   "loc": "TABOR",
+   "age": "B",
+   "emotion": "Effort, anticipation",
+   "action": "Mount Tabor's dome against a deep-blue predawn sky; four tiny figures climb a switchback path; wind moves the grass and oak branches.",
+   "cam": "Extreme wide from the plain",
+   "move": "Slow rise",
+   "fg": "Oak branches in silhouette, moving",
+   "bg": "The last stars, the plain in darkness",
+   "light": "Predawn blue, one bright star",
+   "trans": "Cut",
+   "sound": "Wind on the mountain, grass, a night bird",
+   "music": "Ethereal expansion begins: divided high strings, wordless vocal pad",
+   "start": 1640,
+   "end": 1736,
+   "frames": 96,
+   "narration": [
+    {
+     "clip": 6,
+     "text": "Ήταν επίσης παρών στη Μεταμόρφωση του Κυρίου,"
+    }
+   ],
+   "clip": 6
+  },
+  {
+   "id": "06.2",
+   "title": "Three climb behind Him",
+   "loc": "TABOR",
+   "age": "B",
+   "emotion": "Tired, faithful",
+   "action": "Peter, James and John climb behind Christ; wind whips their mantles; Peter breathing hard, John the youngest, James steady.",
+   "cam": "Medium from behind and below on the path",
+   "move": "Tracking up the slope behind them",
+   "fg": "Rocks and grass tussocks",
+   "bg": "The sky going from blue to grey",
+   "light": "Cold predawn, silhouettes against a pale sky",
+   "trans": "Cut",
+   "sound": "Wind strong, breathing, loose stones",
+   "music": "Harmony widens",
+   "start": 1736,
+   "end": 1790,
+   "frames": 54,
+   "narration": [
+    {
+     "clip": 6,
+     "text": "μαζί με τον Ιάκωβο και τον Ιωάννη,"
+    }
+   ],
+   "clip": 6
+  },
+  {
+   "id": "06.3",
+   "title": "The light",
+   "loc": "TABOR",
+   "age": "B",
+   "kind": "hold",
+   "emotion": "Overwhelmed: awe beyond fear",
+   "action": "The summit. The wind stops; the grass goes still. Light begins subtly around Christ and swells to white-gold. Peter's eyes widen, his breathing slows, he shields his eyes and sinks to one knee. The camera pulls slowly back past him: James and John prostrate, the luminous figure beyond, a bright cloud forming. Moses and Elijah are not shown ◆ (the narration names only the three).",
+   "cam": "Begins CU Peter",
+   "move": "One slow pull-back to a wide of the summit; no cut",
+   "fg": "Peter's raised hand",
+   "bg": "Christ in light, the bright cloud",
+   "light": "Divine white-gold from Christ, every other light source gone; clear, not an explosion",
+   "trans": "The light floods to white; cut to black; a torch passes (06→07)",
+   "sound": "Wind drops to nothing; a low air tone",
+   "music": "Full ethereal chord, then it thins to one high note as the white takes the frame",
+   "start": 1790,
+   "end": 1919,
+   "frames": 129,
+   "narration": [
+    {
+     "clip": 6,
+     "text": "βλέποντας τη θεία δόξα του Χριστού πάνω στο όρος Θαβώρ."
+    }
+   ],
+   "clip": 6
+  },
+  {
+   "id": "07.1",
+   "title": "The courtyard",
+   "loc": "COURT",
+   "age": "C",
+   "emotion": "Fear; trying to be invisible",
+   "action": "Black; a torch passes close across the lens and reveals the courtyard: servants and guards around a charcoal brazier, and in the background the bound Christ led up the stone stair into the high priest's house. Peter stands at the edge of the crowd, hood half up.",
+   "cam": "Wide, a little high (he is small and watched)",
+   "move": "Subtle handheld unease",
+   "fg": "The passing torch, then dark heads",
+   "bg": "Guards with torches on the stair, Christ between them",
+   "light": "Cold blue moonlight; unstable torch orange; deep shadows",
+   "trans": "Cut",
+   "sound": "Fire crackle, murmur, a dog far off, soldiers' boots on the stair",
+   "music": "The theme breaks apart: two low notes, a long gap",
+   "start": 1919,
+   "end": 2026,
+   "frames": 107,
+   "narration": [
+    {
+     "clip": 7,
+     "text": "Όμως ο Πέτρος γνώρισε και τη δική του μεγάλη πτώση."
+    }
+   ],
+   "clip": 7
+  },
+  {
+   "id": "07.2",
+   "title": "At the fire",
+   "loc": "COURT",
+   "age": "C",
+   "emotion": "Fear; small and defensive",
+   "action": "Peter edges in among strangers at the charcoal fire and holds out his hands to it, elbows in, eyes down. (This framing is mirrored at dawn in 08.3.)",
+   "cam": "MCU across the fire, eye level",
+   "move": "Handheld, slightly unstable",
+   "fg": "Coals and heat shimmer",
+   "bg": "Faces lit orange, blue dark beyond",
+   "light": "Fire-lit from below; cold blue rim from the moon",
+   "trans": "Cut",
+   "sound": "Fire crackle, low voices",
+   "music": "Sparse low pizzicato fragments",
+   "start": 2026,
+   "end": 2125,
+   "frames": 99,
+   "narration": [
+    {
+     "clip": 7,
+     "text": "Τη νύχτα που συνέλαβαν τον Χριστό,"
+    }
+   ],
+   "clip": 7
+  },
+  {
+   "id": "07.3",
+   "title": "Three denials",
+   "loc": "COURT",
+   "age": "C",
+   "emotion": "Composed → nervous → afraid",
+   "action": "One unbroken, tightening shot. (1) The servant girl lifts her oil lamp to his face; he answers quickly, composed, a small shake of the head. (2) A man at the fire points; a nervous glance, jaw tight, he shifts back. (3) Several turn on him; a sharp defensive movement, his hand cutting the air. Each denial, the camera is closer.",
+   "cam": "Starts MS, ends in a tight CU",
+   "move": "Handheld push-in in three surges, one per denial",
+   "fg": "The lamp, then shoulders crowding the frame",
+   "bg": "Fire, faces, the stair",
+   "light": "Lamp and fire; warmth drains from the grade with each denial",
+   "trans": "Hard stop into silence",
+   "sound": "Voices (no words) growing louder",
+   "music": "Low tremolo rising, cut dead at the third denial",
+   "start": 2125,
+   "end": 2212,
+   "frames": 87,
+   "narration": [
+    {
+     "clip": 7,
+     "text": "φοβήθηκε και Τον αρνήθηκε τρεις φορές."
+    }
+   ],
+   "clip": 7
+  },
+  {
+   "id": "07.4",
+   "title": "The silence",
+   "loc": "COURT",
+   "age": "C",
+   "kind": "hold",
+   "emotion": "The world stops",
+   "action": "Silence. The courtyard's movement slows. Across it, on the gallery between guards, Christ turns and looks at Peter (Luke 22:61) ◆. A rooster crows, distant and muffled ◆.",
+   "cam": "Long lens from Peter's position",
+   "move": "Restrained slow motion (the one place in the film)",
+   "fg": "Smoke and out-of-focus heads",
+   "bg": "Christ on the gallery, torchlit",
+   "light": "Cold; Christ in a small pool of torchlight",
+   "trans": "Cut to Peter's eyes",
+   "sound": "Everything muffled as if underwater, then the rooster, far off",
+   "music": "Silence",
+   "start": 2212,
+   "end": 2257,
+   "frames": 45,
+   "narration": [],
+   "clip": 7
+  },
+  {
+   "id": "07.5",
+   "title": "His eyes",
+   "loc": "COURT",
+   "age": "C",
+   "kind": "hold",
+   "emotion": "Realisation; his face changes completely",
+   "action": "ECU on his eyes: the understanding arrives and his face breaks.",
+   "cam": "ECU eyes",
+   "move": "Locked",
+   "fg": "—",
+   "bg": "Black",
+   "light": "Nearly all warmth gone; a trace of blue",
+   "trans": "Cut",
+   "sound": "Muffled room tone, his breath",
+   "music": "One low cello note",
+   "start": 2257,
+   "end": 2315,
+   "frames": 58,
+   "narration": [
+    {
+     "clip": 7,
+     "text": "Όταν κατάλαβε τι είχε κάνει,"
+    }
+   ],
+   "clip": 7
+  },
+  {
+   "id": "07.6",
+   "title": "Into the dark",
+   "loc": "COURT",
+   "age": "C",
+   "kind": "hold",
+   "emotion": "Broken",
+   "action": "He pushes out through the gate into the dark street, stops against the wall, and breaks: his shoulders collapse, he covers his face, he slides down the stones. No screaming.",
+   "cam": "Static wide from the street, a lot of negative space around him",
+   "move": "Locked",
+   "fg": "The dark street, a gutter with standing water",
+   "bg": "The gate's torchlight behind him, then darkness",
+   "light": "Cold blue moonlight only",
+   "trans": "Cut to his hands",
+   "sound": "Distant city at night, his muffled sobs",
+   "music": "Nothing; then a single note of the theme, alone",
+   "start": 2315,
+   "end": 2400,
+   "frames": 85,
+   "narration": [
+    {
+     "clip": 7,
+     "text": "έκλαψε πικρά."
+    },
+    {
+     "clip": 8,
+     "text": "Η"
+    }
+   ],
+   "clip": 7
+  },
+  {
+   "id": "08.1",
+   "title": "The tear becomes the lake",
+   "loc": "DAWN",
+   "age": "C",
+   "emotion": "Repentance",
+   "action": "CU: tears fall between his fingers into the water standing in the gutter; rings spread in the moonlit puddle. The rings dissolve into ripples on the lake at dawn: the boat offshore with seven fishermen, mist, and on the shore a small fire with a figure beside it.",
+   "cam": "CU low on the puddle → wide at water level",
+   "move": "Slow tilt down to the puddle; the dissolve lands on a slow drift over the lake",
+   "fg": "Fingers and puddle, then ripples",
+   "bg": "The shore, the fire, the figure",
+   "light": "Cold moon → soft dawn gold, warm cream, muted blue",
+   "trans": "Cut",
+   "sound": "A drop, then lapping water rising in; gentle fire far off, morning birds",
+   "music": "The theme's first note returns, then the theme slowly on the ney",
+   "start": 2400,
+   "end": 2507,
+   "frames": 107,
+   "narration": [
+    {
+     "clip": 8,
+     "text": "μετάνοιά του όμως ήταν αληθινή. Μετά την"
+    }
+   ],
+   "clip": 8
+  },
+  {
+   "id": "08.2",
+   "title": "He jumps in",
+   "loc": "DAWN",
+   "age": "C",
+   "emotion": "Love outruns shame",
+   "action": "Peter recognises Him, throws his mantle round himself and plunges over the side, wading hard for the shore (echo of 02.5).",
+   "cam": "Water level at the shoreline, Peter coming toward camera",
+   "move": "Locked, splash on lens",
+   "fg": "Shallows",
+   "bg": "The boat, the others staring",
+   "light": "Dawn backlight, spray lit gold",
+   "trans": "Cut",
+   "sound": "Splashing, water",
+   "music": "Theme quickens for a bar",
+   "start": 2507,
+   "end": 2560,
+   "frames": 53,
+   "narration": [
+    {
+     "clip": 8,
+     "text": "Ανάσταση, ο Χριστός"
+    }
+   ],
+   "clip": 8
+  },
+  {
+   "id": "08.3",
+   "title": "At the fire again",
+   "loc": "DAWN",
+   "age": "C",
+   "emotion": "Shame",
+   "action": "Dripping, Peter stands a little apart from the charcoal fire where Christ turns fish on the coals. Christ offers him bread. He takes it without raising his eyes. Same framing as 07.2, now in dawn warmth.",
+   "cam": "MCU across the fire (mirror of 07.2)",
+   "move": "Locked",
+   "fg": "Coals, fish, bread",
+   "bg": "The lake, the others dragging the net ashore",
+   "light": "Warm fire and warm dawn: the cold of 07.2 is gone",
+   "trans": "Cut",
+   "sound": "Gentle fire, water, birds",
+   "music": "Theme on the ney, unaccompanied",
+   "start": 2560,
+   "end": 2626,
+   "frames": 66,
+   "narration": [
+    {
+     "clip": 8,
+     "text": "δεν τον απέρριψε."
+    }
+   ],
+   "clip": 8
+  },
+  {
+   "id": "08.4",
+   "title": "First question: shame",
+   "loc": "DAWN",
+   "age": "C",
+   "emotion": "Shame",
+   "action": "Apart from the others, Christ and Peter sit on rocks by the water. Christ turns to him and speaks (implied, no lip-sync, no text). Peter's eyes stay on the ground; his hands are clenched on his knees.",
+   "cam": "Two-shot in profile, eye level",
+   "move": "Locked",
+   "fg": "Rocks",
+   "bg": "The lake and far hills",
+   "light": "Sunrise just below the hills",
+   "trans": "Cut",
+   "sound": "Water",
+   "music": "The theme's second phrase, cello joining",
+   "start": 2626,
+   "end": 2698,
+   "frames": 72,
+   "narration": [
+    {
+     "clip": 8,
+     "text": "Αντίθετα, τον αποκατέστησε με αγάπη,"
+    }
+   ],
+   "clip": 8
+  },
+  {
+   "id": "08.5",
+   "title": "Second: vulnerability",
+   "loc": "DAWN",
+   "age": "C",
+   "emotion": "Vulnerability",
+   "action": "Closer. Peter's eyes lift halfway; his mouth trembles; his hands slowly unclench.",
+   "cam": "MCU Peter",
+   "move": "Locked",
+   "fg": "—",
+   "bg": "Lake, soft",
+   "light": "The first sun touching the far hills",
+   "trans": "Cut",
+   "sound": "Water, a bird",
+   "music": "Harmony warms",
+   "start": 2698,
+   "end": 2752,
+   "frames": 54,
+   "narration": [
+    {
+     "clip": 8,
+     "text": "ρωτώντας τον τρεις φορές:"
+    }
+   ],
+   "clip": 8
+  },
+  {
+   "id": "08.6",
+   "title": "Third: acceptance",
+   "loc": "DAWN",
+   "age": "C",
+   "kind": "hold",
+   "emotion": "Acceptance: he has not been rejected",
+   "action": "Peter looks directly at Christ. The sunrise's reflection off the water reaches his face. Christ's expression is calm. Not triumph: restoration.",
+   "cam": "Balanced, symmetrical two-shot, then Peter's face",
+   "move": "Locked; very slight push",
+   "fg": "The fire's thin smoke",
+   "bg": "The sun rising over the lake between them",
+   "light": "Warm reflected sunrise on Peter's face (key shot)",
+   "trans": "Cut to Peter's face in the upper room (match on face)",
+   "sound": "Water, fire, birds",
+   "music": "The original melody returns complete, quietly",
+   "start": 2752,
+   "end": 2824,
+   "frames": 72,
+   "narration": [
+    {
+     "clip": 8,
+     "text": "«Με αγαπάς;»"
+    }
+   ],
+   "clip": 8
+  },
+  {
+   "id": "09.1",
+   "title": "The frightened man, once more",
+   "loc": "UPPER",
+   "age": "C",
+   "emotion": "An echo of fear",
+   "action": "Peter's face in the dim upper room, hooded, eyes low: exactly the composition of 07.5, for one moment.",
+   "cam": "CU, same lens and angle as 07.5",
+   "move": "Locked",
+   "fg": "—",
+   "bg": "Dim room, the other disciples",
+   "light": "A single oil lamp, dim",
+   "trans": "Continuous into 09.2",
+   "sound": "Room tone, hushed prayer",
+   "music": "Low held note",
+   "start": 2824,
+   "end": 2873,
+   "frames": 49,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "Μετά την Πεντηκοστή,"
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.2",
+   "title": "The wind and the light",
+   "loc": "UPPER",
+   "age": "C",
+   "emotion": "Filled with strength",
+   "action": "A rushing wind: lamp flames bend flat, mantles lift and whip, warm light pours across the room and the faces. Fire-like light shines in Peter's eyes. He lifts his head; the fear is gone. No literal fantasy flames.",
+   "cam": "CU Peter",
+   "move": "Locked, then the frame reverses: he rises into it",
+   "fg": "Fluttering cloth, lamp flames",
+   "bg": "Disciples rising",
+   "light": "Warm amber rushing light, rich red-orange highlights",
+   "trans": "Cut on the rise",
+   "sound": "Low air movement swelling; restrained rising tone",
+   "music": "The theme in full for the first time, tutti",
+   "start": 2873,
+   "end": 2956,
+   "frames": 83,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "ο Πέτρος γέμισε με τη δύναμη του Αγίου Πνεύματος."
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.3",
+   "title": "Toward the crowd",
+   "loc": "STEPS",
+   "age": "C",
+   "emotion": "Courage from humility",
+   "action": "The composition of 07.1 reversed: instead of hiding in a crowd, Peter steps out of the doorway into the bright street toward one.",
+   "cam": "Behind Peter, low",
+   "move": "Following him out into the light",
+   "fg": "The door frame",
+   "bg": "Jerusalem street and crowd in sunlight",
+   "light": "From dim interior into blazing day",
+   "trans": "Cut",
+   "sound": "Market ambience, crowd, distant voices",
+   "music": "Theme",
+   "start": 2956,
+   "end": 3041,
+   "frames": 85,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "Από φοβισμένος άνθρωπος"
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.4",
+   "title": "Preaching",
+   "loc": "STEPS",
+   "age": "C",
+   "emotion": "Authority without arrogance",
+   "action": "Peter preaches from the southern steps with controlled, open gestures.",
+   "cam": "MCU, slightly below eye level",
+   "move": "Locked, then begins to rise",
+   "fg": "Heads of listeners, soft",
+   "bg": "The Royal Stoa's columns",
+   "light": "Bright Mediterranean day",
+   "trans": "Continuous into 09.5",
+   "sound": "Crowd hush, his voice unheard under the narration",
+   "music": "Theme",
+   "start": 3041,
+   "end": 3132,
+   "frames": 91,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "έγινε γενναίος κήρυκας της πίστης."
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.5",
+   "title": "Thousands",
+   "loc": "STEPS",
+   "age": "C",
+   "kind": "hold",
+   "emotion": "Strength shared",
+   "action": "The camera cranes back and up from Peter until the steps and the plaza are full: more and more people, thousands, still and listening; some kneel.",
+   "cam": "Starts at Peter",
+   "move": "One crane back and up; peaks on «χιλιάδες»",
+   "fg": "The crowd, getting smaller",
+   "bg": "The Temple walls, the city beyond",
+   "light": "Full day",
+   "trans": "Cut",
+   "sound": "A vast hush, wind",
+   "music": "Theme at its fullest",
+   "start": 3132,
+   "end": 3257,
+   "frames": 125,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "Κήρυξε στα Ιεροσόλυμα και χιλιάδες άνθρωποι πίστεψαν στον Χριστό."
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.6",
+   "title": "He helps a man rise",
+   "loc": "STEPS",
+   "age": "C",
+   "emotion": "Compassion",
+   "action": "At a gate Peter takes the hand of a lame man and helps him up; the man's weight comes onto his feet (hands: healing).",
+   "cam": "Medium, then CU hands",
+   "move": "Tilt up with the man as he rises",
+   "fg": "Hands",
+   "bg": "The gate, onlookers",
+   "light": "Warm day",
+   "trans": "Cut",
+   "sound": "A gasp in the crowd",
+   "music": "Theme continues, lighter",
+   "start": 3257,
+   "end": 3334,
+   "frames": 77,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "Θεράπευσε ασθενείς,"
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.7",
+   "title": "The first Christians",
+   "loc": "UPPER",
+   "age": "D",
+   "emotion": "Care",
+   "action": "In a courtyard, believers share bread; Peter breaks a loaf and passes it, then steadies an old woman's arm.",
+   "cam": "Medium, eye level",
+   "move": "Slow lateral",
+   "fg": "Bread, bowls",
+   "bg": "Families, children",
+   "light": "Warm late day",
+   "trans": "Cut",
+   "sound": "Soft voices, bowls",
+   "music": "Theme",
+   "start": 3334,
+   "end": 3412,
+   "frames": 78,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "στήριξε τους πρώτους χριστιανούς και"
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.8",
+   "title": "The long road",
+   "loc": "MISSION",
+   "age": "D",
+   "kind": "montage",
+   "emotion": "Perseverance",
+   "action": "Peter walks alone along a coastal road, very small against the hills; his beard is fuller, his mantle faded.",
+   "cam": "Extreme wide",
+   "move": "Slow pan with him",
+   "fg": "Roadside rocks",
+   "bg": "The sea, far hills",
+   "light": "Bright Mediterranean day",
+   "trans": "Cut",
+   "sound": "Wind, far sea",
+   "music": "Theme travels",
+   "start": 3412,
+   "end": 3460,
+   "frames": 48,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "ταξίδεψε για να διαδώσει"
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "09.9",
+   "title": "Aboard",
+   "loc": "MISSION",
+   "age": "D",
+   "kind": "montage",
+   "emotion": "Resolve",
+   "action": "He steps aboard a small merchant ship; the sail fills.",
+   "cam": "Medium from the quay",
+   "move": "Locked; the ship moves off",
+   "fg": "Mooring rope (rope motif)",
+   "bg": "Harbour, open sea",
+   "light": "Day",
+   "trans": "Match to the road in 10.1 (motif: walking)",
+   "sound": "Rigging creak, sail snap, gulls",
+   "music": "Theme settles",
+   "start": 3460,
+   "end": 3506,
+   "frames": 46,
+   "narration": [
+    {
+     "clip": 9,
+     "text": "το Ευαγγέλιο."
+    }
+   ],
+   "clip": 9
+  },
+  {
+   "id": "10.1",
+   "title": "The road to Rome",
+   "loc": "APPIA",
+   "age": "D",
+   "emotion": "Steadfast",
+   "action": "Peter walks toward camera along the Via Appia between tombs and umbrella pines. An ox cart passes through the foreground and covers him.",
+   "cam": "Medium wide, eye level",
+   "move": "Slow push as he approaches",
+   "fg": "The passing ox cart",
+   "bg": "Tombs, pines",
+   "light": "Dusty sunlight",
+   "trans": "The cart covers the frame; when it clears, years have passed",
+   "sound": "Cart wheels, oxen, sandals",
+   "music": "Lower, darker variation begins",
+   "start": 3506,
+   "end": 3597,
+   "frames": 91,
+   "narration": [
+    {
+     "clip": 10,
+     "text": "Η παράδοση της Εκκλησίας αναφέρει ότι"
+    }
+   ],
+   "clip": 10
+  },
+  {
+   "id": "10.2",
+   "title": "Rome rises",
+   "loc": "APPIA",
+   "age": "E",
+   "emotion": "Weathered, calm",
+   "action": "The cart clears: the same walk, but Peter is old, grey-bearded and travel-worn. As he walks past us the camera rises and Rome rises behind him: the aqueduct arches striding to the city, roofs and temples in haze.",
+   "cam": "Medium wide → wide",
+   "move": "Crane up as he passes",
+   "fg": "Peter, passing",
+   "bg": "The Aqua Claudia and the city",
+   "light": "Hard stone-grey sunlight, dust",
+   "trans": "Cut",
+   "sound": "A distant city murmur swelling",
+   "music": "Low strings, frame drum",
+   "start": 3597,
+   "end": 3711,
+   "frames": 114,
+   "narration": [
+    {
+     "clip": 10,
+     "text": "ο Απόστολος Πέτρος έφτασε μέχρι τη Ρώμη."
+    }
+   ],
+   "clip": 10
+  },
+  {
+   "id": "10.3",
+   "title": "Tiny in the city",
+   "loc": "ROME",
+   "age": "E",
+   "emotion": "Undaunted",
+   "action": "A dense Roman street: carts, soldiers, crowds, colonnades. Peter is a tiny figure crossing among them.",
+   "cam": "High wide",
+   "move": "Slow drift",
+   "fg": "A column passes close (wipe into the next shot)",
+   "bg": "Insulae, temples",
+   "light": "Hard grey sunlight, terracotta and muted red",
+   "trans": "Passing Roman column → the gathering (covered switch)",
+   "sound": "Carts, footsteps, reverberant city murmur",
+   "music": "Darker variation",
+   "start": 3711,
+   "end": 3787,
+   "frames": 76,
+   "narration": [
+    {
+     "clip": 10,
+     "text": "Εκεί συνέχισε να κηρύττει τον Χριστό,"
+    }
+   ],
+   "clip": 10
+  },
+  {
+   "id": "10.4",
+   "title": "The hidden gathering",
+   "loc": "ROOM",
+   "age": "E",
+   "emotion": "Calm authority",
+   "action": "In a low room a few dozen people listen quietly by lamplight; Peter, seated, speaks calmly with open hands. The lamp flames echo Pentecost's fire.",
+   "cam": "Medium wide, eye level",
+   "move": "Slow push to Peter",
+   "fg": "Lamps, bowed heads",
+   "bg": "The stair to the street door",
+   "light": "Warm terracotta lamplight in a dark room",
+   "trans": "Cut",
+   "sound": "Hushed room, lamp flicker",
+   "music": "Low strings, sparse",
+   "start": 3787,
+   "end": 3857,
+   "frames": 70,
+   "narration": [
+    {
+     "clip": 10,
+     "text": "σε μια εποχή δύσκολη"
+    }
+   ],
+   "clip": 10
+  },
+  {
+   "id": "10.5",
+   "title": "Footsteps",
+   "loc": "ROOM",
+   "age": "E",
+   "kind": "hold",
+   "emotion": "Tension; (Peter) calm under it",
+   "action": "A young man by the stair watches nervously up toward the door. Hobnailed footsteps outside. Everyone freezes; a lamp flame trembles. Focus racks from the watcher to Peter, whose eyes lift to the door. Hold.",
+   "cam": "MCU watcher in the foreground, Peter seated in the background",
+   "move": "Locked; rack focus watcher → Peter",
+   "fg": "The watcher, the stair rail, a trembling lamp",
+   "bg": "Peter; the door with a line of daylight under it, broken by passing shadows",
+   "light": "Lamplight vs. a cold line of day",
+   "trans": "Cut to the door opening",
+   "sound": "Street noise faint through the door, then hobnailed caligae on stone, then silence",
+   "music": "A held dissonance, cut to silence",
+   "start": 3857,
+   "end": 3945,
+   "frames": 88,
+   "narration": [
+    {
+     "clip": 10,
+     "text": "και επικίνδυνη για τους χριστιανούς."
+    }
+   ],
+   "clip": 10
+  },
+  {
+   "id": "11.1",
+   "title": "He offers his hands",
+   "loc": "ROOM",
+   "age": "E",
+   "emotion": "Without resistance",
+   "action": "Roman soldiers come down the stair with torches. Peter rises, raises a hand to calm the others, and holds out his wrists.",
+   "cam": "Medium",
+   "move": "Locked",
+   "fg": "Torches",
+   "bg": "The frightened community",
+   "light": "Torch orange breaking into lamplight",
+   "trans": "Cut on the offered hands",
+   "sound": "Boots, metal, then quiet",
+   "music": "Music simplifies: one sustained note",
+   "start": 3945,
+   "end": 4002,
+   "frames": 57,
+   "narration": [
+    {
+     "clip": 11,
+     "text": "Τελικά συνελήφθη και μαρτύρησε"
+    }
+   ],
+   "clip": 11
+  },
+  {
+   "id": "11.2",
+   "title": "Bound",
+   "loc": "ROOM",
+   "age": "E",
+   "kind": "insert",
+   "emotion": "Peace",
+   "action": "CU: his old fisherman's hands are bound with rope (rope motif: the hands that hauled rope in 01.1).",
+   "cam": "CU hands",
+   "move": "Locked",
+   "fg": "Rope",
+   "bg": "Soldiers' belts, dark",
+   "light": "Torchlight",
+   "trans": "Cut",
+   "sound": "Rope pulled tight",
+   "music": "Sustained",
+   "start": 4002,
+   "end": 4045,
+   "frames": 43,
+   "narration": [
+    {
+     "clip": 11,
+     "text": "κατά τον διωγμό του Νέρωνα."
+    }
+   ],
+   "clip": 11
+  },
+  {
+   "id": "11.3",
+   "title": "The corridor",
+   "loc": "CIRCUS",
+   "age": "E",
+   "emotion": "Calm",
+   "action": "Peter walks slowly between guards down a stone corridor; beams of light fall through narrow slits.",
+   "cam": "Wide, symmetrical, down the corridor",
+   "move": "Extremely calm slow push",
+   "fg": "Light beams, dust",
+   "bg": "The bright opening at the end",
+   "light": "Quiet late-afternoon light through slits; cool stone",
+   "trans": "Cut",
+   "sound": "Slow footsteps, stone reverberation",
+   "music": "Almost nothing",
+   "start": 4045,
+   "end": 4110,
+   "frames": 65,
+   "narration": [
+    {
+     "clip": 11,
+     "text": "Ζήτησε να σταυρωθεί"
+    }
+   ],
+   "clip": 11
+  },
+  {
+   "id": "11.4",
+   "title": "The cross",
+   "loc": "CIRCUS",
+   "age": "E",
+   "kind": "hold",
+   "emotion": "Humility",
+   "action": "In the yard he sees an ordinary wooden cross structure lying ready. He lowers his eyes (on «θεωρούσε τον εαυτό του»), then looks upward.",
+   "cam": "MCU Peter, then his POV",
+   "move": "Locked",
+   "fg": "Rough timber grain (motif: wood)",
+   "bg": "Sand, stone",
+   "light": "Warm late-day sun",
+   "trans": "Cut",
+   "sound": "Wind, cloth",
+   "music": "Silence",
+   "start": 4110,
+   "end": 4200,
+   "frames": 90,
+   "narration": [
+    {
+     "clip": 11,
+     "text": "ανάποδα, γιατί θεωρούσε τον εαυτό του"
+    }
+   ],
+   "clip": 11
+  },
+  {
+   "id": "11.5",
+   "title": "In silhouette",
+   "loc": "CIRCUS",
+   "age": "E",
+   "kind": "hold",
+   "emotion": "(Seen from far) sacrifice",
+   "action": "Silhouette at great distance: by the Circus obelisk, workers raise the execution structure. The composition (its long shadow on the sand) makes clear it is inverted, with no detail of the body.",
+   "cam": "Extreme wide",
+   "move": "Locked",
+   "fg": "The shadow on the sand",
+   "bg": "The obelisk, the low sun",
+   "light": "Late sun behind: everything in silhouette",
+   "trans": "Cut",
+   "sound": "Distant wood, wind",
+   "music": "A single held note",
+   "start": 4200,
+   "end": 4268,
+   "frames": 68,
+   "narration": [
+    {
+     "clip": 11,
+     "text": "ανάξιο να πεθάνει με τον ίδιο τρόπο"
+    }
+   ],
+   "clip": 11
+  },
+  {
+   "id": "11.6",
+   "title": "Peace",
+   "loc": "CIRCUS",
+   "age": "E",
+   "kind": "hold",
+   "emotion": "Fear exists; faith is stronger",
+   "action": "Close-up, older Peter: wind moves his hair and beard. A flicker of fear, then his face settles into peace. On «όπως ο Κύριός του» he looks up; the sky fills the frame with light.",
+   "cam": "CU, eye level",
+   "move": "Locked, imperceptible push",
+   "fg": "—",
+   "bg": "Sky",
+   "light": "Warm late-day light, then the sky brightens to white",
+   "trans": "Fade through bright sky",
+   "sound": "Wind, then nothing",
+   "music": "The note opens into a soft major chord",
+   "start": 4268,
+   "end": 4332,
+   "frames": 64,
+   "narration": [
+    {
+     "clip": 11,
+     "text": "όπως ο Κύριός του."
+    }
+   ],
+   "clip": 11
+  },
+  {
+   "id": "12.1",
+   "title": "29 June",
+   "loc": "FEAST",
+   "age": "E",
+   "emotion": "Remembered",
+   "action": "The white resolves into warm painted light: candle flames, parchment grain, June sun through a small window, and Peter's figure, still and icon-like. «29 Ιουνίου» is lettered quietly on the parchment ◆.",
+   "cam": "Medium, frontal",
+   "move": "Very slow pull-back",
+   "fg": "Candle flames",
+   "bg": "Warm gold",
+   "light": "Candlelight and a shaft of June sun",
+   "trans": "Continuous into 12.2",
+   "sound": "Candle hiss, a faraway bell",
+   "music": "Warm chorale-like pads",
+   "start": 4332,
+   "end": 4438,
+   "frames": 106,
+   "narration": [
+    {
+     "clip": 12,
+     "text": "Η Εκκλησία τιμά τη μνήμη του στις 29 Ιουνίου,"
+    }
+   ],
+   "clip": 12
+  },
+  {
+   "id": "12.2",
+   "title": "Peter and Paul",
+   "loc": "FEAST",
+   "age": "E",
+   "emotion": "Brotherhood",
+   "action": "The pull-back reveals Paul beside him: the two apostles embrace, an icon-inspired composition (the Byzantine 'Embrace of the Apostles') painted in the film's own hand.",
+   "cam": "Medium wide, frontal",
+   "move": "Pull-back continues, then settles",
+   "fg": "Candles",
+   "bg": "Gold light",
+   "light": "Candle glow and window light",
+   "trans": "Dissolve to the first echo",
+   "sound": "Candles, bell",
+   "music": "Pads resolve",
+   "start": 4438,
+   "end": 4496,
+   "frames": 58,
+   "narration": [
+    {
+     "clip": 12,
+     "text": "μαζί με τον Απόστολο Παύλο."
+    }
+   ],
+   "clip": 12
+  },
+  {
+   "id": "13.1",
+   "title": "Echo: the net",
+   "loc": "LAKE",
+   "age": "A",
+   "kind": "hold",
+   "emotion": "Memory",
+   "action": "Echo of 03.4: the abandoned net stirring in the boat.",
+   "cam": "As 03.4",
+   "move": "Slow dissolve in and out",
+   "fg": "The net",
+   "bg": "The shore",
+   "light": "Golden, a touch softer than the original",
+   "trans": "Slow dissolve",
+   "sound": "Lake water, soft",
+   "music": "The theme in its first, gentle form, now with richer harmony",
+   "start": 4496,
+   "end": 4559,
+   "frames": 63,
+   "narration": [
+    {
+     "clip": 13,
+     "text": "Ο Άγιος Πέτρος μάς θυμίζει"
+    }
+   ],
+   "clip": 13
+  },
+  {
+   "id": "13.2",
+   "title": "Echo: he falls, he rises",
+   "loc": "COURT",
+   "age": "C",
+   "kind": "hold",
+   "emotion": "Memory: failure, then restoration",
+   "action": "Echo of 07.6: Peter against the wall, face in his hands. On «σηκωθεί» it dissolves slowly into the echo of 08.6: Peter lifting his eyes to Christ in the sunrise.",
+   "cam": "As 07.6 → as 08.6",
+   "move": "One slow dissolve, centred on «σηκωθεί»",
+   "fg": "—",
+   "bg": "Darkness → sunrise",
+   "light": "Cold, lifted a little → dawn",
+   "trans": "Slow dissolve",
+   "sound": "Soft",
+   "music": "Theme; the harmony turns from minor to major under «σηκωθεί»",
+   "start": 4559,
+   "end": 4660,
+   "frames": 101,
+   "narration": [
+    {
+     "clip": 13,
+     "text": "ότι ακόμη και ο άνθρωπος που πέφτει μπορεί να σηκωθεί,"
+    }
+   ],
+   "clip": 13
+  },
+  {
+   "id": "13.3",
+   "title": "Echo: following",
+   "loc": "ROAD",
+   "age": "B",
+   "emotion": "Memory: following",
+   "action": "Echo of 01.2 and 04.1: Peter walking close behind Christ in the wheat.",
+   "cam": "As 04.1",
+   "move": "Slow dissolve",
+   "fg": "Wheat",
+   "bg": "Hills",
+   "light": "Warm day",
+   "trans": "Slow dissolve",
+   "sound": "Soft",
+   "music": "Theme",
+   "start": 4660,
+   "end": 4731,
+   "frames": 71,
+   "narration": [
+    {
+     "clip": 13,
+     "text": "όταν μετανοεί αληθινά."
+    }
+   ],
+   "clip": 13
+  },
+  {
+   "id": "13.4",
+   "title": "Echo: His look",
+   "loc": "COURT",
+   "age": "C",
+   "kind": "hold",
+   "emotion": "Love that does not stop at weakness",
+   "action": "Echo of 07.4: Christ's look across the courtyard, re-graded from cold blue to warm ◆: the look was never condemnation.",
+   "cam": "As 07.4, slower",
+   "move": "Slow push",
+   "fg": "Soft smoke",
+   "bg": "Warm dark",
+   "light": "The torchlight warms to gold",
+   "trans": "Slow dissolve",
+   "sound": "Soft",
+   "music": "Theme, a new warm chord under the old melody",
+   "start": 4731,
+   "end": 4854,
+   "frames": 123,
+   "narration": [
+    {
+     "clip": 13,
+     "text": "Η αγάπη του Χριστού δεν σταματά στην αδυναμία μας,"
+    }
+   ],
+   "clip": 13
+  },
+  {
+   "id": "13.5",
+   "title": "Echo: strong",
+   "loc": "STEPS",
+   "age": "C",
+   "emotion": "Memory: strength",
+   "action": "Echo of 09.5: Peter before the crowd.",
+   "cam": "As 09.5",
+   "move": "Slow dissolve",
+   "fg": "Crowd",
+   "bg": "Temple",
+   "light": "Day",
+   "trans": "Slow dissolve",
+   "sound": "Soft",
+   "music": "Theme swells a little",
+   "start": 4854,
+   "end": 4925,
+   "frames": 71,
+   "narration": [
+    {
+     "clip": 13,
+     "text": "αλλά μας καλεί να γίνουμε ξανά δυνατοί,"
+    }
+   ],
+   "clip": 13
+  },
+  {
+   "id": "13.6",
+   "title": "Echo: faithful and brave",
+   "loc": "APPIA",
+   "age": "E",
+   "emotion": "Memory: faithful and brave",
+   "action": "Echo of 10.2: old Peter walking toward Rome.",
+   "cam": "As 10.2",
+   "move": "Slow dissolve",
+   "fg": "—",
+   "bg": "Rome",
+   "light": "Dusty gold",
+   "trans": "Slow dissolve to the lake",
+   "sound": "Soft",
+   "music": "Theme, last phrase",
+   "start": 4925,
+   "end": 4988,
+   "frames": 63,
+   "narration": [
+    {
+     "clip": 13,
+     "text": "πιστοί και γενναίοι."
+    }
+   ],
+   "clip": 13
+  },
+  {
+   "id": "13.7",
+   "title": "Lake Gennesaret, morning",
+   "loc": "LAKE",
+   "age": "—",
+   "kind": "hold",
+   "emotion": "Hope after failure",
+   "action": "Early morning on the lake. An empty fishing boat rocks gently; a net like the one he left lies in it. Golden light spreads across the water. Far off, two figures walk along the shore (no faces). Hold, then fade to warm light.",
+   "cam": "Wide at water level, boat in the near midground",
+   "move": "Locked; the light moves, not the camera",
+   "fg": "Water, the net in the boat",
+   "bg": "The shore, two tiny walking figures",
+   "light": "Dawn gold spreading across the lake (return to the opening light)",
+   "trans": "Fade to warm light",
+   "sound": "Lake water, a gull, breeze",
+   "music": "The theme's opening four notes on the lyre, a final warm chord that rings out",
+   "start": 4988,
+   "end": 5134,
+   "frames": 146,
+   "narration": [],
+   "clip": 13
+  }
+ ]
+}

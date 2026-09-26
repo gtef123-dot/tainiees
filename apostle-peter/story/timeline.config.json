@@ -1,0 +1,67 @@
+{
+  "_comment": "Timing rules. The voice decides every clip's length; only the silences between clips are authored here. gapAfter[n] = frames of visual breathing room after clip n's audio ends and before clip n+1's audio starts. Each clip also carries its own ~0.2 s lead-in and ~0.3-0.5 s tail of silence, so the audible gap is gap + those.",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "mixSampleRate": 48000,
+  "pause": {
+    "thresholdDb": -35,
+    "minMs": 150,
+    "mergeMs": 40,
+    "windowMs": 10
+  },
+  "headFrames": 36,
+  "headReason": "The first image already moves: a weathered hand hauling a dripping rope in the mist, 1.2 s before the voice.",
+  "tailFrames": 150,
+  "tailReason": "Hold the empty boat and the two far figures for 5 s so the meaning settles, then fade to warm light.",
+  "gapAfter": {
+    "1": {
+      "frames": 6,
+      "why": "Intro flows straight into Simon at work."
+    },
+    "2": {
+      "frames": 8,
+      "why": "A breath of lake ambience before the call."
+    },
+    "3": {
+      "frames": 12,
+      "why": "The abandoned net rocks in the breeze while Peter shrinks into the distance."
+    },
+    "4": {
+      "frames": 6,
+      "why": "The montage keeps its momentum into the confession."
+    },
+    "5": {
+      "frames": 10,
+      "why": "Late sun flares; the glare carries us up the mountain."
+    },
+    "6": {
+      "frames": 12,
+      "why": "Major turn: divine light to cold night."
+    },
+    "7": {
+      "frames": 30,
+      "why": "Longer hold (brief: denial realisation may hold): Peter weeping in darkness, the world muffled; tears become the morning lake."
+    },
+    "8": {
+      "frames": 12,
+      "why": "Restoration settles in the sunrise before Pentecost."
+    },
+    "9": {
+      "frames": 8,
+      "why": "Continuous walk into the road-to-Rome transition."
+    },
+    "10": {
+      "frames": 12,
+      "why": "Footsteps outside; everyone frozen; the tension hangs."
+    },
+    "11": {
+      "frames": 24,
+      "why": "Longer hold (brief: martyrdom may hold): fade through bright sky."
+    },
+    "12": {
+      "frames": 8,
+      "why": "Candlelight settles into the final remembrance."
+    }
+  }
+}
