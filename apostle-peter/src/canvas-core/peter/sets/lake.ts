@@ -31,7 +31,7 @@ export const lakeBackdrop = (env: Env, time: LakeTime, w = 2600, h = 760) => P(e
   ridge(c, w, HORIZON + 30, far, { top: css(mix(hex(S.hill[0]), hz, 0.6)), bottom: css(mix(hex(S.hill[0]), hz, 0.35)), texture: 0.5, seed: 22, lightFrom: time === "dawn" ? 1 : -1 });
   const arbel = (x: number) => { const X = x - cx - 1560; return HORIZON - 6 - (X > 0 ? Math.min(78, X * 1.1) * (X < 180 ? 1 : Math.max(0, 1 - (X - 180) / 700)) : 0) - (fractalish(x) * 5); };
   ridge(c, w, HORIZON + 30, arbel, { top: css(mix(hex(S.hill[1]), hz, 0.42)), bottom: css(mix(hex(S.hill[1]), hz, 0.3)), texture: 0.8, seed: 23, lightFrom: -1, terraces: 0 });
-  vgrad(c, 0, HORIZON - 60, w, HORIZON + 30, [[0, css(hex(S.stops[2][1]), 0)], [1, css(hex(S.stops[3][1]), 0.55)]]);
+  vgrad(c, 0, HORIZON - 60, w, HORIZON + 30, [[0, css(hex(S.stops[2][1]), 0)], [1, css(hex(S.stops[S.stops.length - 1][1]), 0.55)]]);
 }, { seed: 31, sizes: [26, 12, 5], flow: (_x, y) => (y < HORIZON - 40 ? 0.02 : null), keepBase: 0.6, alpha: 0.75 });
 const fractalish = (x: number) => Math.sin(x * 0.013) * 0.6 + Math.sin(x * 0.031 + 1) * 0.4;
 
@@ -62,3 +62,36 @@ export const lakeShore = (env: Env, time: LakeTime, variant: "village" | "beach"
   }
   void S; void scalec; void lerp; void rock;
 }, { seed: 53, sizes: [16, 8, 4], keepBase: 0.6, alpha: 0.75 });
+
+// ---- the lake behind a world camera: the horizon follows the tilt, the pan follows the yaw, and in
+// a close-up the far plates go soft (depth of field) by crossfading to blurred copies
+import { blurInto } from "../paint/plates";
+import { type WCam, panOf, wproj } from "../scene";
+export const FOCAL = 2000;
+export const horizonOf = (cam: WCam, H: number) => (cam.cy ?? H / 2) - Math.tan(cam.tilt) * (cam.focal ?? FOCAL);
+const soft = (env: Env, key: string, src: Surface, r: number) => plate(env, `${key}:soft${r}@${env.scale}`, src.w, src.h, (s) => { const b = blurInto(env, src, r * env.scale); s.ctx.drawImage(b.canvas as CanvasImageSource, 0, 0); });
+export const lakeWorld = (ctx: CanvasRenderingContext2D, env: Env, cam: WCam, time: LakeTime, o: { blur?: number; mist?: number; t?: number } = {}) => {
+  const hy = horizonOf(cam, env.H), px = panOf(cam), x0 = (env.W - 2600) / 2 + px, blur = o.blur ?? 0;
+  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.fillStyle = SKY[time].stops[0][1]; ctx.fillRect(0, 0, env.W, env.H); ctx.restore();
+  const back = lakeBackdrop(env, time), water = lakeWater(env, time);
+  const draw = (pl: Surface, dx: number, dy: number, dh: number, a = 1) => { ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.globalAlpha = a; ctx.drawImage(pl.canvas as CanvasImageSource, dx, dy, pl.w / env.scale, dh); ctx.restore(); };
+  const layers: [Surface, number, number][] = [[back, hy - HORIZON, 760], [water, hy - 8, Math.max(60, env.H - hy + 40)]];
+  for (const [pl, y, h] of layers) {
+    if (blur > 0.01) draw(soft(env, `lake:${time}:${pl === back ? "b" : "w"}`, pl, 28), x0, y, h);
+    if (blur < 0.99) draw(pl, x0, y, h, 1 - blur);
+  }
+  const mist = o.mist ?? 0.25, t = o.t ?? 0;
+  if (mist > 0) { ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); for (let i = 0; i < 3; i++) { const y = hy + 20 + i * 60 + Math.sin(t * 0.2 + i) * 6; vgrad(ctx, 0, y - 60, env.W, y + 60, [[0, "rgba(246,226,190,0)"], [0.5, `rgba(246,226,190,${mist * (1 - i * 0.28)})`], [1, "rgba(246,226,190,0)"]]); } ctx.restore(); }
+};
+
+// the beach under a world camera: the lake beyond, the pebble shore laid so its wet edge sits where
+// the camera says the waterline (world z = shoreZ) falls on screen
+export const beachWorld = (ctx: CanvasRenderingContext2D, env: Env, cam: WCam, time: LakeTime, shoreZ: number, o: { blur?: number; mist?: number; t?: number; village?: boolean } = {}) => {
+  lakeWorld(ctx, env, cam, time, o);
+  const ys = wprojY(cam, env, shoreZ), sh = lakeShore(env, time, o.village ? "village" : "beach"), px = panOf(cam, 1400, 600) * 1.2;
+  const src = (o.blur ?? 0) > 0.3 ? soft(env, `lake:shore:${time}:${o.village ? "v" : "b"}`, sh, 14) : sh;
+  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.drawImage(src.canvas as CanvasImageSource, (env.W - 2600) / 2 + px, ys - 380, 2600, Math.max(700, env.H - ys + 400)); ctx.restore();
+  return ys;
+};
+// where the waterline z falls on screen (straight ahead of the camera: the shore plate is laid flat)
+const wprojY = (cam: WCam, env: Env, z: number) => wproj({ ...cam, shake: 0 }, env, [cam.target[0], 0, z])[1];

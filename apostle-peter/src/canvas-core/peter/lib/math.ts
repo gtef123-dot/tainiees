@@ -41,6 +41,8 @@ export const view = (yaw: number, tilt = 0, roll = 0): M3 => mmul(rotZ(roll), mm
 export const apply = (m: M3, v: V3): V3 => [m[0] * v[0] + m[1] * v[1] + m[2] * v[2], m[3] * v[0] + m[4] * v[1] + m[5] * v[2], m[6] * v[0] + m[7] * v[1] + m[8] * v[2]];
 
 // ---- colour
+// a painter masses light into a few planes (shadow, core, halftone, light), with soft turns between them
+export const planes = (d: number, n = 4, keep = 0.35) => { const q = clamp(d) * n, b = Math.floor(Math.min(q, n - 1e-6)), f = q - b; const st = (b + (f < 0.4 ? 0 : f > 0.6 ? 1 : (f - 0.4) / 0.2 * ((f - 0.4) / 0.2) * (3 - 2 * ((f - 0.4) / 0.2)))) / n; return st * (1 - keep) + clamp(d) * keep; };
 export const hex = (h: string): RGB => { if (h.startsWith("rgb")) { const n = h.replace(/[^\d.,]/g, "").split(",").map(Number); return [n[0] / 255, n[1] / 255, n[2] / 255]; } const s = h.replace("#", ""); const n = parseInt(s.length === 3 ? s.split("").map((c) => c + c).join("") : s, 16); return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; };
 export const mix = (a: RGB, b: RGB, t: number): RGB => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 export const mulc = (a: RGB, b: RGB): RGB => [a[0] * b[0], a[1] * b[1], a[2] * b[2]];

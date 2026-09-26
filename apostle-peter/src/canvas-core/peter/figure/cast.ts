@@ -52,3 +52,10 @@ export const ANDREW_FIG: Figure = { id: ANDREW, height: 1.7, bulk: 0.98, costume
 export const JAMES_FIG: Figure = { id: JAMES, height: 1.74, bulk: 1.0, costume: { tunic: "#6b5a48", tunicLen: 0.3, sleeves: "long", mantle: "#4f5a4a", mantleLen: 0.42, belt: "#3d2c1f", dirt: 0.35 } };
 export const JOHN_FIG: Figure = { id: JOHN, height: 1.68, bulk: 0.9, costume: { tunic: "#a08a6a", tunicLen: 0.3, sleeves: "long", mantle: "#8a6e5a", mantleLen: 0.45, belt: "#4a3322", dirt: 0.3 } };
 export const PAUL_FIG: Figure = { id: PAUL, height: 1.62, bulk: 0.95, costume: { tunic: "#6a5a4a", tunicLen: 0.25, sleeves: "long", mantle: "#8a6a50", mantleLen: 0.35, belt: "#3d2c1f", dirt: 0.4 } };
+// more of the Twelve, for the walking group and the crowds of disciples
+export const PHILIP: Identity = { ...JAMES, name: "philip", seed: 1811, width: 1.0, jaw: 0.95, noseLen: 1.0, noseBump: 0.2, hair: "#3b2b1f", beardColor: "#3b2b1f", beardLen: 0.6, skin: "#a4765c", hairCurl: 0.8, age: 0.1 };
+export const THOMAS: Identity = { ...ANDREW, name: "thomas", seed: 1812, width: 1.02, jaw: 1.02, noseWidth: 1.12, hair: "#241a13", beardColor: "#241a13", beardLen: 0.85, skin: "#98684f", age: 0.14 };
+export const MATTHEW: Identity = { ...JAMES, name: "matthew", seed: 1813, width: 0.97, jaw: 0.92, noseLen: 1.05, noseWidth: 0.95, hair: "#4a3526", beardColor: "#4a3526", beardLen: 0.5, skin: "#a97c63", hairline: 0.36, recede: 0.4, age: 0.2 };
+export const PHILIP_FIG: Figure = { id: PHILIP, height: 1.73, bulk: 1.0, costume: { tunic: "#80694f", tunicLen: 0.3, sleeves: "long", mantle: "#6e6450", mantleLen: 0.42, belt: "#3d2c1f", dirt: 0.35 } };
+export const THOMAS_FIG: Figure = { id: THOMAS, height: 1.7, bulk: 1.05, costume: { tunic: "#6a563f", tunicLen: 0.32, sleeves: "long", mantle: "#586270", mantleLen: 0.4, belt: "#3d2c1f", dirt: 0.4 } };
+export const MATTHEW_FIG: Figure = { id: MATTHEW, height: 1.68, bulk: 0.95, costume: { tunic: "#8c7a60", tunicLen: 0.3, sleeves: "long", mantle: "#5e4d3c", mantleLen: 0.42, belt: "#3d2c1f", dirt: 0.3 } };

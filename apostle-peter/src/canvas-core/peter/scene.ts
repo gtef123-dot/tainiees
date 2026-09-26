@@ -52,18 +52,24 @@ export const actorParts = (ctx: Ctx2, env: Env, cam: Cam, a: Actor, t: number, l
   return figureParts(ctx, a.fig, pose, { x: sx, y: sy, scale: a.scale * s, yaw: a.yaw, tilt, light, t, expr, paint: a.paint, detail: a.detail });
 };
 // render a group of parts together (they occlude each other) in their own layer
-export const renderGroup = (ctx: Ctx2, env: Env, parts: Parts[], fx?: LayerFx, paint = 0.55) => renderParts(ctx, parts, { env, cell: 2, tol: 6, paint, fx });
+export const renderGroup = (ctx: Ctx2, env: Env, parts: Parts[], scale: number, fx?: LayerFx, paint = 0.6) => renderParts(ctx, parts, { env, cell: 2, tol: 0.03 * scale, paint, fx });
 
 // ---- a world camera for shots built in 3D: it aims at a point, at a scale (px per metre there)
 import { type V3, type M3, view, apply, mmul, rotY, rotZ, rotX, sub3 } from "./lib/math";
-export type WCam = { target: V3; scale: number; yaw: number; tilt: number; roll?: number; cx?: number; cy?: number; shake?: number; t?: number };
+// focal (px): when set the camera is a true perspective camera standing focal/scale metres from its
+// target (a point at the target's depth still maps 1 m -> scale px); unset, it is orthographic.
+// Figures and props take WEAK perspective: each is scaled by the depth of its own root.
+export type WCam = { target: V3; scale: number; yaw: number; tilt: number; roll?: number; cx?: number; cy?: number; shake?: number; t?: number; pan0?: number; focal?: number };
+export const depthK = (c: WCam, vz: number) => { if (!c.focal) return 1; const D = c.focal / c.scale; return D / Math.max(D * 0.08, D - vz); };
+export const panOf = (c: WCam, k = 1000, lim = 320) => Math.max(-lim, Math.min(lim, -(c.yaw - (c.pan0 ?? c.yaw)) * k));
 export const wview = (c: WCam): M3 => view(c.yaw, c.tilt, c.roll ?? 0);
 export const wproj = (c: WCam, env: Env, p: V3): [number, number, number] => {
   const v = apply(wview(c), sub3(p, c.target)), hx = c.shake ? (fractal(71, (c.t ?? 0) * 0.9, 0.3, 1, 1, 3) - 0.5) * 16 * c.shake : 0, hy = c.shake ? (fractal(76, 0.7, (c.t ?? 0) * 0.9, 1, 1, 3) - 0.5) * 12 * c.shake : 0;
-  return [(c.cx ?? env.W / 2) + v[0] * c.scale + hx, (c.cy ?? env.H / 2) - v[1] * c.scale + hy, v[2] * c.scale];
+  const k = depthK(c, v[2]);
+  return [(c.cx ?? env.W / 2) + v[0] * c.scale * k + hx, (c.cy ?? env.H / 2) - v[1] * c.scale * k + hy, v[2] * c.scale];
 };
 // the rotation to hand a figure or prop standing at `pos` and turned by `yaw` (plus rock/pitch)
 export const wplace = (c: WCam, env: Env, pos: V3, yaw: number, rock: { pitch?: number; roll?: number } = {}) => {
   const [x, y, z] = wproj(c, env, pos), R = mmul(wview(c), mmul(rotY(yaw), mmul(rotX(rock.pitch ?? 0), rotZ(rock.roll ?? 0))));
-  return { x, y, z, R, scale: c.scale };
+  return { x, y, z, R, scale: c.scale * depthK(c, z / c.scale) };
 };

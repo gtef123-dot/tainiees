@@ -6,7 +6,7 @@ import { extname, join } from "node:path";
 
 const MIME = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".woff2": "font/woff2" };
 export const buildPage = async ({ entry, out, title, plugins = [] }) => {
-  const js = (await build({ entryPoints: [entry], bundle: true, format: "iife", target: "es2020", minify: true, write: false, legalComments: "none", plugins })).outputFiles[0].text;
+  const js = (await build({ entryPoints: [entry], bundle: true, format: "iife", target: "es2020", minify: !process.env.NOMIN, write: false, legalComments: "none", plugins })).outputFiles[0].text;
   // read the manifest out of the film module itself, so the page and the film can never disagree
   const probe = (await build({ stdin: { contents: `export { ${title} as film } from "./src/canvas-core/${title}";`, resolveDir: process.cwd(), loader: "ts" }, bundle: true, format: "esm", write: false, platform: "neutral", plugins })).outputFiles[0].text;
   const { film } = await import("data:text/javascript;base64," + Buffer.from(probe).toString("base64"));

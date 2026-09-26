@@ -1,11 +1,13 @@
 // BUILD: small tools for making anything in 3D out of rows of points (rings, arcs, tubes), then
 // lighting it with the film's light model and projecting it to painted triangles and brush anchors.
-import { type V3, type RGB, type M3, clamp, scalec, addc, tone, apply, norm3, dot3, cross3, sub3, add3, mul3 } from "../lib/math";
+import { planes, type V3, type RGB, type M3, clamp, scalec, addc, tone, apply, norm3, dot3, cross3, sub3, add3, mul3 } from "../lib/math";
 import type { Light } from "./head";
 import type { Tri, Anchor } from "./mesh";
 // ---------------------------------------------------------------- cloth + limbs as meshes
-export type Builder = { V: V3[]; N: V3[]; C: RGB[]; T: number[]; flow: V3[]; anchor: boolean[]; noCull: boolean[] };
-export const newB = (): Builder => ({ V: [], N: [], C: [], T: [], flow: [], anchor: [], noCull: [] });
+// bias: a depth nudge (metres toward the viewer) so a limb passing through the torso wall wins or loses
+// cleanly instead of zigzagging with it triangle by triangle
+export type Builder = { V: V3[]; N: V3[]; C: RGB[]; T: number[]; flow: V3[]; anchor: boolean[]; noCull: boolean[]; brush: number[]; bias: number[]; curBrush?: number; curBias?: number };
+export const newB = (): Builder => ({ V: [], N: [], C: [], T: [], flow: [], anchor: [], noCull: [], brush: [], bias: [] });
 // a surface from rows of points (each row a ring or an arc); normals from the grid, colour per vertex
 export const surface = (B: Builder, rows: V3[][], closed: boolean, color: (r: number, k: number, p: V3) => RGB, o: { flowVertical?: boolean; anchor?: boolean; noCull?: boolean; flip?: boolean } = {}) => {
   const R = rows.length, K = rows[0].length, base = B.V.length;
@@ -16,7 +18,7 @@ export const surface = (B: Builder, rows: V3[][], closed: boolean, color: (r: nu
     if (dot3(n, sub3(p, centres[r])) < 0) n = mul3(n, -1);                                  // always outward
     if (o.flip) n = mul3(n, -1);
     B.V.push(p); B.N.push(n); B.C.push(color(r / Math.max(1, R - 1), k / K, p));
-    B.flow.push(o.flowVertical === false ? norm3(sub3(pu, pd)) : norm3(sub3(qu, qd))); B.anchor.push(o.anchor !== false); B.noCull.push(!!o.noCull);
+    B.flow.push(o.flowVertical === false ? norm3(sub3(pu, pd)) : norm3(sub3(qu, qd))); B.anchor.push(o.anchor !== false); B.noCull.push(!!o.noCull); B.brush.push(B.curBrush ?? 1); B.bias.push(B.curBias ?? 0);
   }
   const KK = closed ? K : K - 1;
   for (let r = 0; r < R - 1; r++) for (let k = 0; k < KK; k++) {
@@ -41,11 +43,11 @@ export const tube = (B: Builder, pts: V3[], radii: number[], n: number, color: (
 export type Proj = { x: number; y: number; scale: number; R: M3; z?: number; light: Light; alpha?: number; paint?: number; seed: number; matte?: number };
 export const toParts = (B: Builder, o: Proj): { tris: Tri[]; anchors: Anchor[] } => {
   const sc = o.scale, Z = o.z ?? 0, L = o.light, alpha = o.alpha ?? 1, Rb = o.R;
-  const proj = B.V.map((v) => { const w = apply(Rb, v); return [o.x + w[0] * sc, o.y - w[1] * sc, w[2] * sc + Z] as V3; });
+  const proj = B.V.map((v, i) => { const w = apply(Rb, v); return [o.x + w[0] * sc, o.y - w[1] * sc, (w[2] + (B.bias[i] ?? 0)) * sc + Z] as V3; });
   const nrm = B.N.map((n) => apply(Rb, n));
   const colV = B.C.map((alb, i) => {
     let n = nrm[i]; const back = n[2] < 0; if (B.noCull[i] && back) n = mul3(n, -1);
-    const d = dot3(n, L.key), diff = clamp((d + 0.3) / 1.3);
+    const d = dot3(n, L.key), diff = planes(clamp((d + 0.3) / 1.3), 4, 0.35);
     let cc: RGB = scalec(L.keyColor, diff * L.keyAmt);
     cc = addc(cc, scalec(L.fill, L.fillAmt * (0.5 + 0.5 * n[1]))); cc = addc(cc, scalec(L.bounce, L.bounceAmt * clamp(0.3 - 0.7 * n[1])));
     let out: RGB = [alb[0] * cc[0], alb[1] * cc[1], alb[2] * cc[2]];
@@ -58,17 +60,28 @@ export const toParts = (B: Builder, o: Proj): { tris: Tri[]; anchors: Anchor[] }
     const a = B.T[k], b = B.T[k + 1], cI = B.T[k + 2];
     if (!B.noCull[a] && nrm[a][2] + nrm[b][2] + nrm[cI][2] < -0.35) continue;
     const pa = proj[a], pb = proj[b], pc = proj[cI], ca = colV[a], cb = colV[b], cc = colV[cI];
-    tris.push({ ax: pa[0], ay: pa[1], bx: pb[0], by: pb[1], cx: pc[0], cy: pc[1], z: (pa[2] + pb[2] + pc[2]) / 3, col: [(ca[0] + cb[0] + cc[0]) / 3, (ca[1] + cb[1] + cc[1]) / 3, (ca[2] + cb[2] + cc[2]) / 3], alpha });
+    tris.push({ ax: pa[0], ay: pa[1], bx: pb[0], by: pb[1], cx: pc[0], cy: pc[1], z: (pa[2] + pb[2] + pc[2]) / 3, col: [(ca[0] + cb[0] + cc[0]) / 3, (ca[1] + cb[1] + cc[1]) / 3, (ca[2] + cb[2] + cc[2]) / 3], alpha, c3: [ca, cb, cc] });
   }
+  // brush marks scattered by SCREEN AREA over each triangle (a fixed seeded sequence per triangle,
+  // so as a surface grows on screen the next mark fades in instead of popping)
   const anchors: Anchor[] = [];
-  if ((o.paint ?? 1) > 0 && sc > 80) {
-    const step = sc > 600 ? 1 : sc > 250 ? 2 : 3, bw = 0.014 * sc, bl = 0.07 * sc;
-    for (let i = 0; i < B.V.length; i += step) {
-      if (!B.anchor[i] || (nrm[i][2] < 0.1 && !B.noCull[i])) continue;
-      const h1 = ((i * 2654435761 + o.seed) >>> 0) / 4294967296, h2 = ((i * 40503 + 977 * o.seed) >>> 0) % 1000 / 1000, h3 = ((i * 69069 + 13) >>> 0) % 1000 / 1000;
-      const f = apply(Rb, B.flow[i]); let dx = f[0], dy = -f[1]; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;
-      const ang = (h1 - 0.5) * 0.6, ca = Math.cos(ang), sa = Math.sin(ang), ndx = dx * ca - dy * sa, ndy = dx * sa + dy * ca;
-      anchors.push({ x: proj[i][0] + (h2 - 0.5) * bl * 0.6 * ndx + (h3 - 0.5) * bw * 2 * -ndy, y: proj[i][1] + (h2 - 0.5) * bl * 0.6 * ndy + (h3 - 0.5) * bw * 2 * ndx, z: proj[i][2], dx: ndx, dy: ndy, len: bl * (0.5 + h3 * 0.8), w: bw * (0.7 + h2 * 0.8), seed: o.seed * 31 + i });
+  if ((o.paint ?? 1) > 0 && sc > 60) {
+    const bw = Math.min(0.016 * sc, 13), bl = Math.min(0.07 * sc, 42);
+    for (let k = 0; k < B.T.length; k += 3) {
+      const a = B.T[k], b = B.T[k + 1], c = B.T[k + 2];
+      if (!B.anchor[a]) continue;
+      if (!B.noCull[a] && nrm[a][2] + nrm[b][2] + nrm[c][2] < 0.2) continue;
+      const pa = proj[a], pb = proj[b], pc = proj[c], area = Math.abs((pb[0] - pa[0]) * (pc[1] - pa[1]) - (pb[1] - pa[1]) * (pc[0] - pa[0])) * 0.5;
+      const bs = B.brush[a] ?? 1, per = bw * bs * bl * bs * 0.45, want = Math.min(24, area / per);
+      if (want < 0.05) continue;
+      const fa = apply(Rb, B.flow[a]); let dx = fa[0], dy = -fa[1]; const dl = Math.hypot(dx, dy) || 1; dx /= dl; dy /= dl;
+      for (let j = 0; j < Math.ceil(want); j++) {
+        const h = (x: number) => ((((k + 1) * 2654435761) ^ ((j + 1) * 40503) ^ (o.seed * 977 + x * 69069)) >>> 0) / 4294967296;
+        let u = h(1), v = h(2); if (u + v > 1) { u = 1 - u; v = 1 - v; }
+        const x = pa[0] + (pb[0] - pa[0]) * u + (pc[0] - pa[0]) * v, y = pa[1] + (pb[1] - pa[1]) * u + (pc[1] - pa[1]) * v, z = pa[2] + (pb[2] - pa[2]) * u + (pc[2] - pa[2]) * v;
+        const ang = (h(3) - 0.5) * 0.6, ca = Math.cos(ang), sa = Math.sin(ang);
+        anchors.push({ x, y, z, dx: dx * ca - dy * sa, dy: dx * sa + dy * ca, len: bl * bs * (0.5 + h(4) * 0.8), w: bw * bs * (0.7 + h(5) * 0.8), seed: o.seed * 7919 + k * 31 + j, alpha: Math.min(1, want - j) });
+      }
     }
   }
   return { tris, anchors };

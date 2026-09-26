@@ -42,7 +42,7 @@ export const skeleton = (f: Figure, p: BodyPose): Joints => {
   const chestM = rotation(p.twist ?? 0, p.bend ?? 0, -(p.side ?? 0));
   const up = apply(chestM, [0, 1, 0]), chest = add3(pelvis, mul3(up, D.chestUp)), neck = add3(chest, mul3(up, D.neckUp));
   const nk = p.neck ?? {}, head = mulM(chestM, rotation(nk.yaw ?? 0, nk.pitch ?? 0, nk.roll ?? 0));
-  const shoulder = (side: number) => add3(chest, apply(chestM, [side * D.shoulderW, D.neckUp * 0.62, -0.01]));
+  const shoulder = (side: number) => add3(chest, apply(chestM, [side * D.shoulderW, D.neckUp * 0.2, -0.01]));
   const arm = (side: number, a: Arm = {}) => {
     const s = shoulder(side);
     if (a.target) {
@@ -73,6 +73,12 @@ export const skeleton = (f: Figure, p: BodyPose): Joints => {
 };
 
 // walking: a cycle of placed feet and a counter-swinging torso; phase 0..1 per stride pair
+// drop (or lift) the whole body so the lowest foot (or knee, when kneeling) rests on the floor
+export const grounded = (f: Figure, p: BodyPose, floor = 0): BodyPose => {
+  const J = skeleton(f, { ...p, root: [p.root?.[0] ?? 0, 0, p.root?.[2] ?? 0] }), D = dims(f);
+  const low = Math.min(J.ankleL[1] - D.ankleH, J.ankleR[1] - D.ankleH, J.kneeL[1] - 0.05, J.kneeR[1] - 0.05);
+  return { ...p, root: [p.root?.[0] ?? 0, floor - low, p.root?.[2] ?? 0] };
+};
 export const walk = (phase: number, stride = 1, base: BodyPose = {}): BodyPose => {
   const a = phase * Math.PI * 2, s = Math.sin(a), c = Math.cos(a), k = stride;
   const leg = (sgn: number): Leg => { const ss = Math.sin(a + (sgn > 0 ? 0 : Math.PI)); return { hip: 0.38 * k * ss, knee: 0.08 + 0.55 * k * clamp(Math.sin(a + (sgn > 0 ? 0 : Math.PI) - 1.1)) , ankle: 0 }; };
@@ -104,6 +110,7 @@ const digit = (B: Builder, joints: V3[], radius: (t: number) => number, flat: V3
   for (let i = 0; i < L; i++) for (let k = 0; k < n; k++) B.C[base + i * n + k] = colors[i][k];
 };
 const handMesh = (B: Builder, wrist: V3, dir: V3, upv: V3, side: number, h: Hand, len: number, skin: RGB) => {
+  B.curBrush = 0.32;
   const fwd = norm3(dir), nrm = norm3(sub3(upv, mul3(fwd, dot3(upv, fwd)))), lat = mul3(norm3(cross3(nrm, fwd)), side);
   const L = len, palmL = L * 0.47, palmW = L * 0.47, cup = (h.curl ?? 0.38) * 0.5;
   const P = (a: number, b: number, c: number): V3 => add3(wrist, add3(mul3(fwd, a), add3(mul3(lat, b), mul3(nrm, c))));
@@ -134,6 +141,7 @@ const handMesh = (B: Builder, wrist: V3, dir: V3, upv: V3, side: number, h: Hand
   const tp: V3[] = [P(0.02 * L, palmW * 0.12, 0), p];
   for (let sI = 0; sI < 3; sI++) { d = norm3(rotAxis(d, fwd, side * (0.25 + 0.5 * op) * (sI === 0 ? 1 : 0.4))); d = norm3(rotAxis(d, lat, -side * tc * (sI === 0 ? 0.3 : 0.75))); d = norm3(add3(d, mul3(lat, -0.12 * op))); p = add3(p, mul3(d, L * [0.24, 0.18, 0.15][sI])); tp.push(p); }
   digit(B, tp, (t) => L * lerp(0.085, 0.052, t), mul3(nrm, -1), skin, 0.8);
+  B.curBrush = 1;
 };
 
 // ---------------------------------------------------------------- build + render a figure
@@ -148,7 +156,9 @@ export const figureParts = (ctx: CanvasRenderingContext2D, fig: Figure, pose: Bo
   const up = apply(J.chestM, [0, 1, 0]), fwd = apply(J.chestM, [0, 0, 1]);
   // torso rings: belt -> chest -> shoulders -> collar
   const beltY = J.pelvis[1] + 0.06, torsoRows: V3[][] = [];
-  const torsoProfile: [number, number, number][] = [[0, 0.152, 0.116], [0.07, 0.168, 0.126], [0.2, 0.16, 0.118], [0.45, 0.166, 0.124], [0.68, 0.175, 0.126], [0.82, D.shoulderW + 0.028, 0.118], [0.9, D.shoulderW + 0.012, 0.105], [0.96, D.shoulderW * 0.62, 0.085], [1.0, 0.068, 0.064]];
+  // the shoulder line: widest across the deltoids at the joints, round over the acromion, then the
+  // long trapezius slope up to a neck that stands clear of the collar
+  const torsoProfile: [number, number, number][] = [[0, 0.152, 0.116], [0.07, 0.168, 0.126], [0.2, 0.16, 0.118], [0.42, 0.166, 0.124], [0.6, 0.174, 0.126], [0.7, D.shoulderW + 0.025, 0.122], [0.78, D.shoulderW + 0.02, 0.116], [0.84, D.shoulderW - 0.008, 0.106], [0.9, D.shoulderW * 0.78, 0.096], [0.95, D.shoulderW * 0.56, 0.084], [0.985, 0.085, 0.072], [1.0, 0.074, 0.066]];
   const torsoLen = D.chestUp + D.neckUp - 0.05;
   for (const [t, rx, rz] of torsoProfile) { const cpt = add3([J.pelvis[0], beltY, J.pelvis[2]], mul3(up, t * torsoLen)); torsoRows.push(ring(cpt, rx * (0.92 + 0.08 * fig.bulk), rz * (0.92 + 0.08 * fig.bulk), segs, pose.twist ?? 0, 0, Math.PI * 2, (a) => 0.004 * Math.sin(a * 7 + t * 5))); }
   surface(B, torsoRows, true, clothCol(tunicC, 11));
@@ -165,18 +175,26 @@ export const figureParts = (ctx: CanvasRenderingContext2D, fig: Figure, pose: Bo
   // belt
   surface(B, [ring([J.pelvis[0], beltY + 0.035, J.pelvis[2]], 0.165 * (0.92 + 0.08 * fig.bulk), 0.126, segs), ring([J.pelvis[0], beltY - 0.005, J.pelvis[2]], 0.165 * (0.92 + 0.08 * fig.bulk), 0.126, segs)], true, () => beltC, { anchor: false });
   // arms: sleeve tube, bare forearm, hand
+  const Rb0 = place.R ?? view(place.yaw, place.tilt ?? 0, 0);
   for (const side of [1, -1]) {
     const s = side > 0 ? J.shoulderL : J.shoulderR, e = side > 0 ? J.elbowL : J.elbowR, w = side > 0 ? J.wristL : J.wristR;
+    // the arm nearer the viewer than the chest is drawn over the torso wall, the farther one under it
+    B.curBias = apply(Rb0, sub3(add3(s, e), mul3(J.chest, 2)))[2] > 0 ? 0.05 : -0.05;
     const long = c.sleeves === "long", sEnd = long ? add3(e, mul3(sub3(w, e), 0.88)) : add3(s, mul3(sub3(e, s), 0.72));
-    const sp = long ? [s, add3(s, mul3(sub3(e, s), 0.5)), e, add3(e, mul3(sub3(sEnd, e), 0.5)), sEnd] : [s, add3(s, mul3(sub3(sEnd, s), 0.5)), sEnd];
-    const sr = long ? [0.068, 0.062, 0.058, 0.056, 0.062] : [0.07, 0.068, 0.072];
-    tube(B, sp, sr.map((r) => r * (0.9 + 0.1 * fig.bulk)), segs >= 22 ? 14 : 9, () => mix(scalec(tunicC, 0.95), [0, 0, 0], 0.03));
+    // the sleeve grows out of the shoulder: a narrow cap tucked inside the torso, so its top runs on
+    // from the shoulder line instead of standing up off it like a stovepipe; the hem flares a little
+    const inward = mul3(norm3(sub3([J.neck[0], s[1], J.neck[2]], s)), 0.045), cap = add3(add3(s, inward), [0, -0.012, 0]);
+    const sp = long ? [cap, add3(s, mul3(sub3(e, s), 0.12)), add3(s, mul3(sub3(e, s), 0.5)), e, add3(e, mul3(sub3(sEnd, e), 0.5)), sEnd] : [cap, add3(s, mul3(sub3(e, s), 0.12)), add3(s, mul3(sub3(sEnd, s), 0.55)), add3(s, mul3(sub3(sEnd, s), 0.92)), sEnd];
+    const sr = long ? [0.04, 0.056, 0.053, 0.05, 0.05, 0.056] : [0.04, 0.057, 0.059, 0.062, 0.064];
+    const sb = B.V.length; tube(B, sp, sr.map((r) => r * (0.9 + 0.1 * fig.bulk)), segs >= 22 ? 14 : 9, () => tunicC);
+    const sc = clothCol(tunicC, 13); for (let i = sb; i < B.V.length; i++) B.C[i] = sc(0, 0, B.V[i]);
     const skinStart = long ? sEnd : add3(s, mul3(sub3(e, s), 0.6));
     const ap = long ? [skinStart, w] : [skinStart, e, add3(e, mul3(sub3(w, e), 0.5)), w];
     const ar = long ? [0.03, 0.026] : [0.045, 0.042, 0.037, 0.028];
     tube(B, ap, ar, segs >= 22 ? 12 : 8, () => skin);
     if (detail >= 1) handMesh(B, w, side > 0 ? J.handDirL : J.handDirR, side > 0 ? J.handUpL : J.handUpR, side, (side > 0 ? pose.handL : pose.handR) ?? {}, D.hand, skin);
     else tube(B, [w, add3(w, mul3(side > 0 ? J.handDirL : J.handDirR, D.hand * 0.8))], [0.03, 0.02], 6, () => skin, true);
+    B.curBias = 0;
   }
   // legs below the hem, and sandalled feet
   for (const side of [1, -1]) {

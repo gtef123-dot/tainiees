@@ -9,8 +9,8 @@
 // much hair/beard/lip it is, so their edges are soft, never stair-stepped). Eyes, brows, the mouth
 // line, nostrils and wrinkles are painted overlays placed on the same surface, so they turn with it.
 import { fractal, rng, type Env } from "../../core";
-import { type Tri, type Anchor, DepthGrid, fillTris, paintAnchors } from "./mesh";
-import { type V3, type RGB, type M3, clamp, lerp, smooth, hex, mix, scalec, addc, css, tone, rotation, apply, norm3, dot3 } from "../lib/math";
+import { type Tri, type Anchor, DepthGrid, fillTris, paintAnchors, drawCtx } from "./mesh";
+import { planes, type V3, type RGB, type M3, clamp, lerp, smooth, hex, mix, scalec, addc, css, tone, rotation, apply, norm3, dot3 } from "../lib/math";
 
 export type Identity = {
   name: string; seed: number;
@@ -226,7 +226,7 @@ export const surfaceZ = (id: Identity, x: number, y: number) => {
 
 // ---------------------------------------------------------------- lighting
 const lightTerm = (n: V3, L: Light, hair: boolean): { c: RGB; term: number; spec: number } => {
-  const d = dot3(n, L.key), wrap = hair ? 0.4 : 0.2, diff = clamp((d + wrap) / (1 + wrap));
+  const d = dot3(n, L.key), wrap = hair ? 0.4 : 0.2, diff = planes(clamp((d + wrap) / (1 + wrap)), 4, hair ? 0.5 : 0.38);
   const up = n[1];
   let c: RGB = scalec(L.keyColor, diff * L.keyAmt);
   c = addc(c, scalec(L.fill, L.fillAmt * (0.5 + 0.5 * up)));
@@ -263,7 +263,7 @@ export type Overlay = { z: number; draw: (g: DepthGrid) => void };
 export type Parts = { tris: Tri[]; anchors: Anchor[]; overlays: Overlay[] };
 // Everything the head contributes to a character: its triangles, its paint anchors, and one overlay
 // (eyes, brows, mouth, wrinkles, hair) drawn at the depth of the face.
-export const headParts = (ctx: CanvasRenderingContext2D, id: Identity, o: HeadOpts): Parts => {
+export const headParts = (ctx0: CanvasRenderingContext2D, id: Identity, o: HeadOpts): Parts => {
   const e = o.expr ?? {}, lod = o.lod ?? (o.size > 260 ? 2 : o.size > 110 ? 1 : 0), m = meshFor(id, lod), N = m.hw.length, C = colsOf(id);
   const R = rotation(o.pose.yaw, o.pose.pitch, o.pose.roll), S = o.size, F = 7;
   const t = o.t ?? 0, open = clamp(e.open ?? 0), smile = e.smile ?? 0, trem = e.tremble ?? 0, withNeck = o.neck !== false;
@@ -286,13 +286,13 @@ export const headParts = (ctx: CanvasRenderingContext2D, id: Identity, o: HeadOp
     if (!withNeck && m.neck[a]) continue;
     if (nzv[a] + nzv[b] + nzv[c] < -0.3 && !(m.ew[a] > 0) && !m.lock[a]) continue;
     const ca = col[a], cb = col[b], cc = col[c];
-    const tri: Tri = { ax: sx[a], ay: sy[a], bx: sx[b], by: sy[b], cx: sx[c], cy: sy[c], z: (sz[a] + sz[b] + sz[c]) / 3, col: [(ca[0] + cb[0] + cc[0]) / 3, (ca[1] + cb[1] + cc[1]) / 3, (ca[2] + cb[2] + cc[2]) / 3], alpha };
+    const tri: Tri = { ax: sx[a], ay: sy[a], bx: sx[b], by: sy[b], cx: sx[c], cy: sy[c], z: (sz[a] + sz[b] + sz[c]) / 3, col: [(ca[0] + cb[0] + cc[0]) / 3, (ca[1] + cb[1] + cc[1]) / 3, (ca[2] + cb[2] + cc[2]) / 3], alpha, c3: [ca, cb, cc] };
     tris.push(tri); if (m.nose[a]) noseTris.push(tri);
   }
   // paint anchors on the bare skin (hair and beard get their own strokes)
   const anchors: Anchor[] = [];
   if (o.strokes !== false && S > 70) {
-    const step = S > 500 ? 2 : S > 250 ? 3 : 5, bw = S * 0.013, bl = S * 0.034;
+    const step = S > 500 ? 2 : S > 250 ? 3 : 5, bw = Math.min(S * 0.013, 11), bl = Math.min(S * 0.034, 32);
     for (let i = 0; i < N; i += step) {
       if (nzv[i] < 0.15 || m.hw[i] > 0.5 || m.bw[i] > 0.5 || m.lock[i] || (!withNeck && m.neck[i])) continue;
       const nx = m.n[i * 3], nz = m.n[i * 3 + 2], j = ((i * 2654435761) >>> 0) / 4294967296;
@@ -304,6 +304,7 @@ export const headParts = (ctx: CanvasRenderingContext2D, id: Identity, o: HeadOp
   }
   let faceZ = -1e9; for (const tr of tris) if (tr.z > faceZ) faceZ = tr.z;
   const overlay: Overlay = { z: faceZ + 0.5, draw: (grid: DepthGrid) => {
+  const ctx = drawCtx.ctx ?? ctx0;
   ctx.save(); ctx.globalAlpha = o.alpha ?? 1;
   const seen = (i: number, tol = 0.035) => grid.seen(sx[i], sy[i], sz[i], tol * S);
   const fillTri = (tr: Tri) => fillTris(ctx, [tr], Math.max(0.7, S / 520));
@@ -447,33 +448,38 @@ export const headParts = (ctx: CanvasRenderingContext2D, id: Identity, o: HeadOp
 // Render parts from several sources together: far to near, painted, overlays at their depth.
 // With an env, a character is built in its own layer so the brush marks stay inside its silhouette
 // (edges stay found), then optional layer effects (atmospheric haze, a dissolve) and one composite.
-export type LayerFx = { haze?: [number, number, number]; hazeAmt?: number; alpha?: number; tint?: [number, number, number]; tintAmt?: number; waterY?: number; reflect?: number; reflectTint?: [number, number, number] };
+export type LayerFx = { blur?: number; haze?: [number, number, number]; hazeAmt?: number; alpha?: number; tint?: [number, number, number]; tintAmt?: number; waterY?: number; reflect?: number; reflectTint?: [number, number, number] };
 export const scratch = (env: Env, ctx: CanvasRenderingContext2D) => {
   const W = ctx.canvas.width, H = ctx.canvas.height, key = `figLayer:${W}x${H}`; let L = env.cache.get(key) as { canvas: OffscreenCanvas | HTMLCanvasElement; ctx: CanvasRenderingContext2D } | undefined;
   if (!L) { const l = env.canvas(W, H); L = { canvas: l.canvas as OffscreenCanvas, ctx: l.ctx }; env.cache.set(key, L); }
   L.ctx.setTransform(ctx.getTransform()); return L;
 };
-export const renderParts = (ctx: CanvasRenderingContext2D, parts: Parts[], o: { seam?: number; cell?: number; tol?: number; paint?: number; env?: Env; fx?: LayerFx } = {}) => {
+export const renderParts = (ctx: CanvasRenderingContext2D, parts: Parts[], o: { seam?: number; cell?: number; tol?: number; paint?: number; env?: Env; fx?: LayerFx; soften?: number } = {}) => {
   const tris = parts.flatMap((p) => p.tris).sort((a, b) => a.z - b.z), anchors = parts.flatMap((p) => p.anchors).sort((a, b) => a.z - b.z), ovs = parts.flatMap((p) => p.overlays).sort((a, b) => a.z - b.z);
-  if (!tris.length) return;
+  if (!tris.length && !ovs.length) return;
   const grid = new DepthGrid(tris, o.cell ?? 3), seam = o.seam ?? 0.8, tol = o.tol ?? 8, paint = o.paint ?? 0.62;
   const L = o.env ? scratch(o.env, ctx) : null, g = L ? L.ctx : ctx, tr = ctx.getTransform();
   let X0 = 0, Y0 = 0, X1 = 0, Y1 = 0;
   if (L) {
     let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    if (!tris.length) { const iv = tr.inverse(); x0 = iv.e; y0 = iv.f; x1 = iv.a * ctx.canvas.width + iv.e; y1 = iv.d * ctx.canvas.height + iv.f; }   // overlays only: the whole frame
     for (const t of tris) { x0 = Math.min(x0, t.ax, t.bx, t.cx); y0 = Math.min(y0, t.ay, t.by, t.cy); x1 = Math.max(x1, t.ax, t.bx, t.cx); y1 = Math.max(y1, t.ay, t.by, t.cy); }
     const pad = 40; X0 = Math.max(0, Math.floor(tr.a * x0 + tr.e - pad)); Y0 = Math.max(0, Math.floor(tr.d * y0 + tr.f - pad)); X1 = Math.min(ctx.canvas.width, Math.ceil(tr.a * x1 + tr.e + pad)); Y1 = Math.min(ctx.canvas.height, Math.ceil(tr.d * y1 + tr.f + pad));
     if (X1 <= X0 || Y1 <= Y0) return;
     g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(X0, Y0, X1 - X0, Y1 - Y0); g.restore(); g.setTransform(tr);
   }
-  let ti = 0, ai = 0;
+  let ti = 0, ai = 0, softened = false;
   const upTo = (z: number) => {
     const from = ti; while (ti < tris.length && tris[ti].z < z) ti++;
     fillTris(g, tris.slice(from, ti), seam);
+    // close up, soften the facets before the brush marks go on (once, before any overlay is drawn)
+    if (L && o.soften && !softened && o.env) { softened = true; const k = Math.max(2, Math.round(o.soften)), w = X1 - X0, h = Y1 - Y0, key = `soft:${Math.ceil(w / k)}x${Math.ceil(h / k)}`; let sm = o.env.cache.get(key) as { canvas: OffscreenCanvas; ctx: CanvasRenderingContext2D } | undefined; if (!sm) { const l = o.env.canvas(Math.ceil(w / k), Math.ceil(h / k)); sm = { canvas: l.canvas as OffscreenCanvas, ctx: l.ctx }; o.env.cache.set(key, sm); } sm.ctx.setTransform(1, 0, 0, 1, 0, 0); sm.ctx.clearRect(0, 0, sm.canvas.width, sm.canvas.height); sm.ctx.imageSmoothingEnabled = true; sm.ctx.drawImage(L.canvas as CanvasImageSource, X0, Y0, w, h, 0, 0, sm.canvas.width, sm.canvas.height); g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingEnabled = true; g.globalCompositeOperation = "source-atop"; g.globalAlpha = 0.85; g.drawImage(sm.canvas as CanvasImageSource, 0, 0, sm.canvas.width, sm.canvas.height, X0, Y0, w, h); g.restore(); }
     const a0 = ai; while (ai < anchors.length && anchors[ai].z < z) ai++;
     if (paint > 0) { if (L) g.globalCompositeOperation = "source-atop"; paintAnchors(g, anchors.slice(a0, ai), grid, tol, paint); g.globalCompositeOperation = "source-over"; }
   };
+  const prevCtx = drawCtx.ctx; drawCtx.ctx = g;
   for (const ov of ovs) { upTo(ov.z); ov.draw(grid); }
+  drawCtx.ctx = prevCtx;
   upTo(Infinity);
   if (L) {
     const fx = o.fx ?? {};
@@ -481,6 +487,13 @@ export const renderParts = (ctx: CanvasRenderingContext2D, parts: Parts[], o: { 
     if (fx.tint && fx.tintAmt) { g.globalAlpha = fx.tintAmt; g.fillStyle = `rgb(${fx.tint.map((v) => Math.round(v * 255)).join(",")})`; g.fillRect(X0, Y0, X1 - X0, Y1 - Y0); }
     if (fx.haze && fx.hazeAmt) { g.globalAlpha = fx.hazeAmt; g.fillStyle = `rgb(${fx.haze.map((v) => Math.round(v * 255)).join(",")})`; g.fillRect(X0, Y0, X1 - X0, Y1 - Y0); }
     g.restore();
+    // depth of field / rack focus: the whole layer softened by scaling down and up
+    if (fx.blur && fx.blur > 0.4 && o.env) {
+      const k = Math.max(1.5, fx.blur), w = X1 - X0, h = Y1 - Y0, sw = Math.max(1, Math.ceil(w / k)), sh = Math.max(1, Math.ceil(h / k)), key = `dof:${sw}x${sh}`;
+      let sm = o.env.cache.get(key) as { canvas: OffscreenCanvas; ctx: CanvasRenderingContext2D } | undefined; if (!sm) { const l = o.env.canvas(sw, sh); sm = { canvas: l.canvas as OffscreenCanvas, ctx: l.ctx }; o.env.cache.set(key, sm); }
+      sm.ctx.setTransform(1, 0, 0, 1, 0, 0); sm.ctx.clearRect(0, 0, sw, sh); sm.ctx.imageSmoothingEnabled = true; sm.ctx.drawImage(L.canvas as CanvasImageSource, X0, Y0, w, h, 0, 0, sw, sh);
+      g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(X0, Y0, w, h); g.imageSmoothingEnabled = true; g.drawImage(sm.canvas as CanvasImageSource, 0, 0, sw, sh, X0, Y0, w, h); g.restore();
+    }
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = fx.alpha ?? 1;
     if (fx.waterY === undefined) ctx.drawImage(L.canvas as CanvasImageSource, X0, Y0, X1 - X0, Y1 - Y0, X0, Y0, X1 - X0, Y1 - Y0);
     else {

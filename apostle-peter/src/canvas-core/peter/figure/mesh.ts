@@ -5,7 +5,7 @@
 import { rng } from "../../core";
 import { type RGB, css, scalec, clamp } from "../lib/math";
 
-export type Tri = { ax: number; ay: number; bx: number; by: number; cx: number; cy: number; z: number; col: RGB; alpha?: number; tag?: number };
+export type Tri = { ax: number; ay: number; bx: number; by: number; cx: number; cy: number; z: number; col: RGB; alpha?: number; tag?: number; c3?: [RGB, RGB, RGB] };
 export type Anchor = { x: number; y: number; z: number; dx: number; dy: number; len: number; w: number; seed: number; alpha?: number };
 
 export class DepthGrid {
@@ -28,13 +28,33 @@ export class DepthGrid {
     }
   }
   seen(x: number, y: number, z: number, tol: number) { const i = Math.round((x - this.x0) / this.cell), j = Math.round((y - this.y0) / this.cell); if (i < 0 || j < 0 || i >= this.W || j >= this.H) return false; return z >= this.z[j * this.W + i] - tol; }
+  // is there any surface here at all (a mark's end in empty air would ragged the silhouette)
+  covered(x: number, y: number) { const i = Math.round((x - this.x0) / this.cell), j = Math.round((y - this.y0) / this.cell); if (i < 0 || j < 0 || i >= this.W || j >= this.H) return false; return this.z[j * this.W + i] > -1e8; }
 }
 
 const lw = new Map<number, number>();
 export const fillTris = (ctx: CanvasRenderingContext2D, tris: Tri[], seam: number) => {
   ctx.lineJoin = "round"; ctx.lineWidth = seam;
   for (const t of tris) {
-    const s = css(t.col); ctx.fillStyle = s; ctx.strokeStyle = s; ctx.globalAlpha = t.alpha ?? 1;
+    let s: string | CanvasGradient = css(t.col);
+    // big triangles are shaded smoothly: the colour is a plane over the triangle (Gouraud), drawn as a gradient along its steepest change
+    if (t.c3) {
+      const area = Math.abs((t.bx - t.ax) * (t.cy - t.ay) - (t.by - t.ay) * (t.cx - t.ax)) * 0.5;
+      if (area > 36) {
+        const den = (t.bx - t.ax) * (t.cy - t.ay) - (t.cx - t.ax) * (t.by - t.ay);
+        if (Math.abs(den) > 1e-6) {
+          const plane = (a: number, b: number, c: number) => [((b - a) * (t.cy - t.ay) - (c - a) * (t.by - t.ay)) / den, ((c - a) * (t.bx - t.ax) - (b - a) * (t.cx - t.ax)) / den];
+          const L = (c: RGB) => 0.3 * c[0] + 0.59 * c[1] + 0.11 * c[2], gl = plane(L(t.c3[0]), L(t.c3[1]), L(t.c3[2])), gm = Math.hypot(gl[0], gl[1]);
+          if (gm > 1e-5) {
+            const ux = gl[0] / gm, uy = gl[1] / gm, mx = (t.ax + t.bx + t.cx) / 3, my = (t.ay + t.by + t.cy) / 3;
+            const ds = [t.ax, t.bx, t.cx].map((x, i) => (x - mx) * ux + ([t.ay, t.by, t.cy][i] - my) * uy), d0 = Math.min(...ds), d1 = Math.max(...ds);
+            const at = (d: number): RGB => [0, 1, 2].map((ch) => { const g = plane(t.c3![0][ch], t.c3![1][ch], t.c3![2][ch]); return t.c3![0][ch] + g[0] * (mx + ux * d - t.ax) + g[1] * (my + uy * d - t.ay); }) as RGB;
+            const gr = ctx.createLinearGradient(mx + ux * d0, my + uy * d0, mx + ux * d1, my + uy * d1); gr.addColorStop(0, css(at(d0))); gr.addColorStop(1, css(at(d1))); s = gr;
+          }
+        }
+      }
+    }
+    ctx.fillStyle = s; ctx.strokeStyle = s; ctx.globalAlpha = t.alpha ?? 1;
     ctx.beginPath(); ctx.moveTo(t.ax, t.ay); ctx.lineTo(t.bx, t.by); ctx.lineTo(t.cx, t.cy); ctx.closePath(); ctx.fill(); if (seam > 0) ctx.stroke();
   }
   ctx.globalAlpha = 1; void lw;
@@ -55,9 +75,15 @@ export const paintAnchors = (ctx: CanvasRenderingContext2D, anchors: Anchor[], d
     const q = (Y * IW + X) * 4; if (img[q + 3] < 200) continue;
     const r = rng(a.seed), j1 = r(), j2 = r(), j3 = r();
     const c: RGB = scalec([img[q] / 255, img[q + 1] / 255, img[q + 2] / 255], 0.93 + j2 * 0.14);
-    const L = a.len * (0.6 + j1 * 0.8), bend = (j3 - 0.5) * L * 0.25;
+    let L = a.len * (0.6 + j1 * 0.8);
+    // a mark stops at a silhouette: if either end lands on a farther surface, shorten it
+    for (let k = 0; k < 3; k++) { const ex = a.x + a.dx * L * 0.5, ey = a.y + a.dy * L * 0.5, sx = a.x - a.dx * L * 0.5, sy = a.y - a.dy * L * 0.5; if (depth.seen(ex, ey, a.z, tol * 2) && depth.seen(sx, sy, a.z, tol * 2) && depth.covered(ex, ey) && depth.covered(sx, sy)) break; L *= 0.5; }
+    const bend = (j3 - 0.5) * L * 0.25;
     ctx.strokeStyle = css(c, clamp(opacity * (a.alpha ?? 1))); ctx.lineWidth = a.w * (0.75 + j2 * 0.7);
     ctx.beginPath(); ctx.moveTo(a.x - a.dx * L * 0.5, a.y - a.dy * L * 0.5); ctx.quadraticCurveTo(a.x - a.dy * bend, a.y + a.dx * bend, a.x + a.dx * L * 0.5, a.y + a.dy * L * 0.5); ctx.stroke();
   }
   ctx.restore();
 };
+
+// the surface overlays should draw on right now (set by the renderer; a character may be painted in its own layer)
+export const drawCtx: { ctx: CanvasRenderingContext2D | null } = { ctx: null };
