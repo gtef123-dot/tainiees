@@ -346,11 +346,11 @@ export const stairs = (ctx: C, env: Env, cam: WCam, tread: Surface, riser: Surfa
 // shoulders in every colour of cloth, heads dark or covered, a few faces turned up. tile = 6 m.
 export const crowdTopTex = (env: Env, seed: number) => tex(env, `crowdtop2:${seed}`, 900, 900, (c, w, h) => {
   const r = rng(seed), k = w / 6, cloth = ["#8a7458", "#9c8a6a", "#6e5c48", "#b3a07c", "#7a6a5a", "#a08060", "#5a6470", "#8a5a50", "#6a6a7a", "#c2b08e", "#4f5a52"].map(hex);
-  c.fillStyle = "#b8a684"; c.fillRect(0, 0, w, h);
-  for (let i = 0; i < 150; i++) { const x = r() * w, y = r() * h, col = cloth[Math.floor(r() * cloth.length)], a = (r() - 0.5) * 0.6, fem = r() < 0.35;
+  c.fillStyle = "#5e5040"; c.fillRect(0, 0, w, h); // a packed crowd: shoulders and heads to the edges, the ground barely showing
+  for (let i = 0; i < 330; i++) { const x = r() * w, y = r() * h, col = cloth[Math.floor(r() * cloth.length)], a = (r() - 0.5) * 0.6, fem = r() < 0.35;
     wrap(w, h, x, y, 0.35 * k, (X, Y) => { c.fillStyle = "rgba(60,48,36,0.35)"; c.beginPath(); c.ellipse(X + 0.1 * k, Y + 0.12 * k, 0.26 * k, 0.17 * k, a, 0, Math.PI * 2); c.fill(); c.fillStyle = css(scalec(col, 0.8 + r() * 0.3)); c.beginPath(); c.ellipse(X, Y, 0.24 * k, 0.15 * k, a, 0, Math.PI * 2); c.fill(); c.fillStyle = css(mix(col, [1, 0.97, 0.9], 0.25), 0.6); c.beginPath(); c.ellipse(X - 0.05 * k, Y - 0.04 * k, 0.14 * k, 0.07 * k, a, 0, Math.PI * 2); c.fill();
       c.fillStyle = fem ? css(scalec(col, 0.95)) : css(hex(r() < 0.2 ? "#6a6058" : "#2a1d15")); c.beginPath(); c.ellipse(X + 0.01 * k, Y - 0.02 * k, 0.085 * k, 0.095 * k, 0, 0, Math.PI * 2); c.fill(); }); }
-}, { seed: seed + 1, sizes: [6, 3], keepBase: 0.7, alpha: 0.55 });
+}, { seed: seed + 1, sizes: [6, 3], keepBase: 0.8, alpha: 0.4 });
 // two rough beams lying crossed on the ground, seen from above, on a transparent texture: 5 x 3 m
 export const beamsTex = (env: Env) => plate(env, "tex:beams", 1000, 600, (s) => {
   const c = s.ctx, r = rng(421), k = 200, wood = hex("#6a5238");

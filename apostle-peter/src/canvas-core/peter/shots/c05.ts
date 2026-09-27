@@ -103,7 +103,7 @@ const s053 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
 const s054 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const t = f / 30, n = prog(f, s), hand = smooth(0.12, 0.4, n);
   const P: V3 = [-1.45, 0, -5.4], PY = faceYaw(P, CHS);
-  const pose: BodyPose = { armR: { raise: lerp(0.15, 0.95, hand), out: lerp(0.1, 0.35, hand), elbow: lerp(0.3, 1.0, hand), twist: 0.4 }, handR: hand > 0.3 ? HANDS.open : HANDS.relaxed, armL: { raise: 0.1, elbow: 0.3 }, neck: { pitch: -0.04 } };
+  const pose: BodyPose = { armR: { raise: lerp(0.15, 0.95, hand), out: lerp(0.1, 0.35, hand), elbow: lerp(0.3, 1.0, hand), twist: 0.4 }, handR: hand > 0.3 ? HANDS.offer : HANDS.relaxed, armL: { raise: 0.1, elbow: 0.3 }, neck: { pitch: -0.04 } };
   const face = worldJoint(PETER, pose, P, PY, "face");
   const cam = lookFrom([CHS[0] + 0.7, face[1] - 0.18, CHS[2] + 0.45], [face[0], face[1] - 0.08, face[2]], lerp(1300, 1380, n), { cy: 480, cx: 1000, t, shake: 0.06 });
   begin(ctx, env);
@@ -121,7 +121,7 @@ const s055 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const t = f / 30, n = prog(f, s);
   const pose = grounded(CHRIST_FIG, { bend: 0.05, legL: { hip: 1.45, knee: 1.5 }, legR: { hip: 1.3, knee: 1.35 }, armL: { raise: 0.5, elbow: 1.2 }, armR: { raise: 0.45, elbow: 1.2 }, neck: { pitch: -0.12, yaw: 0 } }, CHS[1] - 0.45);
   const CP: V3 = [CHS[0], 0, CHS[2]], CY = faceYaw(CHS, [-1.4, 0, -5.4]), face = worldJoint(CHRIST_FIG, pose, CP, CY, "face");
-  const cam = lookFrom([-1.5, face[1] + 0.05, -5.3], [face[0], face[1] - 0.05, face[2]], lerp(1250, 1330, n), { cy: 490, cx: 960, t, shake: 0.05 });
+  const cam = lookFrom([-1.5, face[1] + 0.05, -5.3], [face[0], face[1] - 0.35, face[2]], lerp(470, 510, n), { cy: 540, cx: 960, t, shake: 0.05 });
   begin(ctx, env);
   caesarea(ctx, env, cam, t, { blurBack: 1, skip: 0 });
   const L = { ...sunLight(cam, 0.6), rimAmt: 1.3, rimColor: [1, 0.85, 0.6] as [number, number, number], fill: [0.95, 0.78, 0.6] as [number, number, number], fillAmt: 1.0, bounce: [1, 0.8, 0.6] as [number, number, number], bounceAmt: 0.6 };

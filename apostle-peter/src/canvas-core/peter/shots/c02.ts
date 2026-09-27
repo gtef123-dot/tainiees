@@ -80,8 +80,8 @@ const s023 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const work = (fg: typeof PETER_FIG.A, pos: V3, yaw: number, ph: number) => fig(ctx, env, cam, fg, { bend: 0.35 + 0.15 * Math.sin(t * 2.4 + ph), armL: { raise: 0.9 + 0.2 * Math.sin(t * 2.4 + ph), elbow: 0.5 }, armR: { raise: 0.8 + 0.2 * Math.sin(t * 2.4 + ph), elbow: 0.6 }, handL: HANDS.grip, handR: HANDS.grip }, pos, yaw, t, { rock: rockOf(t, 3), paint: 0.3 });
   const B1: V3 = [-10, 0, -34], B2: V3 = [8, 0, -26], B3: V3 = [0, 0, -12], B4: V3 = [-5.5, 0, 9];
   afloat(ctx, env, cam, [
-    { at: B1, parts: [boatAt(ctx, env, cam, B1, 0.5, t, { seed: 11, sail: "furled", paint: 0.3 }), work(JAMES_FIG, onBoat(B1, 0.5, [0.5, -0.3, 0.4]), 2.0, 1)] },
-    { at: B2, parts: [boatAt(ctx, env, cam, B2, -0.4, t, { seed: 12, sail: "furled", paint: 0.3 }), work(JOHN_FIG, onBoat(B2, -0.4, [-0.6, -0.3, -0.3]), -1.2, 2)] },
+    { at: B1, parts: [boatAt(ctx, env, cam, B1, 0.5, t, { seed: 11, sail: "none", paint: 0.3 }), work(JAMES_FIG, onBoat(B1, 0.5, [0.5, -0.3, 0.4]), 2.0, 1)] },
+    { at: B2, parts: [boatAt(ctx, env, cam, B2, -0.4, t, { seed: 12, sail: "none", paint: 0.3 }), work(JOHN_FIG, onBoat(B2, -0.4, [-0.6, -0.3, -0.3]), -1.2, 2)] },
     { at: B3, parts: [boatAt(ctx, env, cam, B3, 0.35, t, { seed: 3 }), work(PETER_FIG.A, onBoat(B3, 0.35, [-0.8, -0.3, 0.4]), 0.2, 0), work(ANDREW_FIG, onBoat(B3, 0.35, [0.8, -0.3, 0.4]), 0.4, 0.8)] },
     // a moored boat rides in the shallows right in front of us, nose to the beach
     { at: B4, parts: [boatAt(ctx, env, cam, B4, -1.2, t, { seed: 14, rock: 0.5 })] },

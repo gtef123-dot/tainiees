@@ -157,3 +157,23 @@ The plate cache was bounded by count (24) and thrashed on the Via Appia, repaint
   - the confetti crowds from above;
   - close faces;
   - 05.5 (Christ's face in close-up).
+
+## Review 3
+
+- **The band across Peter's chest (03.1–03.3):**
+  - *Cause:* "Christ's shadow" falling on him was a multiply-blended rectangle, and its top edge drew a straight line across the shirt and the shore.
+  - *Fix:* it now covers the whole frame, so the only edge is the gradient's own soft falloff.
+- **Close faces:**
+  - 07.5 went from an extreme close-up (6600–7100 px/m) to a head-and-shoulders shot in the dark (2600–2850).
+  - 11.6 went from 1700–1850 to 1050–1150.
+  - The planar head no longer fills the frame.
+- **05.5:** Christ's answer is now a wide frame. His face is no longer in close-up, which keeps the character bible's rule.
+- **Crowds from above (09.5, 10.3):** twice as many people on a dark ground, so they read as a packed crowd instead of confetti on sand.
+- **05.4:** the confession hand is an open palm, where it read as a thumbs-up.
+- **02.3:** the furled sails are removed; they read as umbrellas.
+- **Still open:**
+  - boxy seated figures (04.2, 09.7, 10.4);
+  - flat cloaks in the seated close-ups (08.5);
+  - empty frames (09.4, 09.8);
+  - the 09.9 sail;
+  - the 11.2 rope.

@@ -138,7 +138,7 @@ const s075 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const t = f / 30, n = prog(f, s), know = smooth(0.1, 0.4, n), br = smooth(0.45, 0.85, n);
   const P1 = at(0.55, 1.02), PY = faceYaw(P1, B) + 0.35, pose: BodyPose = { neck: { pitch: lerp(-0.35, -0.15, br), yaw: 0.25 } };
   const face = worldJoint(PETER, pose, P1, PY, "face"), fwd: V3 = [Math.sin(PY + 0.25), 0, Math.cos(PY + 0.25)];
-  const cam = lookFrom([face[0] + fwd[0] * 0.6, face[1] + 0.08, face[2] + fwd[2] * 0.6], [face[0], face[1] + 0.028, face[2]], lerp(6600, 7100, n), { cy: 540, cx: 960, t, shake: 0.06 });
+  const cam = lookFrom([face[0] + fwd[0] * 1.1, face[1] + 0.06, face[2] + fwd[2] * 1.1], [face[0], face[1] - 0.06, face[2]], lerp(2600, 2850, n), { cy: 540, cx: 960, t, shake: 0.06 });
   begin(ctx, env, "#05070c");
   const L: Light = { ...fireLight(cam, P1, 0.3), keyAmt: 1.05, fillAmt: 0.6, rimAmt: 0.6 };
   const peter = fig(ctx, env, cam, PETER, pose, P1, PY, t, { expr: blendFace(blendFace({ ...FACE.frightened, gazeY: 0.3, lid: 0.95 }, { ...FACE.vulnerable, gazeY: 0.25, lid: 0.9, tears: 0.4 }, know), { ...FACE.crying, gazeY: 0.1 }, br), light: L, live: 0.1 });

@@ -83,10 +83,10 @@ const s032 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   renderParts(ctx, [beachedBoat(ctx, env, cam)], { env, cell: 3, tol: 0.03 * cam.scale, paint: 0.4, fx: { blur: 9 } });
   const expr = blendFace({ ...FACE.neutral, gazeY: -0.5 }, { ...FACE.awe, gazeX: -0.28, gazeY: 0.2, open: 0.08 }, look);
   const peter = fig(ctx, env, cam, PETER_FIG.A, onSeat(pose), SEAT, PY, t, { expr: { ...expr, lid: n > 0.35 ? 0.95 : expr.lid }, light: FRONT, live: 0.08 });
-  renderParts(ctx, [boulder(cam, env), peter], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0.62 });
+  renderParts(ctx, [boulder(cam, env)], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0.62 }); renderParts(ctx, [peter], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0.62 }); /* the rock first: its big facets sorted with his body painted over his chest */
   // the edge of His shadow across the chest and shoulder
   const ch = wproj(cam, env, worldJoint(PETER_FIG.A, onSeat(pose), SEAT, PY, "chest"));
-  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.globalCompositeOperation = "multiply"; const g = ctx.createLinearGradient(ch[0] - 300, ch[1] + 200, ch[0] + 100, ch[1] - 120); g.addColorStop(0, "rgba(80,90,115,0.6)"); g.addColorStop(0.7, "rgba(80,90,115,0.5)"); g.addColorStop(1, "rgba(80,90,115,0)"); ctx.fillStyle = g; ctx.fillRect(0, ch[1] - 140, env.W, env.H); ctx.restore();
+  ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); ctx.globalCompositeOperation = "multiply"; const g = ctx.createLinearGradient(ch[0] - 300, ch[1] + 200, ch[0] + 100, ch[1] - 120); g.addColorStop(0, "rgba(80,90,115,0.6)"); g.addColorStop(0.7, "rgba(80,90,115,0.5)"); g.addColorStop(1, "rgba(80,90,115,0)"); ctx.fillStyle = g; ctx.fillRect(0, 0, env.W, env.H); /* the whole frame: a rect edge drew a hard line across his chest */ ctx.restore();
   finish(ctx, env, s.abs, { bloom: 0.25, vignette: 0.34, grain: 0.07, gain: [1, 0.97, 0.9], gainAmt: 0.12 });
 };
 

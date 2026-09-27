@@ -125,7 +125,7 @@ const s115 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
 const s116 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const t = f / 30, n = prog(f, s), fear = smooth(0.05, 0.15, n) * (1 - smooth(0.25, 0.4, n)), peace = smooth(0.3, 0.5, n), up = easeInOut(clamp((n - 0.55) / 0.3)), white = smooth(0.72, 1, n);
   const P: V3 = [0, 0, 0], pose: BodyPose = { neck: { pitch: lerp(0.05, -0.45, up), roll: 0.04 * Math.sin(t * 1.3) }, bend: -0.05 * up }, face = worldJoint(PE, pose, P, 0, "face");
-  const cam = lookFrom([face[0] + 0.25, face[1] - 0.05, face[2] + 1.2], [face[0], face[1] + 0.06 * up, face[2]], lerp(1700, 1850, n), { cy: 500, cx: 960, t, shake: 0.06 });
+  const cam = lookFrom([face[0] + 0.25, face[1] - 0.05, face[2] + 1.2], [face[0], face[1] - 0.12 + 0.06 * up, face[2]], lerp(1050, 1150, n), { cy: 500, cx: 960, t, shake: 0.06 });
   begin(ctx, env);
   ctx.save(); ctx.setTransform(env.scale, 0, 0, env.scale, 0, 0); const g = ctx.createLinearGradient(0, 0, 0, env.H); g.addColorStop(0, "#9ab2cc"); g.addColorStop(0.7, "#e6d2ac"); g.addColorStop(1, "#c8a880"); ctx.fillStyle = g; ctx.fillRect(0, 0, env.W, env.H); ctx.restore();
   const L: Light = { ...LIGHTS.lateDay, key: dirView(cam, [0.75, 0.35, 0.55]), keyAmt: 1.05, fillAmt: 0.5 + 0.3 * up, rimAmt: 0.8 };
