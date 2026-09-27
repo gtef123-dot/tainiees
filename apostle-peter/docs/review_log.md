@@ -177,3 +177,12 @@ The plate cache was bounded by count (24) and thrashed on the Via Appia, repaint
   - empty frames (09.4, 09.8);
   - the 09.9 sail;
   - the 11.2 rope.
+
+## Review 4
+
+- **09.9:**
+  - *Cause of the holes:* the set sail was built twice (a front sheet and a flipped copy) on the same vertices, and the two z-fought into jagged holes.
+  - *Fix:* it is now one two-sided sheet, and reads clean against the sky.
+- **09.8:** the camera was 50 m out, and Peter was a speck on an empty green plain. It now walks with him, with an olive grove around the road and the lake behind.
+- **11.2:** the binding was five loops stacked toward the lens, which read as a spring. It is now a tight wrap.
+- **Still open:** boxy seated figures (04.2, 09.7, 10.4), flat cloaks in the seated close-ups, and the empty stage behind the preaching (09.4).

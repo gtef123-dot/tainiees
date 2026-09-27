@@ -48,7 +48,7 @@ const s112 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const L: Light = { ...LIGHTS.torchNight, key: dirView(cam, [0.6, 0.4, 0.6]), keyAmt: 1.2, fillAmt: 0.35 };
   const P2 = (p: V3) => wproj(cam, env, p);
   // the rope: coil after coil round both wrists as the soldier's hands work, then the knot and its tail
-  const coils = Math.floor(1 + 5 * tie), hw = Math.abs(wl[0] - wr[0]) / 2 + 0.028, ropeOv = Array.from({ length: coils }, (_, i) => { const z = mid[2] - 0.05 + i * 0.022, pts: V3[] = []; for (let a = 0; a <= 24; a++) { const q = (a / 24) * Math.PI * 2; pts.push([mid[0] + Math.cos(q) * hw, mid[1] + 0.01 + Math.sin(q) * 0.034, z + Math.sin(q) * 0.004]); } return rope(P2, pts, { width: Math.max(2, 0.008 * cam.scale), color: "#8a7050", t: t + i }); });
+  const coils = Math.floor(1 + 2 * tie), hw = Math.abs(wl[0] - wr[0]) / 2 + 0.028, ropeOv = Array.from({ length: coils }, (_, i) => { const z = mid[2] - 0.02 + i * 0.012, pts: V3[] = []; for (let a = 0; a <= 24; a++) { const q = (a / 24) * Math.PI * 2; pts.push([mid[0] + Math.cos(q) * hw, mid[1] + 0.01 + Math.sin(q) * 0.034, z + Math.sin(q) * 0.004]); } return rope(P2, pts, { width: Math.max(2, 0.008 * cam.scale), color: "#8a7050", t: t + i }); });
   const tail = rope(P2, [[mid[0] + hw * 0.6, mid[1] - 0.02, mid[2] + 0.04], [mid[0] + 0.08, mid[1] - 0.16, mid[2] + 0.1], [mid[0] + 0.04, mid[1] - 0.34, mid[2] + 0.16]], { width: Math.max(2, 0.008 * cam.scale), color: "#8a7050", sag: 0.05 });
   const peter = fig(ctx, env, cam, PE, pose, P, 0, t, { light: L, live: 0.05 });
   renderParts(ctx, [{ ...peter, overlays: [...peter.overlays, ...ropeOv, ...(tie > 0.95 ? [tail] : [])] }], { env, cell: 2, tol: 0.03 * cam.scale, paint: 0.6 });

@@ -190,13 +190,13 @@ const s097 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
 // very wide: a lone traveller on the coast road, small against the hills and the sea
 const s098 = (ctx: Ctx2, f: number, env: Env, s: ShotInfo) => {
   const t = f / 30, n = prog(f, s);
-  const cam = lookFrom([4, 7, 42], [0, 0.5, -4], 22, { cy: 480, cx: 960, t, pan0: 0 });
+  const cam = lookFrom([2, 1.9, 11], [0, 0.9, -4], 82, { cy: 740, cx: 960, t, pan0: 0 }); /* close enough to walk with him; the grove fills the frame */
   begin(ctx, env);
   lakeWorld(ctx, env, cam, "day", { t, mist: 0.15 });
   ground(ctx, env, cam, pebbleTex(env, 1024), { x0: -140, x1: 140, z0: -12, z1: -9, tile: [2, 2] });
   ground(ctx, env, cam, grassTex(env, "#9a9460"), { x0: -140, x1: 140, z0: -9, z1: 70, tile: [3, 3] });
   ground(ctx, env, cam, earthTex(env, "#cdb68a"), { x0: -140, x1: 140, z0: -5.2, z1: -3.8, tile: [3, 3] });
-  trees(ctx, env, cam, [{ at: [-30, 0, 2], kind: "olive", h: 5, seed: 981 }, { at: [22, 0, -1], kind: "olive", h: 4.5, seed: 982 }, { at: [-12, 0, 12], kind: "cypress", h: 9, seed: 983 }, { at: [36, 0, 8], kind: "pine", h: 11, seed: 984 }, { at: [-45, 0, 18], kind: "pine", h: 12, seed: 985 }], -1);
+  trees(ctx, env, cam, [{ at: [-14, 0, -9], kind: "olive", h: 4.2, seed: 985 }, { at: [-7, 0, -10], kind: "olive", h: 3.8, seed: 986 }, { at: [9, 0, -9.5], kind: "olive", h: 4.4, seed: 987 }, { at: [16, 0, -8], kind: "olive", h: 4, seed: 988 }, { at: [-11, 0, 1], kind: "olive", h: 4.6, seed: 989 }, { at: [12, 0, 2], kind: "olive", h: 4.3, seed: 990 }, { at: [-30, 0, 2], kind: "olive", h: 5, seed: 981 }, { at: [22, 0, -1], kind: "olive", h: 4.5, seed: 982 }, { at: [-12, 0, 12], kind: "cypress", h: 9, seed: 983 }, { at: [36, 0, 8], kind: "pine", h: 11, seed: 984 }, { at: [-45, 0, 18], kind: "pine", h: 12, seed: 985 }], -1);
   const pos: V3 = [lerp(-9, 5, n), 0, -4.5];
   renderParts(ctx, [fig(ctx, env, cam, PD, walk(t * 0.9, 1, {}), pos, Math.PI / 2, t, { light: DAY(cam), live: 0.3, paint: 0.2 })], { env, cell: 2, tol: 5, paint: 0.2 });
   finish(ctx, env, s.abs, { bloom: 0.3, vignette: 0.25, grain: 0.07, gain: [1, 0.97, 0.9], gainAmt: 0.12 });

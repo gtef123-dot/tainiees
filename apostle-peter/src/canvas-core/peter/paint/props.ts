@@ -42,7 +42,7 @@ export const boatParts = (o: Place3 & { sail?: "furled" | "none" | "set"; seed?:
       // the square sail let fall from the yard and filling: bellied forward (+x) by `fill`
       const fl = o.fill ?? 1, rows: V3[][] = [];
       for (let i = 0; i <= 8; i++) { const v = i / 8; rows.push(Array.from({ length: 9 }, (_, j) => { const u = j / 8; return [0.72 + fl * 0.9 * Math.sin(Math.PI * u) * Math.sin(Math.PI * Math.min(1, v * 1.1)) + 0.05 * Math.sin(u * 9), 4.9 - v * 3.8, lerp(-2.5, 2.5, u) * (1 - 0.06 * v)] as V3; })); }
-      const sc = (_r: number, k: number) => mix(hex("#f0e6cc"), hex("#cbbc9a"), 0.3 + 0.3 * Math.sin(k * 20)); surface(B, rows, false, sc, { flowVertical: true }); surface(B, rows, false, sc, { flowVertical: true, flip: true });
+      const sc = (_r: number, k: number) => mix(hex("#f0e6cc"), hex("#cbbc9a"), 0.3 + 0.3 * Math.sin(k * 20)); surface(B, rows, false, sc, { flowVertical: true, noCull: true }); /* one two-sided sheet: a front and a flipped copy on the same vertices z-fought into jagged holes */
       tube(B, yard, yard.map(() => 0.07), 7, () => hex("#6a5438"));
     } else tube(B, yard, yard.map((_, i) => 0.09 + 0.07 * Math.sin((i / 8) * Math.PI) + 0.02 * r()), 9, (t) => mix(hex("#b9a27c"), hex("#8f7a58"), Math.abs(t - 0.5)));
   }
