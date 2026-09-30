@@ -19,7 +19,8 @@ print('frames', len(fr), 'expected', want); ok &= len(fr) == want
 
 def src_frames(key, s, n=3):
     q_ = subprocess.run([FF, '-v', 'error', '-ss', f'{max(0.0, s - 1.5 / FPS):.4f}', '-i', os.path.join(DL, CLIPS[key]),
-                         '-frames:v', str(n), '-vf', 'scale=1920:1094,crop=1920:1080:0:7,scale=64:36,format=gray',
+                         '-frames:v', str(n), '-fps_mode', 'passthrough',
+                         '-vf', 'scale=1920:1094,crop=1920:1080:0:7,scale=64:36,format=gray',
                          '-f', 'rawvideo', '-'], capture_output=True)
     return np.frombuffer(q_.stdout, np.uint8).reshape(-1, 64 * 36).astype(np.float32)
 

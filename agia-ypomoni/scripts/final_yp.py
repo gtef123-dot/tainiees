@@ -2,7 +2,9 @@
   * out/Agia Ypomoni - edit Claude.mp4          1080p24, the -16 LUFS mix; two-pass x264 sized to stay under GitHub's
                                                 100 MB file limit (CRF 17 if that is already smaller)
   * out/Agia Ypomoni - edit Claude (kinito).mp4  720p, under 25 MB, for the phone
-Usage: final_yp.py [--dry] [--no-master] [--two-pass]
+Usage: final_yp.py [--dry] [--no-master] [--two-pass] [--crf N]
+  --crf N   also writes a heavier film at CRF N with no size cap ("... (CRF N).mp4"), for uploading from a PC;
+            it is too big for GitHub (CRF 17 is about 245 MB for this film), so keep it out of git
 """
 import sys
 from plan_yp import *
@@ -84,7 +86,17 @@ def encode_phone(target_mb=23.0):
     print(f'phone copy: {os.path.getsize(PHONE) / 1e6:.1f} MB ({kbps} kb/s)', flush=True)
 
 
+def encode_crf(crf):
+    out = FILM.replace('.mp4', f' (CRF {crf}).mp4')
+    run(['-i', MASTER, '-i', MIX, '-map', '0:v', '-map', '1:a', '-c:v', 'libx264', '-preset', 'slow', '-crf', str(crf),
+         '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-r', '24', '-g', '48'] + BT709 +
+        ['-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart', out])
+    print(f'film at CRF {crf}: {os.path.getsize(out) / 1e6:.1f} MB -> {out}', flush=True)
+
+
 if __name__ == '__main__':
+    if '--crf' in sys.argv:
+        encode_crf(int(sys.argv[sys.argv.index('--crf') + 1])); sys.exit()
     if '--dry' in sys.argv:
         print(join_graph()[0].replace(';', ';\n')); sys.exit()
     if '--no-master' not in sys.argv:
