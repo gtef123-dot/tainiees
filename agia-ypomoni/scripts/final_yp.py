@@ -2,7 +2,7 @@
   * out/Agia Ypomoni - edit Claude.mp4          1080p24, the -16 LUFS mix; two-pass x264 sized to stay under GitHub's
                                                 100 MB file limit (CRF 17 if that is already smaller)
   * out/Agia Ypomoni - edit Claude (kinito).mp4  720p, under 25 MB, for the phone
-Usage: final_yp.py [--dry] [--no-master]
+Usage: final_yp.py [--dry] [--no-master] [--two-pass]
 """
 import sys
 from plan_yp import *
@@ -60,8 +60,13 @@ def two_pass(src, out, vf, kbps, audio_kbps, preset='slow', extra=()):
     run(common + ['-pass', '2', '-c:a', 'aac', '-b:a', f'{audio_kbps}k', '-ar', '48000', '-movflags', '+faststart', out])
 
 
-def encode_film(limit_mb=95.0, target_mb=92.0):
+def encode_film(limit_mb=95.0, target_mb=92.0, try_crf=True):
     os.makedirs(OUT, exist_ok=True)
+    if not try_crf:                               # known to be too big at CRF 17 (this film: 245+ MB)
+        kbps = int((target_mb * 8e6 / END - 256e3) / 1000)
+        two_pass(MASTER, FILM, None, kbps, 256)
+        print(f'film two-pass at {kbps} kb/s: {os.path.getsize(FILM) / 1e6:.1f} MB', flush=True)
+        return
     run(['-i', MASTER, '-i', MIX, '-map', '0:v', '-map', '1:a', '-c:v', 'libx264', '-preset', 'slow', '-crf', '17',
          '-profile:v', 'high', '-pix_fmt', 'yuv420p', '-r', '24', '-g', '48'] + BT709 +
         ['-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart', FILM])
@@ -84,5 +89,5 @@ if __name__ == '__main__':
         print(join_graph()[0].replace(';', ';\n')); sys.exit()
     if '--no-master' not in sys.argv:
         make_master()
-    encode_film()
+    encode_film(try_crf='--two-pass' not in sys.argv)
     encode_phone()

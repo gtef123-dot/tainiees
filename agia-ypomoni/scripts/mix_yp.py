@@ -136,11 +136,24 @@ for n in ORDER:
 # the four scenes that speak English: pads from their neighbours' music, overlapping the dissolves
 PADS = {'E': ('D', 2.5, 6.0, 'D major, 04'), 'G': ('F', 5.0, 10.04, 'E-flat, 06'), 'H': ('I', 2.5, 10.04, 'E-flat, 09'),
         'L': ('M', 2.5, 10.04, 'C minor / E-flat, 13')}
+# 06 and 09 open near silence (8-12 dB under their own music for 3-5 s): the pad before each runs on over that opening
+PAD_TAIL = {'E': 4.0, 'H': 3.0}
 for k, (n, (src, a, b, what)) in enumerate(PADS.items()):
     t0, t1 = WIN[n]
-    t0, t1 = t0 - 0.35, t1 + 0.35
+    tail = PAD_TAIL.get(n, 0.0)
+    t0, t1 = t0 - 0.35, t1 + 0.35 + tail
     x = paulstretch(seg(C[src], a, b), t1 - t0, seed=k + 1)
-    bed(f'{n} pad ({what})', x, t0, BED_T - 1.0, 1.1, 1.1, lufs_ref=x)
+    bed(f'{n} pad ({what})' + (f', on {tail:.1f} s into {ORDER[ORDER.index(n) + 1]}' if tail else ''), x, t0, BED_T - 1.0,
+        1.1, 2.6 if tail else 1.1, lufs_ref=x)
+
+# 10 and 11 open 10-15 dB under their own music for 3-5 s: a bridge of the previous clip's music (same key) carries
+# the carpet over the opening and fades as the clip's own music comes in
+BRIDGES = {'J': ('I', 5.0, 10.04, 5.0, 'E-flat, 09'), 'K': ('J', 10.0, 15.04, 7.5, 'E-flat, 10')}
+for k, (n, (src, a, b, into, what)) in enumerate(BRIDGES.items()):
+    s0 = span(ORDER[ORDER.index(n) - 1] + n)[0] - 0.3
+    t1 = WIN[n][0] + into
+    x = paulstretch(seg(C[src], a, b), t1 - s0, seed=11 + k)
+    bed(f'{n} bridge ({what})', x, s0, BED_T - 2.0, 0.9, 3.0, lufs_ref=x)
 
 # ------------------------------------------------------------------ master
 head = np.clip(np.arange(NS) / SR / FADE_IN, 0, 1)[:, None]

@@ -1,7 +1,7 @@
 """Render the TikTok parts of the «Αγία Υπομονή» film: 1080x1920, 24 fps, -14 LUFS / -1 dBFS, a cover per part.
 Each part is encoded two-pass to stay under 25 MB, small enough to send straight to the phone (TikTok re-encodes
 everything it gets anyway); --master also keeps a CRF 18 master of every part in out/tiktok/master.
-Usage: tiktok_render_yp.py [--master] [part numbers...]
+Usage: tiktok_render_yp.py [--master | --covers] [part numbers...]
 """
 import sys, wave
 import numpy as np
@@ -228,8 +228,9 @@ def render_cover(i):
 
 
 if __name__ == '__main__':
-    keep = '--master' in sys.argv
-    which = [int(a) - 1 for a in sys.argv[1:] if a != '--master'] or list(range(NP))
+    keep, covers_only = '--master' in sys.argv, '--covers' in sys.argv
+    which = [int(a) - 1 for a in sys.argv[1:] if not a.startswith('--')] or list(range(NP))
     for i in which:
         render_cover(i)
-        render_part(i, keep)
+        if not covers_only:
+            render_part(i, keep)

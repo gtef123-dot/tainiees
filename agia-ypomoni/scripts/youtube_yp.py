@@ -15,9 +15,12 @@ PAL, PALB = os.path.join(FONTS, 'P052-Roman.otf'), os.path.join(FONTS, 'P052-Bol
 GOLD = (232, 199, 122)
 
 
-def frame(t):
+def frame(t, crop=(0, 0, 1920, 1080)):
+    """The master's frame at t, cropped (x, y, w, h in 1080p pixels) and scaled to 1280x720."""
+    x, y, w, h = crop
     p = subprocess.run([FF, '-v', 'error', '-ss', f'{t:.3f}', '-i', os.path.join(R, 'final_master.mp4'), '-frames:v', '1',
-                        '-vf', 'scale=in_color_matrix=bt709:in_range=tv:out_range=pc,scale=1280:720:flags=lanczos,format=rgb24',
+                        '-vf', f'crop={w}:{h}:{x}:{y},scale=in_color_matrix=bt709:in_range=tv:out_range=pc,'
+                               f'scale=1280:720:flags=lanczos,format=rgb24',
                         '-f', 'rawvideo', '-'], capture_output=True, check=True)
     return Image.fromarray(np.frombuffer(p.stdout, np.uint8).reshape(720, 1280, 3).copy())
 
@@ -30,8 +33,8 @@ def text_with_shadow(im, xy, text, font, fill, anchor, blur=10, dark=210):
     ImageDraw.Draw(im).text(xy, text, font=font, fill=fill, anchor=anchor)
 
 
-def thumbnail(t):
-    im = frame(t)
+def thumbnail(t, crop=(0, 35, 1371, 771)):
+    im = frame(t, crop)          # 1.4x: her face lands in the right half, the title sits on the crowd at the left
     # a soft dark band on the left for the title, the picture stays untouched on the right
     a = np.asarray(im, np.float32)
     x = np.arange(1280, dtype=np.float32)
@@ -42,7 +45,7 @@ def thumbnail(t):
     text_with_shadow(im, (64, 400), 'ΥΠΟΜΟΝΗ', f1, GOLD, 'ls')
     text_with_shadow(im, (68, 486), 'Η αυτοκράτειρα', f2, (255, 255, 255), 'ls', blur=8)
     text_with_shadow(im, (68, 556), 'που έγινε μοναχή', f2, (255, 255, 255), 'ls', blur=8)
-    text_with_shadow(im, (70, 640), 'Ελένη Δραγάση  ·  1372–1450', f3, (235, 225, 205), 'ls', blur=6)
+    text_with_shadow(im, (70, 640), 'Ελένη Δραγάση  ·  περ. 1372–1450', f3, (235, 225, 205), 'ls', blur=6)
     path = os.path.join(OUTD, 'thumbnail.jpg')
     im.save(path, quality=92)
     print('wrote', path, f'{os.path.getsize(path) / 1e6:.2f} MB')

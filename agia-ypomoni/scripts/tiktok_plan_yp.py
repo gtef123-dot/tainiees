@@ -34,7 +34,7 @@ def tl(scene, src):
     return t0 + (src - a) * (t1 - t0) / (b - a)
 
 # a strong frame of each part for its cover (scene, source second)
-COVER_T = [tl('A', 11.2), tl('E', 8.3), tl('G', 7.0), tl('J', 13.2), tl('L', 14.2)]
+COVER_T = [tl('B', 3.0), tl('E', 8.3), tl('G', 7.0), tl('J', 13.2), tl('L', 14.2)]
 
 # horizontal centre (1080p x) of the 1:1 window, per scene, keyed on the clip's own seconds; smooth between keys
 SCENE_KEYS = {
